@@ -1,0 +1,429 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C294F8E627FCF9A6002B6550 /* bone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8CC27FCF9A6002B6550 /* bone.cpp */; };
+		C294F8E727FCF9A6002B6550 /* geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8CD27FCF9A6002B6550 /* geometry.cpp */; };
+		C294F8E827FCF9A6002B6550 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8CE27FCF9A6002B6550 /* input.cpp */; };
+		C294F8E927FCF9A6002B6550 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8CF27FCF9A6002B6550 /* image.cpp */; };
+		C294F8EA27FCF9A6002B6550 /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8D027FCF9A6002B6550 /* core.cpp */; };
+		C294F8EB27FCF9A6002B6550 /* node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8D227FCF9A6002B6550 /* node.cpp */; };
+		C294F8EC27FCF9A6002B6550 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8D327FCF9A6002B6550 /* texture.cpp */; };
+		C294F8ED27FCF9A6002B6550 /* shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8D527FCF9A6002B6550 /* shader.cpp */; };
+		C294F8EE27FCF9A6002B6550 /* animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8D627FCF9A6002B6550 /* animation.cpp */; };
+		C294F8EF27FCF9A6002B6550 /* animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8D927FCF9A6002B6550 /* animator.cpp */; };
+		C294F8F027FCF9A6002B6550 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8E527FCF9A6002B6550 /* main.cpp */; };
+		C294F8F527FCFB19002B6550 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C294F8F427FCFB19002B6550 /* OpenGL.framework */; };
+		C294F8F727FCFB22002B6550 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C294F8F627FCFB22002B6550 /* libglfw.3.3.dylib */; };
+		C294F8F927FCFB27002B6550 /* libGLEW.2.2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C294F8F827FCFB27002B6550 /* libGLEW.2.2.0.dylib */; };
+		C294F8FB27FCFB2E002B6550 /* libassimp.5.2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C294F8FA27FCFB2E002B6550 /* libassimp.5.2.0.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C294F8BF27FCF903002B6550 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		C294F8C127FCF903002B6550 /* KGLEngine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KGLEngine; sourceTree = BUILT_PRODUCTS_DIR; };
+		C294F8CC27FCF9A6002B6550 /* bone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bone.cpp; sourceTree = "<group>"; };
+		C294F8CD27FCF9A6002B6550 /* geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geometry.cpp; sourceTree = "<group>"; };
+		C294F8CE27FCF9A6002B6550 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
+		C294F8CF27FCF9A6002B6550 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image.cpp; sourceTree = "<group>"; };
+		C294F8D027FCF9A6002B6550 /* core.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = core.cpp; sourceTree = "<group>"; };
+		C294F8D127FCF9A6002B6550 /* animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = animation.hpp; sourceTree = "<group>"; };
+		C294F8D227FCF9A6002B6550 /* node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = node.cpp; sourceTree = "<group>"; };
+		C294F8D327FCF9A6002B6550 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
+		C294F8D427FCF9A6002B6550 /* animator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = animator.hpp; sourceTree = "<group>"; };
+		C294F8D527FCF9A6002B6550 /* shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shader.cpp; sourceTree = "<group>"; };
+		C294F8D627FCF9A6002B6550 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
+		C294F8D727FCF9A6002B6550 /* node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = node.hpp; sourceTree = "<group>"; };
+		C294F8D827FCF9A6002B6550 /* texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = texture.hpp; sourceTree = "<group>"; };
+		C294F8D927FCF9A6002B6550 /* animator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animator.cpp; sourceTree = "<group>"; };
+		C294F8DA27FCF9A6002B6550 /* shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = shader.hpp; sourceTree = "<group>"; };
+		C294F8DB27FCF9A6002B6550 /* bone.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bone.hpp; sourceTree = "<group>"; };
+		C294F8DC27FCF9A6002B6550 /* geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = geometry.hpp; sourceTree = "<group>"; };
+		C294F8DD27FCF9A6002B6550 /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = input.hpp; sourceTree = "<group>"; };
+		C294F8DF27FCF9A6002B6550 /* keys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = keys.h; sourceTree = "<group>"; };
+		C294F8E027FCF9A6002B6550 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
+		C294F8E127FCF9A6002B6550 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		C294F8E227FCF9A6002B6550 /* assimp_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = assimp_helper.h; sourceTree = "<group>"; };
+		C294F8E327FCF9A6002B6550 /* image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = image.hpp; sourceTree = "<group>"; };
+		C294F8E427FCF9A6002B6550 /* core.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = core.hpp; sourceTree = "<group>"; };
+		C294F8E527FCF9A6002B6550 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C294F8F127FCFA37002B6550 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
+		C294F8F427FCFB19002B6550 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		C294F8F627FCFB22002B6550 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../opt/homebrew/Cellar/glfw/3.3.6/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
+		C294F8F827FCFB27002B6550 /* libGLEW.2.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.2.0.dylib; path = ../../../../opt/homebrew/Cellar/glew/2.2.0_1/lib/libGLEW.2.2.0.dylib; sourceTree = "<group>"; };
+		C294F8FA27FCFB2E002B6550 /* libassimp.5.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.5.2.0.dylib; path = ../../../../opt/homebrew/Cellar/assimp/5.2.3/lib/libassimp.5.2.0.dylib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C294F8BE27FCF903002B6550 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C294F8F527FCFB19002B6550 /* OpenGL.framework in Frameworks */,
+				C294F8F727FCFB22002B6550 /* libglfw.3.3.dylib in Frameworks */,
+				C294F8F927FCFB27002B6550 /* libGLEW.2.2.0.dylib in Frameworks */,
+				C294F8FB27FCFB2E002B6550 /* libassimp.5.2.0.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C294F8B827FCF903002B6550 = {
+			isa = PBXGroup;
+			children = (
+				C294F8C327FCF903002B6550 /* KGLEngine */,
+				C294F8C227FCF903002B6550 /* Products */,
+				C294F8F327FCFB19002B6550 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		C294F8C227FCF903002B6550 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C294F8C127FCF903002B6550 /* KGLEngine */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C294F8C327FCF903002B6550 /* KGLEngine */ = {
+			isa = PBXGroup;
+			children = (
+				C294F8F127FCFA37002B6550 /* Resources */,
+				C294F8CB27FCF9A6002B6550 /* KGLEngine */,
+				C294F8E527FCF9A6002B6550 /* main.cpp */,
+			);
+			path = KGLEngine;
+			sourceTree = "<group>";
+		};
+		C294F8CB27FCF9A6002B6550 /* KGLEngine */ = {
+			isa = PBXGroup;
+			children = (
+				C294F8DE27FCF9A6002B6550 /* Toolkit */,
+				C294F8E427FCF9A6002B6550 /* core.hpp */,
+				C294F8D027FCF9A6002B6550 /* core.cpp */,
+				C294F8DD27FCF9A6002B6550 /* input.hpp */,
+				C294F8CE27FCF9A6002B6550 /* input.cpp */,
+				C294F8E327FCF9A6002B6550 /* image.hpp */,
+				C294F8CF27FCF9A6002B6550 /* image.cpp */,
+				C294F8D827FCF9A6002B6550 /* texture.hpp */,
+				C294F8D327FCF9A6002B6550 /* texture.cpp */,
+				C294F8DA27FCF9A6002B6550 /* shader.hpp */,
+				C294F8D527FCF9A6002B6550 /* shader.cpp */,
+				C294F8DC27FCF9A6002B6550 /* geometry.hpp */,
+				C294F8CD27FCF9A6002B6550 /* geometry.cpp */,
+				C294F8DB27FCF9A6002B6550 /* bone.hpp */,
+				C294F8CC27FCF9A6002B6550 /* bone.cpp */,
+				C294F8D127FCF9A6002B6550 /* animation.hpp */,
+				C294F8D627FCF9A6002B6550 /* animation.cpp */,
+				C294F8D427FCF9A6002B6550 /* animator.hpp */,
+				C294F8D927FCF9A6002B6550 /* animator.cpp */,
+				C294F8D727FCF9A6002B6550 /* node.hpp */,
+				C294F8D227FCF9A6002B6550 /* node.cpp */,
+			);
+			path = KGLEngine;
+			sourceTree = "<group>";
+		};
+		C294F8DE27FCF9A6002B6550 /* Toolkit */ = {
+			isa = PBXGroup;
+			children = (
+				C294F8E127FCF9A6002B6550 /* common.h */,
+				C294F8E027FCF9A6002B6550 /* stb_image.h */,
+				C294F8E227FCF9A6002B6550 /* assimp_helper.h */,
+				C294F8DF27FCF9A6002B6550 /* keys.h */,
+			);
+			path = Toolkit;
+			sourceTree = "<group>";
+		};
+		C294F8F327FCFB19002B6550 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C294F8FA27FCFB2E002B6550 /* libassimp.5.2.0.dylib */,
+				C294F8F827FCFB27002B6550 /* libGLEW.2.2.0.dylib */,
+				C294F8F627FCFB22002B6550 /* libglfw.3.3.dylib */,
+				C294F8F427FCFB19002B6550 /* OpenGL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C294F8C027FCF903002B6550 /* KGLEngine */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C294F8C827FCF903002B6550 /* Build configuration list for PBXNativeTarget "KGLEngine" */;
+			buildPhases = (
+				C294F8F227FCFAFC002B6550 /* ShellScript */,
+				C294F8BD27FCF903002B6550 /* Sources */,
+				C294F8BE27FCF903002B6550 /* Frameworks */,
+				C294F8BF27FCF903002B6550 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KGLEngine;
+			productName = KGLEngine;
+			productReference = C294F8C127FCF903002B6550 /* KGLEngine */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C294F8B927FCF903002B6550 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1300;
+				TargetAttributes = {
+					C294F8C027FCF903002B6550 = {
+						CreatedOnToolsVersion = 13.0;
+					};
+				};
+			};
+			buildConfigurationList = C294F8BC27FCF903002B6550 /* Build configuration list for PBXProject "KGLEngine" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C294F8B827FCF903002B6550;
+			productRefGroup = C294F8C227FCF903002B6550 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C294F8C027FCF903002B6550 /* KGLEngine */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C294F8F227FCFAFC002B6550 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp -R ${PROJECT_DIR}/KGLEngine/Resources ${BUILT_PRODUCTS_DIR}\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C294F8BD27FCF903002B6550 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C294F8EF27FCF9A6002B6550 /* animator.cpp in Sources */,
+				C294F8E627FCF9A6002B6550 /* bone.cpp in Sources */,
+				C294F8E927FCF9A6002B6550 /* image.cpp in Sources */,
+				C294F8ED27FCF9A6002B6550 /* shader.cpp in Sources */,
+				C294F8F027FCF9A6002B6550 /* main.cpp in Sources */,
+				C294F8E727FCF9A6002B6550 /* geometry.cpp in Sources */,
+				C294F8EE27FCF9A6002B6550 /* animation.cpp in Sources */,
+				C294F8EA27FCF9A6002B6550 /* core.cpp in Sources */,
+				C294F8EC27FCF9A6002B6550 /* texture.cpp in Sources */,
+				C294F8E827FCF9A6002B6550 /* input.cpp in Sources */,
+				C294F8EB27FCF9A6002B6550 /* node.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C294F8C627FCF903002B6550 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		C294F8C727FCF903002B6550 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		C294F8C927FCF903002B6550 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = "\"/opt/homebrew/include/\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"/opt/homebrew/Cellar/glfw/3.3.6/lib\"",
+					"\"/opt/homebrew/Cellar/glew/2.2.0_1/lib\"",
+					"\"/opt/homebrew/Cellar/glm/0.9.9.8/lib\"",
+					"\"/opt/homebrew/Cellar/assimp/5.2.3/lib\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
+			};
+			name = Debug;
+		};
+		C294F8CA27FCF903002B6550 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = "\"/opt/homebrew/include/\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"/opt/homebrew/Cellar/glfw/3.3.6/lib\"",
+					"\"/opt/homebrew/Cellar/glew/2.2.0_1/lib\"",
+					"\"/opt/homebrew/Cellar/glm/0.9.9.8/lib\"",
+					"\"/opt/homebrew/Cellar/assimp/5.2.3/lib\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C294F8BC27FCF903002B6550 /* Build configuration list for PBXProject "KGLEngine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C294F8C627FCF903002B6550 /* Debug */,
+				C294F8C727FCF903002B6550 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C294F8C827FCF903002B6550 /* Build configuration list for PBXNativeTarget "KGLEngine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C294F8C927FCF903002B6550 /* Debug */,
+				C294F8CA27FCF903002B6550 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C294F8B927FCF903002B6550 /* Project object */;
+}
