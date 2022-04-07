@@ -1,12 +1,13 @@
 // Developed by Kelin.Lyu.
 #include "texture.hpp"
-Texture::Texture(string file, GLint wrapMode) {
+Texture::Texture(string file, GLint wrapMode, float maxAnisotropy) {
     glGenTextures(1, &this->data);
     glBindTexture(GL_TEXTURE_2D, this->data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
     Image* image = new Image(file);
     GLenum format = GL_RED;
     if(image->channelCount == 3) {

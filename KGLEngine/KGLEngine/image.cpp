@@ -3,10 +3,11 @@
 #include "Toolkit/stb_image.h"
 #include "image.hpp"
 Image::Image(string file) {
-    this->data = stbi_load((Engine::main->programDirectory + file).c_str(),
+    this->data = stbi_load((Engine::main->getProgramDirectory() + file).c_str(),
                            &this->width, &this->height, &this->channelCount, 0);
     if(this->data == NULL) {
-        cout << "\nFailed to find the image: " << file << "!" << endl;
+        cout << "\nFailed to find the image: "
+             << Engine::main->getProgramDirectory() + file << "!\n" << endl;
         exit(0);
     }
 }

@@ -4,7 +4,10 @@ Engine* Engine::main;
 Engine::Engine(const char* windowTitle,
                float resolutionScaleFactor,
                bool fullscreenMode,
-               const char* iconFile) {
+               int samples,
+               const char* iconFile,
+               bool useAbsolutePaths) {
+    this->useAbsolutePaths = useAbsolutePaths;
     this->fps = 1.0f / 60.0f;
     this->currentFps = 0.0f;
     this->currentTime = 0.0f;
@@ -16,17 +19,17 @@ Engine::Engine(const char* windowTitle,
     // get the executable's location:
     char directory[1024];
     if(getcwd(directory, sizeof(directory)) == NULL) {
-        cout << "\nFailed to find the executable's location using getcwd()!" << endl;
+        cout << "\nFailed to find the executable's location using getcwd()!\n" << endl;
         exit(1);
     }
     this->programDirectory = string(directory);
     // initialize the window:
     glfwTerminate();
     if(!glfwInit()) {
-        cout << "\nFailed to initialize glfw!" << endl;
+        cout << "\nFailed to initialize glfw!\n" << endl;
         exit(1);
     }
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_SAMPLES, samples);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     if(fullscreenMode) {
         glfwWindowHint(GLFW_DECORATED, GL_FALSE);
@@ -55,7 +58,7 @@ Engine::Engine(const char* windowTitle,
     }
     glViewport(0, 0, width, height);
     if(this->window == NULL) {
-        cout << "\nFailed to initialize the glfw window!" << endl;
+        cout << "\nFailed to initialize the glfw window!\n" << endl;
         exit(1);
     }
     // set the window's icon if provided:
@@ -78,6 +81,7 @@ Engine::Engine(const char* windowTitle,
     glewExperimental = GL_TRUE;
     glewInit();
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
     this->root = new Node();
 }
 void Engine::changeResolution(float resolutionScaleFactor) {
@@ -193,6 +197,15 @@ void Engine::prepareGeometryForRendering(Geometry* geometry) {
 }
 void Engine::prepareLightNodeForRendering(LightNode* lightNode) {
     this->lightNodes.push_back(lightNode);
+}
+string Engine::getProgramDirectory() {
+    if(this->useAbsolutePaths) {
+        return("");
+    }
+    return(this->programDirectory);
+}
+vec2 Engine::getScreenResolution() {
+    return(vec2(this->screenWidth, this->screenHeight));
 }
 float Engine::getTime() {
     return(this->currentTime);

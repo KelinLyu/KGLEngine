@@ -16,6 +16,11 @@ class CameraNode;
 class LightNode;
 class Engine final {
 private:
+    bool useAbsolutePaths;
+    string programDirectory;
+    float screenWidth;
+    float screenHeight;
+    GLFWwindow* window;
     float fps;
     float currentFps;
     float currentTime;
@@ -33,17 +38,15 @@ private:
     vector<LightNode*> lightNodes;
 public:
     static Engine* main;
-    string programDirectory;
-    float screenWidth;
-    float screenHeight;
-    GLFWwindow* window;
     Input* input;
     Node* root;
     CameraNode* cameraNode;
     Engine(const char* windowTitle,
            float resolutionScaleFactor,
            bool fullscreenMode,
-           const char* iconFile);
+           int samples,
+           const char* iconFile,
+           bool useAbsolutePaths);
     void changeResolution(float resolutionScaleFactor);
     void hideCursor();
     void showCursor();
@@ -55,6 +58,8 @@ public:
     void prepareGeometryForRendering(Geometry* geometry);
     void prepareLightNodeForRendering(LightNode* lightNode);
     void render();
+    string getProgramDirectory();
+    vec2 getScreenResolution();
     float getTime();
     float getDeltaTime();
     float getCurrentFps();

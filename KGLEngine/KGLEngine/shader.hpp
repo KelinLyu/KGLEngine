@@ -7,15 +7,19 @@ class Texture;
 class Geometry;
 class Shader final {
 private:
+    int cullMode;
     void checkCompileErrors(unsigned int shader, string type);
 public:
     unsigned int programID;
     vector<Texture*> textures;
     vector<string> uniformNames;
     Shader(string shaderFile);
-    Shader(Geometry* geometry);
+    Shader(Geometry* geometryWithMissingShader);
     void addTexture(Texture* texture, string uniformName);
     void render(mat4 modelTransform);
+    void cullBack();
+    void cullFront();
+    void doubleSided();
     void setActivate();
     void setInt(const string &name, int value) const;
     void setFloat(const string &name, float value) const;

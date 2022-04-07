@@ -1,6 +1,7 @@
 // Developed by Kelin.Lyu.
 #include "shader.hpp"
 Shader::Shader(string shaderFile) {
+    this->cullMode = 0;
     // read the files:
     string vertexShaderCode;
     string fragmentShaderCode;
@@ -9,8 +10,8 @@ Shader::Shader(string shaderFile) {
     vertexShaderStream.exceptions(ifstream::failbit | ifstream::badbit);
     fragmentShaderStream.exceptions(ifstream::failbit | ifstream::badbit);
     try {
-        string vertexShaderFile = Engine::main->programDirectory + shaderFile + ".vs";
-        string fragmentShaderFile = Engine::main->programDirectory + shaderFile + ".fs";
+        string vertexShaderFile = Engine::main->getProgramDirectory() + shaderFile + ".vs";
+        string fragmentShaderFile = Engine::main->getProgramDirectory() + shaderFile + ".fs";
         vertexShaderStream.open(vertexShaderFile.c_str());
         fragmentShaderStream.open(fragmentShaderFile.c_str());
         stringstream vertexShader, fragmentShader;
@@ -21,7 +22,8 @@ Shader::Shader(string shaderFile) {
         vertexShaderCode = vertexShader.str();
         fragmentShaderCode = fragmentShader.str();
     }catch(ifstream::failure error) {
-        cout << "\nFailed to load the shaders " << shaderFile << "!" << endl;
+        cout << "\nFailed to load the shaders: "
+             << Engine::main->getProgramDirectory() + shaderFile << "!\n" << endl;
         exit(1);
     }
     const char* vertexShader = vertexShaderCode.c_str();
@@ -47,7 +49,8 @@ Shader::Shader(string shaderFile) {
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
-Shader::Shader(Geometry* geometry) {
+Shader::Shader(Geometry* geometryWithMissingShader) {
+    this->cullMode = 0;
     string vertexShaderCode = "#version 330 core\n"
     "layout (location = 0) in vec3 vertexPosition;\n"
     "struct node_data {\n"
@@ -57,7 +60,7 @@ Shader::Shader(Geometry* geometry) {
     "void main() {\n"
     "    gl_Position = node.modelViewProjectionTransform * vec4(vertexPosition, 1.0);\n"
     "}\0";
-    if(geometry->hasBones()) {
+    if(geometryWithMissingShader->hasBones()) {
         vertexShaderCode = "#version 330 core\n"
         "layout (location = 0) in vec3 vertexPosition;\n"
         "layout(location = 5) in ivec4 boneIDs;\n"
@@ -129,6 +132,15 @@ void Shader::addTexture(Texture* texture, string uniformName) {
     this->uniformNames.push_back(uniformName);
 }
 void Shader::render(mat4 modelTransform) {
+    if(this->cullMode == 0) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }else if(this->cullMode == 1) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+    }else{
+        glDisable(GL_CULL_FACE);
+    }
     mat4 viewTransform = Engine::main->cameraNode->getViewTransform();
     mat4 projectionTransform = Engine::main->cameraNode->getProjectionTransform();
     float time = Engine::main->getTime();
@@ -152,6 +164,15 @@ void Shader::render(mat4 modelTransform) {
         this->setInt(this->uniformNames[i], i);
         glBindTexture(GL_TEXTURE_2D, textures[i]->data);
     }
+}
+void Shader::cullBack() {
+    this->cullMode = 0;
+}
+void Shader::cullFront() {
+    this->cullMode = 1;
+}
+void Shader::doubleSided() {
+    this->cullMode = 2;
 }
 void Shader::setActivate() {
     glUseProgram(this->programID);

@@ -6,7 +6,7 @@
 class Texture final {
 public:
     unsigned int data;
-    Texture(string file, GLint wrapMode);
+    Texture(string file, GLint wrapMode, float maxAnisotropy);
     ~Texture();
 };
 #endif

@@ -10,9 +10,10 @@ Node::Node() {
 }
 void Node::loadGeometry(string file) {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(Engine::main->programDirectory + file, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene* scene = importer.ReadFile(Engine::main->getProgramDirectory() + file, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     if(scene == NULL || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        cout << "\nFailed to load the 3D model file: " << file << "!" << endl;
+        cout << "\nFailed to load the 3D model file: "
+             << Engine::main->getProgramDirectory() + file << "!\n" << endl;
         exit(0);
     }
     this->processNode(scene->mRootNode, scene);
@@ -137,7 +138,8 @@ CameraNode::CameraNode(float field, float near, float far) {
     this->far = far;
 }
 mat4 CameraNode::getProjectionTransform() {
-    float ratio = (float)Engine::main->screenWidth / (float)Engine::main->screenHeight;
+    vec2 resolution = Engine::main->getScreenResolution();
+    float ratio = (float)resolution.x / (float)resolution.y;
     return(perspective(this->field, ratio, this->near, this->far));
 }
 mat4 CameraNode::getViewTransform() {

@@ -13,9 +13,10 @@ Animator::Animator(string file, Node* node) {
     this->stateChangeTime = 0.0f;
     this->stateChangeBlendFactor = 0.0f;
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(Engine::main->programDirectory + file, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene* scene = importer.ReadFile(Engine::main->getProgramDirectory() + file, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     if(scene == NULL || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        cout << "\nFailed to load the animation file: " << file << "!" << endl;
+        cout << "\nFailed to load the animation file: "
+             << Engine::main->getProgramDirectory() + file << "!\n" << endl;
         exit(0);
     }
     aiAnimation* animation = scene->mAnimations[0];
