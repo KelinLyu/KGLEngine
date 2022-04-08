@@ -1,8 +1,7 @@
 // Developed by Kelin.Lyu.
 #ifndef node_hpp
 #define node_hpp
-#include "Toolkit/common.h"
-#include "core.hpp"
+#include "../core.hpp"
 #define LIGHTS_LIMIT 10
 struct Vertex;
 class Shader;
@@ -27,6 +26,7 @@ public:
     void loadUnitCube();
     void loadGeometry(string file);
     Animator* loadAnimator(string file);
+    void setShader(Shader* shader, int geometryIndex);
     void addChild(Node* node);
     void updateAnimators(mat4 parentTransform, float deltaTime);
     void updateTransform();

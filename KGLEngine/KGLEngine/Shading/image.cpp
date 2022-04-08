@@ -1,6 +1,6 @@
 // Developed by Kelin.Lyu.
 #define STB_IMAGE_IMPLEMENTATION
-#include "Toolkit/stb_image.h"
+#include "../Toolkit/stb_image.h"
 #include "image.hpp"
 Image::Image(string file) {
     this->data = stbi_load((Engine::main->getProgramDirectory() + file).c_str(),

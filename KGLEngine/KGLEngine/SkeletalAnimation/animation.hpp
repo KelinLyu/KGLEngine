@@ -1,8 +1,7 @@
 // Developed by Kelin.Lyu.
 #ifndef animation_hpp
 #define animation_hpp
-#include "Toolkit/common.h"
-#include "core.hpp"
+#include "../core.hpp"
 struct AssimpNode {
     string name;
     mat4 transform;
@@ -11,7 +10,7 @@ struct AssimpNode {
 class Bone;
 class Geometry;
 class Animator;
-class Animation {
+class Animation final {
 private:
     void processNode(AssimpNode* target, aiNode* node);
 public:

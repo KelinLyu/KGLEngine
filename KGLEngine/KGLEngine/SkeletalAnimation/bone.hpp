@@ -1,8 +1,7 @@
 // Developed by Kelin.Lyu.
 #ifndef bone_hpp
 #define bone_hpp
-#include "Toolkit/common.h"
-#include "core.hpp"
+#include "../core.hpp"
 struct BoneInfo {
     int id;
     mat4 offset;
@@ -19,7 +18,7 @@ struct KeyFrameScale {
     vec3 scale;
     float timeStamp;
 };
-class Bone {
+class Bone final {
 private:
     string name;
     mat4 transform;

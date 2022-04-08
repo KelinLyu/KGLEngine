@@ -1,8 +1,7 @@
 // Developed by Kelin.Lyu.
 #ifndef shader_hpp
 #define shader_hpp
-#include "Toolkit/common.h"
-#include "core.hpp"
+#include "../core.hpp"
 class Texture;
 class Geometry;
 class Shader final {

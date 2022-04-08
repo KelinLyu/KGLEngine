@@ -72,13 +72,15 @@ void Animator::update(float deltaTime) {
 }
 void Animator::reset() {
     this->time = 0.0f;
-    this->state = 0.0f;
+    this->state = 0;
     this->currentBlendFactor = 0.0f;
 }
 void Animator::play(float fadeIn, float fadeOut) {
     this->fadeOut = fadeOut;
     if(this->state == 1 || this->state == 2) {
         return;
+    }else if(this->state == 0) {
+        this->time = 0.0f;
     }
     if(!this->repeats) {
         this->reset();

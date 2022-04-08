@@ -6,11 +6,11 @@
 #include "image.hpp"
 #include "texture.hpp"
 #include "shader.hpp"
-#include "geometry.hpp"
-#include "node.hpp"
-#include "bone.hpp"
-#include "animation.hpp"
-#include "animator.hpp"
+#include "Geometry/geometry.hpp"
+#include "SkeletalAnimation/bone.hpp"
+#include "SkeletalAnimation/animation.hpp"
+#include "SkeletalAnimation/animator.hpp"
+#include "Node/node.hpp"
 class Node;
 class CameraNode;
 class LightNode;

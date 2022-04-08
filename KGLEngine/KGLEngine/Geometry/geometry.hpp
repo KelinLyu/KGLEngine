@@ -1,8 +1,7 @@
 // Developed by Kelin.Lyu.
 #ifndef geometry_hpp
 #define geometry_hpp
-#include "Toolkit/common.h"
-#include "core.hpp"
+#include "../core.hpp"
 #define MAX_BONE_INFLUENCE 4
 #define BONES_LIMIT 100
 struct Vertex {
@@ -19,8 +18,8 @@ struct AssimpNode;
 class Shader;
 class Animation;
 class LightNode;
-class Geometry final {
-private:
+class Geometry {
+protected:
     Shader* shader;
     vector<Vertex> vertices;
     vector<unsigned int> indices;
@@ -36,7 +35,7 @@ private:
     mat4 worldTransform;
 public:
     bool isHidden;
-    Geometry();
+    Geometry() = default;
     Geometry(aiMesh* mesh);
     void setShader(Shader* shader);
     void addAnimation(Animation* animation);
@@ -47,6 +46,15 @@ public:
     int& getBonesCount();
     void setRenderingOrder(int renderingOrder);
     int getRenderingOrder();
+    mat4 getBoneWorldTransform(string name);
     ~Geometry();
+};
+class UnitCube: public Geometry {
+public:
+    UnitCube();
+};
+class SkyBoxCube: public Geometry {
+public:
+    SkyBoxCube();
 };
 #endif

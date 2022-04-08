@@ -1,11 +1,10 @@
 // Developed by Kelin.Lyu.
 #ifndef animator_hpp
 #define animator_hpp
-#include "Toolkit/common.h"
-#include "core.hpp"
+#include "../core.hpp"
 class Node;
 class Animation;
-class Animator {
+class Animator final {
 private:
     int state;
     float time;

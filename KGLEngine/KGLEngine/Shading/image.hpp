@@ -1,8 +1,7 @@
 // Developed by Kelin.Lyu.
 #ifndef image_hpp
 #define image_hpp
-#include "Toolkit/common.h"
-#include "core.hpp"
+#include "../core.hpp"
 class Image final {
 public:
     unsigned char* data;
