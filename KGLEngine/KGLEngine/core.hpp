@@ -40,7 +40,7 @@ public:
     static Engine* main;
     Input* input;
     Node* root;
-    CameraNode* cameraNode;
+    CameraNode* camera;
     Engine(const char* windowTitle,
            float resolutionScaleFactor,
            bool fullscreenMode,

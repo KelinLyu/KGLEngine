@@ -154,10 +154,10 @@
 		C2AD2E8227FF0EE700A493D6 /* Toolkit */ = {
 			isa = PBXGroup;
 			children = (
-				C2AD2E8327FF0EE700A493D6 /* keys.h */,
-				C2AD2E8427FF0EE700A493D6 /* stb_image.h */,
 				C2AD2E8527FF0EE700A493D6 /* common.h */,
 				C2AD2E8627FF0EE700A493D6 /* assimp_helper.h */,
+				C2AD2E8327FF0EE700A493D6 /* keys.h */,
+				C2AD2E8427FF0EE700A493D6 /* stb_image.h */,
 			);
 			path = Toolkit;
 			sourceTree = "<group>";

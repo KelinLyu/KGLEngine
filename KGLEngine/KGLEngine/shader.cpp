@@ -141,8 +141,8 @@ void Shader::render(mat4 modelTransform) {
     }else{
         glDisable(GL_CULL_FACE);
     }
-    mat4 viewTransform = Engine::main->cameraNode->getViewTransform();
-    mat4 projectionTransform = Engine::main->cameraNode->getProjectionTransform();
+    mat4 viewTransform = Engine::main->camera->getViewTransform();
+    mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
     float time = Engine::main->getTime();
     this->setMat4("frame.viewTransform", viewTransform);
     this->setMat4("frame.inverseViewTransform", inverse(viewTransform));
@@ -152,6 +152,9 @@ void Shader::render(mat4 modelTransform) {
     this->setMat4("frame.inverseViewProjectionTransform", inverse(projectionTransform * viewTransform));
     this->setFloat("frame.time", time);
     this->setFloat("frame.random", linearRand(0.0f, 1.0f));
+    this->setVec3("frame.cameraPosition", Engine::main->camera->getWorldPosition());
+    this->setVec3("frame.cameraDirection", Engine::main->camera->getFrontVectorInWorld());
+    this->setMat4("frame.cameraTransform", Engine::main->camera->getWorldTransform());
     this->setMat4("node.modelTransform", modelTransform);
     this->setMat4("node.inverseModelTransform", inverse(modelTransform));
     this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));

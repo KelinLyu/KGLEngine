@@ -181,14 +181,16 @@ bool Engine::shouldUpdate() {
 void Engine::render() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    this->geometries.clear();
-    this->lightNodes.clear();
-    this->root->prepareForRendering(mat4(1.0f));
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        this->geometries[i]->render(&this->lightNodes);
+    if(this->camera != NULL) {
+        this->geometries.clear();
+        this->lightNodes.clear();
+        this->root->prepareForRendering(mat4(1.0f));
+        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+            this->geometries[i]->render(&this->lightNodes);
+        }
+        this->geometries.clear();
+        this->lightNodes.clear();
     }
-    this->geometries.clear();
-    this->lightNodes.clear();
     glfwSwapInterval(1);
     glfwSwapBuffers(this->window);
 }
@@ -222,4 +224,8 @@ void Engine::terminate() {
 Engine::~Engine() {
     glfwTerminate();
     delete(this->input);
+    delete(this->root);
+    this->root = NULL;
+    this->camera = NULL;
+    Engine::main = NULL;
 }
