@@ -36,6 +36,7 @@ private:
     mat4 worldTransform;
 public:
     bool isHidden;
+    Geometry();
     Geometry(aiMesh* mesh);
     void setShader(Shader* shader);
     void addAnimation(Animation* animation);

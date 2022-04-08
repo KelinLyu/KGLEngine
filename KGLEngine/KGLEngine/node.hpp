@@ -24,6 +24,7 @@ public:
     Node* parent;
     bool isHidden;
     Node();
+    void loadUnitCube();
     void loadGeometry(string file);
     Animator* loadAnimator(string file);
     void addChild(Node* node);

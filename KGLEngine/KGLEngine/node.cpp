@@ -8,6 +8,9 @@ Node::Node() {
     this->parent = NULL;
     this->isHidden = false;
 }
+void Node::loadUnitCube() {
+    this->geometries.push_back(new Geometry());
+}
 void Node::loadGeometry(string file) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(Engine::main->getProgramDirectory() + file, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
