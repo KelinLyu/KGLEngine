@@ -40,6 +40,7 @@ public:
     void setShader(Shader* shader);
     void addAnimation(Animation* animation);
     void update(mat4 worldTransform);
+    void prepareForRendering();
     void render(vector<LightNode*>* lights);
     bool hasBones();
     map<string, BoneInfo>& getBonesInfoMap();

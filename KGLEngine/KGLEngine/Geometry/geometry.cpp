@@ -65,7 +65,7 @@ Geometry::Geometry(aiMesh* mesh) {
         }
         this->boneTransforms.reserve(BONES_LIMIT);
         for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
-            this->boneTransforms.push_back(mat4(1.0f));
+            this->boneTransforms.push_back(mat4(0.0f));
         }
     }
     this->vertices = vertices;
@@ -105,21 +105,25 @@ void Geometry::addAnimation(Animation* animation) {
 }
 void Geometry::update(mat4 worldTransform) {
     this->worldTransform = worldTransform;
-    Engine::main->prepareGeometryForRendering(this);
+    if(this->hasBones()) {
+        if(this->animations.size() > 0) {
+            this->calculateBoneTransforms(this->animations[0]->assimpRootNode, mat4(1.0f), true);
+        }
+    }
 }
-void Geometry::render(vector<LightNode*>* lights) {
+void Geometry::prepareForRendering() {
     if(this->isHidden) {
         return;
     }
     if(this->shader == NULL) {
         this->setShader(new Shader(this));
     }
+    Engine::main->prepareGeometryForRendering(this);
+}
+void Geometry::render(vector<LightNode*>* lights) {
     this->shader->setActivate();
     if(this->hasBones()) {
         this->shader->setInt("hasBones", 1);
-        if(this->animations.size() > 0) {
-            this->calculateBoneTransforms(this->animations[0]->assimpRootNode, mat4(1.0f), true);
-        }
         for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
             this->shader->setMat4("boneTransforms[" + to_string(i) + "]", boneTransforms[i]);
         }
@@ -200,9 +204,15 @@ int Geometry::getRenderingOrder() {
 }
 mat4 Geometry::getBoneWorldTransform(string name) {
     if(this->hasBones()) {
-        
+        if(this->bonesInfoMap.find(name) != this->bonesInfoMap.end()) {
+            int index = this->bonesInfoMap[name].id;
+            mat4 transform = this->boneTransforms[index];
+            if(transform != mat4(0.0f)) {
+                mat4 offset = this->bonesInfoMap[name].offset;
+                return(this->worldTransform * transform * inverse(offset));
+            }
+        }
     }
-    
     return(mat4(0.0f));
 }
 Geometry::~Geometry() {

@@ -26,9 +26,8 @@ public:
     void loadUnitCube();
     void loadGeometry(string file);
     Animator* loadAnimator(string file);
-    void setShader(Shader* shader, int geometryIndex);
     void addChild(Node* node);
-    void updateAnimators(mat4 parentTransform, float deltaTime);
+    void update(mat4 parentTransform, float deltaTime);
     void updateTransform();
     void prepareForRendering(mat4 parentTransform);
     void calculateWorldTransform(mat4 parentTransform);
@@ -42,7 +41,8 @@ public:
     vec3 getRightVectorInWorld();
     vec3 getUpVectorInWorld();
     vec3 getDownVectorInWorld();
-    void setRenderingOrder(int renderingOrder);
+    mat4 getBoneWorldTransform(string boneName);
+    void stickToBoneOfNode(string boneName, Node* node, bool keepOriginalScale);
     ~Node();
 };
 class CameraNode: public Node {

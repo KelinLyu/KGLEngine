@@ -26,24 +26,22 @@ Animator* Node::loadAnimator(string file) {
     this->animators.push_back(animator);
     return(animator);
 }
-void Node::setShader(Shader* shader, int geometryIndex) {
-    if(0 <= geometryIndex && geometryIndex < this->geometries.size()) {
-        this->geometries[geometryIndex]->setShader(shader);
-    }
-}
 void Node::addChild(Node* node) {
     this->children.push_back(node);
     node->parent = this;
 }
-void Node::updateAnimators(mat4 parentTransform, float deltaTime) {
+void Node::update(mat4 parentTransform, float deltaTime) {
     this->calculateWorldTransform(parentTransform);
     if(this->animators.size() > 0) {
         for(unsigned int i = 0; i < this->animators.size(); i += 1) {
             this->animators[i]->update(deltaTime);
         }
     }
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        this->geometries[i]->update(this->worldTransform);
+    }
     for(unsigned int i = 0; i < this->children.size(); i += 1) {
-        this->children[i]->updateAnimators(this->worldTransform, deltaTime);
+        this->children[i]->update(this->worldTransform, deltaTime);
     }
 }
 void Node::updateTransform() {
@@ -59,6 +57,9 @@ void Node::prepareForRendering(mat4 parentTransform) {
         return;
     }
     this->calculateWorldTransform(parentTransform);
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        this->geometries[i]->prepareForRendering();
+    }
     if(this->classType == "LightNode") {
         LightNode* lightNode = static_cast<LightNode*>(this);
         Engine::main->prepareLightNodeForRendering(lightNode);
@@ -121,9 +122,25 @@ vec3 Node::getUpVectorInWorld() {
 vec3 Node::getDownVectorInWorld() {
     return(this->convertLocalVectorToWorld(vec3(0.0f, -1.0f, 0.0f)));
 }
-void Node::setRenderingOrder(int renderingOrder) {
+mat4 Node::getBoneWorldTransform(string boneName) {
+    mat4 result = mat4(0.0f);
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        this->geometries[i]->setRenderingOrder(renderingOrder);
+        result = this->geometries[i]->getBoneWorldTransform(boneName);
+        if(result != mat4(0.0f)) {
+            return(result);
+        }
+    }
+    return(result);
+}
+void Node::stickToBoneOfNode(string boneName, Node *node, bool keepOriginalScale) {
+    mat4 transform = node->getBoneWorldTransform(boneName);
+    if(this->parent != NULL) {
+        transform = inverse(this->parent->worldTransform) * transform;
+        this->position = vec3(transform[3][0], transform[3][1], transform[3][2]);
+        float x, y, z;
+        glm::extractEulerAngleXYZ(transform, x, y, z);
+        this->eulerAngles = vec3(degrees(x), degrees(y), degrees(z));
+        this->updateTransform();
     }
 }
 Node::~Node() {

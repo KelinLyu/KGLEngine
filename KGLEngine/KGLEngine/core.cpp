@@ -172,7 +172,7 @@ bool Engine::shouldUpdate() {
     this->currentFps = 1.0f / deltaTime;
     if(this->deltaTime >= this->fps) {
         this->input->update();
-        this->root->updateAnimators(mat4(1.0f), this->deltaTime);
+        this->root->update(mat4(1.0f), this->deltaTime);
         this->updateTime = this->currentTime;
         result = true;
     }
