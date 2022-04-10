@@ -80,9 +80,11 @@ Engine::Engine(const char* windowTitle,
     // initialize glew:
     glewExperimental = GL_TRUE;
     glewInit();
-    glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST);
     this->root = new Node();
+    this->camera = NULL;
+    this->skybox = NULL;
 }
 void Engine::changeResolution(float resolutionScaleFactor) {
     int width = (int)(this->screenWidth * resolutionScaleFactor);
@@ -185,6 +187,9 @@ void Engine::render() {
         this->geometries.clear();
         this->lightNodes.clear();
         this->root->prepareForRendering(mat4(1.0f));
+        if(this->skybox != NULL) {
+            this->skybox->render();
+        }
         for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
             this->geometries[i]->render(&this->lightNodes);
         }
@@ -195,6 +200,12 @@ void Engine::render() {
     glfwSwapBuffers(this->window);
 }
 void Engine::prepareGeometryForRendering(Geometry* geometry) {
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        if(this->geometries[i]->renderingOrder > geometry->renderingOrder) {
+            this->geometries.insert(this->geometries.begin() + i, geometry);
+            return;
+        }
+    }
     this->geometries.push_back(geometry);
 }
 void Engine::prepareLightNodeForRendering(LightNode* lightNode) {

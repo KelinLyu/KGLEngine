@@ -1,7 +1,34 @@
 // Developed by Kelin.Lyu.
 #include "shader.hpp"
+void Shader::compileShaders(string vertexShaderCode, string fragmentShaderCode) {
+    this->blendMode = 0;
+    const char* vertexShader = vertexShaderCode.c_str();
+    const char* fragmentShader = fragmentShaderCode.c_str();
+    // compile the vertex shader:
+    unsigned int vertex;
+    vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vertexShader, NULL);
+    glCompileShader(vertex);
+    checkCompileErrors(vertex, "VERTEX");
+    // compile the fragment shader:
+    unsigned int fragment;
+    fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fragmentShader, NULL);
+    glCompileShader(fragment);
+    checkCompileErrors(fragment, "FRAGMENT");
+    // create the shader Program:
+    this->programID = glCreateProgram();
+    glAttachShader(this->programID, vertex);
+    glAttachShader(this->programID, fragment);
+    glLinkProgram(this->programID);
+    checkCompileErrors(this->programID, "PROGRAM");
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+}
+Shader::Shader(string vertexShaderCode, string fragmentShaderCode) {
+    this->compileShaders(vertexShaderCode, fragmentShaderCode);
+}
 Shader::Shader(string shaderFile) {
-    this->cullMode = 0;
     // read the files:
     string vertexShaderCode;
     string fragmentShaderCode;
@@ -26,31 +53,9 @@ Shader::Shader(string shaderFile) {
              << Engine::main->getProgramDirectory() + shaderFile << "!\n" << endl;
         exit(1);
     }
-    const char* vertexShader = vertexShaderCode.c_str();
-    const char* fragmentShader = fragmentShaderCode.c_str();
-    // compile the vertex shader:
-    unsigned int vertex;
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vertexShader, NULL);
-    glCompileShader(vertex);
-    checkCompileErrors(vertex, "VERTEX");
-    // compile the fragment shader:
-    unsigned int fragment;
-    fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fragmentShader, NULL);
-    glCompileShader(fragment);
-    checkCompileErrors(fragment, "FRAGMENT");
-    // create the shader Program:
-    this->programID = glCreateProgram();
-    glAttachShader(this->programID, vertex);
-    glAttachShader(this->programID, fragment);
-    glLinkProgram(this->programID);
-    checkCompileErrors(this->programID, "PROGRAM");
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    this->compileShaders(vertexShaderCode, fragmentShaderCode);
 }
 Shader::Shader(Geometry* geometryWithMissingShader) {
-    this->cullMode = 0;
     string vertexShaderCode = "#version 330 core\n"
     "layout (location = 0) in vec3 vertexPosition;\n"
     "struct node_data {\n"
@@ -70,7 +75,7 @@ Shader::Shader(Geometry* geometryWithMissingShader) {
         "};\n"
         "uniform node_data node;\n"
         "const int MAX_BONE_INFLUENCE = 4;\n"
-        "const int BONES_LIMIT = 100;\n"
+        "const int BONES_LIMIT = 120;\n"
         "uniform mat4 boneTransforms[BONES_LIMIT];\n"
         "void main() {\n"
         "    vec4 position = vec4(0.0f);\n"
@@ -104,42 +109,24 @@ Shader::Shader(Geometry* geometryWithMissingShader) {
     "        color = vec4(0.0f, 0.0f, 1.0f, 1.0f);\n"
     "    }\n"
     "}\n\0";
-    const char* vertexShader = vertexShaderCode.c_str();
-    const char* fragmentShader = fragmentShaderCode.c_str();
-    // compile the vertex shader:
-    unsigned int vertex;
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vertexShader, NULL);
-    glCompileShader(vertex);
-    checkCompileErrors(vertex, "VERTEX");
-    // compile the fragment shader:
-    unsigned int fragment;
-    fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fragmentShader, NULL);
-    glCompileShader(fragment);
-    checkCompileErrors(fragment, "FRAGMENT");
-    // create the shader Program:
-    this->programID = glCreateProgram();
-    glAttachShader(this->programID, vertex);
-    glAttachShader(this->programID, fragment);
-    glLinkProgram(this->programID);
-    checkCompileErrors(this->programID, "PROGRAM");
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    this->compileShaders(vertexShaderCode, fragmentShaderCode);
 }
 void Shader::addTexture(Texture* texture, string uniformName) {
     this->textures.push_back(texture);
     this->uniformNames.push_back(uniformName);
+    this->setActivate();
+    int i = (int)this->textures.size() - 1;
+    this->setInt(this->uniformNames[i], i);
 }
 void Shader::render(mat4 modelTransform) {
-    if(this->cullMode == 0) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-    }else if(this->cullMode == 1) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-    }else{
-        glDisable(GL_CULL_FACE);
+    if(this->blendMode == 0) {
+        glDisable(GL_BLEND);
+    }else if(this->blendMode == 1) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    }else if(this->blendMode == 2) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
     mat4 viewTransform = Engine::main->camera->getViewTransform();
     mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
@@ -164,44 +151,54 @@ void Shader::render(mat4 modelTransform) {
     this->setMat4("node.inverseModelViewProjectionTransform", inverse(projectionTransform * viewTransform * modelTransform));
     for(unsigned int i = 0; i < this->textures.size(); i += 1) {
         glActiveTexture(GL_TEXTURE0 + i);
-        this->setInt(this->uniformNames[i], i);
         glBindTexture(GL_TEXTURE_2D, textures[i]->data);
     }
 }
-void Shader::cullBack() {
-    this->cullMode = 0;
+void Shader::setOpaque() {
+    this->blendMode = 0;
 }
-void Shader::cullFront() {
-    this->cullMode = 1;
+void Shader::setAdditive() {
+    this->blendMode = 1;
 }
-void Shader::doubleSided() {
-    this->cullMode = 2;
+void Shader::setSemitransparent() {
+    this->blendMode = 2;
 }
-void Shader::setActivate() {
-    glUseProgram(this->programID);
+void Shader::setActivate() const {
+    if(Engine::main->currentShaderProgramID != this->programID) {
+        Engine::main->currentShaderProgramID = this->programID;
+        glUseProgram(this->programID);
+    }
 }
 void Shader::setInt(const string &name, int value) const {
+    this->setActivate();
     glUniform1i(glGetUniformLocation(this->programID, name.c_str()), value);
 }
 void Shader::setFloat(const string &name, float value) const {
+    this->setActivate();
     glUniform1f(glGetUniformLocation(this->programID, name.c_str()), value);
 }
 void Shader::setVec2(const std::string &name, const vec2 &value) const {
+    this->setActivate();
     glUniform2fv(glGetUniformLocation(this->programID, name.c_str()), 1, &value[0]);
 }
 void Shader::setVec3(const std::string &name, const vec3 &value) const {
+    this->setActivate();
     glUniform3fv(glGetUniformLocation(this->programID, name.c_str()), 1, &value[0]);
 }
 void Shader::setVec4(const std::string &name, const vec4 &value) const {
+    this->setActivate();
     glUniform4fv(glGetUniformLocation(this->programID, name.c_str()), 1, &value[0]);
 }
 void Shader::setMat2(const std::string &name, const mat2 &mat) const {
+    this->setActivate();
     glUniformMatrix2fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 void Shader::setMat3(const std::string &name, const mat3 &mat) const {
+    this->setActivate();
     glUniformMatrix3fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 void Shader::setMat4(const std::string &name, const mat4 &mat) const {
+    this->setActivate();
     glUniformMatrix4fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 void Shader::checkCompileErrors(unsigned int shader, string type) {

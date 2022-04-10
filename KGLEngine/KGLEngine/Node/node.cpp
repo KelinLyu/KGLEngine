@@ -89,8 +89,7 @@ void Node::calculateWorldTransform(mat4 parentTransform) {
     }
 }
 vec3 Node::getWorldPosition() {
-    vec3 worldPosition = vec3(this->worldTransform[3][0], this->worldTransform[3][1], this->worldTransform[3][2]);
-    return(worldPosition);
+    return(glm_helper::getPosition(this->worldTransform));
 }
 mat4 Node::getWorldTransform() {
     return(this->worldTransform);
@@ -98,8 +97,7 @@ mat4 Node::getWorldTransform() {
 vec3 Node::convertLocalPositionToWorld(vec3 localPosition) {
     mat4 translateMatrix = translate(mat4(1.0f), localPosition);
     translateMatrix = this->worldTransform * translateMatrix;
-    vec3 result = vec3(translateMatrix[3][0], translateMatrix[3][1], translateMatrix[3][2]);
-    return(result);
+    return(glm_helper::getPosition(translateMatrix));
 }
 vec3 Node::convertLocalVectorToWorld(vec3 localVector) {
     return(this->convertLocalPositionToWorld(localVector) - this->getWorldPosition());
@@ -132,16 +130,14 @@ mat4 Node::getBoneWorldTransform(string boneName) {
     }
     return(result);
 }
-void Node::stickToBoneOfNode(string boneName, Node *node, bool keepOriginalScale) {
+void Node::stickToBoneOfNode(string boneName, Node *node) {
     mat4 transform = node->getBoneWorldTransform(boneName);
     if(this->parent != NULL) {
         transform = inverse(this->parent->worldTransform) * transform;
-        this->position = vec3(transform[3][0], transform[3][1], transform[3][2]);
-        float x, y, z;
-        glm::extractEulerAngleXYZ(transform, x, y, z);
-        this->eulerAngles = vec3(degrees(x), degrees(y), degrees(z));
-        this->updateTransform();
     }
+    this->position = glm_helper::getPosition(transform);
+    this->eulerAngles = glm_helper::getEularAngles(transform);
+    this->updateTransform();
 }
 Node::~Node() {
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {

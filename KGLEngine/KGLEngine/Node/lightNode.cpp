@@ -13,6 +13,8 @@ LightNode::LightNode(vec3 color) {
     this->range = 0.0f;
     this->innerAngle = 0.0f;
     this->outerAngle = 0.0f;
+    this->lightMask = -1;
+    this->shadowMask = -1;
 }
 void LightNode::setAmbientLight() {
     this->type = 0;

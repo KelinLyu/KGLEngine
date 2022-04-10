@@ -1,3 +1,4 @@
+// Developed by Kelin.Lyu.
 #ifndef assimp_helper_h
 #define assimp_helper_h
 class assimp_helper {

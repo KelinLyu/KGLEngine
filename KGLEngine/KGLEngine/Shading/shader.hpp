@@ -6,20 +6,22 @@ class Texture;
 class Geometry;
 class Shader final {
 private:
-    int cullMode;
+    int blendMode;
+    void compileShaders(string vertexShaderCode, string fragmentShaderCode);
     void checkCompileErrors(unsigned int shader, string type);
+    void setActivate() const;
 public:
     unsigned int programID;
     vector<Texture*> textures;
     vector<string> uniformNames;
+    Shader(string vertexShaderCode, string fragmentShaderCode);
     Shader(string shaderFile);
     Shader(Geometry* geometryWithMissingShader);
     void addTexture(Texture* texture, string uniformName);
     void render(mat4 modelTransform);
-    void cullBack();
-    void cullFront();
-    void doubleSided();
-    void setActivate();
+    void setOpaque();
+    void setAdditive();
+    void setSemitransparent();
     void setInt(const string &name, int value) const;
     void setFloat(const string &name, float value) const;
     void setVec2(const std::string &name, const vec2 &value) const;

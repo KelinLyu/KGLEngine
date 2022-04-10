@@ -1,10 +1,13 @@
 // Developed by Kelin.Lyu.
 #include "geometry.hpp"
 Geometry::Geometry(aiMesh* mesh) {
+    this->cullMode = 0;
     this->shader = NULL;
     this->bonesCount = 0;
     this->isHidden = false;
     this->renderingOrder = 0;
+    this->lightMask = -1;
+    this->shadowMask = -1;
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     for(unsigned int i = 0; i < mesh->mNumVertices; i += 1) {
@@ -68,8 +71,7 @@ Geometry::Geometry(aiMesh* mesh) {
             this->boneTransforms.push_back(mat4(0.0f));
         }
     }
-    this->vertices = vertices;
-    this->indices = indices;
+    this->indiceCount = (unsigned int)indices.size();
     // create buffers:
     glGenVertexArrays(1, &this->vertexArrays);
     glGenBuffers(1, &this->vertexBuffers);
@@ -97,6 +99,15 @@ Geometry::Geometry(aiMesh* mesh) {
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
     glBindVertexArray(0);
 }
+void Geometry::cullBack() {
+    this->cullMode = 0;
+}
+void Geometry::cullFront() {
+    this->cullMode = 1;
+}
+void Geometry::doubleSided() {
+    this->cullMode = 2;
+}
 void Geometry::setShader(Shader* shader) {
     this->shader = shader;
 }
@@ -121,7 +132,16 @@ void Geometry::prepareForRendering() {
     Engine::main->prepareGeometryForRendering(this);
 }
 void Geometry::render(vector<LightNode*>* lights) {
-    this->shader->setActivate();
+    glDepthFunc(GL_LESS);
+    if(this->cullMode == 0) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }else if(this->cullMode == 1) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+    }else if(this->cullMode == 2) {
+        glDisable(GL_CULL_FACE);
+    }
     if(this->hasBones()) {
         this->shader->setInt("hasBones", 1);
         for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
@@ -139,7 +159,7 @@ void Geometry::render(vector<LightNode*>* lights) {
     }
     this->shader->render(this->worldTransform);
     glBindVertexArray(this->vertexArrays);
-    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(this->indices.size()), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, this->indiceCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 void Geometry::calculateBoneTransforms(AssimpNode *node, mat4 parentTransform, bool first) {
@@ -196,12 +216,6 @@ map<string, BoneInfo>& Geometry::getBonesInfoMap() {
 int& Geometry::getBonesCount() {
     return(this->bonesCount);
 }
-void Geometry::setRenderingOrder(int renderingOrder) {
-    this->renderingOrder = renderingOrder;
-}
-int Geometry::getRenderingOrder() {
-    return(this->renderingOrder);
-}
 mat4 Geometry::getBoneWorldTransform(string name) {
     if(this->hasBones()) {
         if(this->bonesInfoMap.find(name) != this->bonesInfoMap.end()) {
@@ -219,8 +233,6 @@ Geometry::~Geometry() {
     glDeleteVertexArrays(1, &this->vertexArrays);
     glDeleteBuffers(1, &this->vertexBuffers);
     glDeleteBuffers(1, &this->elementBuffers);
-    this->vertices.clear();
-    this->indices.clear();
     for(unsigned int i = 0; i < this->animations.size(); i += 1) {
         delete(this->animations[i]);
     }

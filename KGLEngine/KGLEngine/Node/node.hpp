@@ -42,7 +42,7 @@ public:
     vec3 getUpVectorInWorld();
     vec3 getDownVectorInWorld();
     mat4 getBoneWorldTransform(string boneName);
-    void stickToBoneOfNode(string boneName, Node* node, bool keepOriginalScale);
+    void stickToBoneOfNode(string boneName, Node* node);
     ~Node();
 };
 class CameraNode: public Node {
@@ -62,6 +62,8 @@ public:
     float range;
     float innerAngle;
     float outerAngle;
+    unsigned int lightMask;
+    unsigned int shadowMask;
     LightNode(vec3 color);
     void setAmbientLight();
     void setDirectionalLight();

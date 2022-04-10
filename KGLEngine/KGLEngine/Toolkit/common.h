@@ -1,3 +1,4 @@
+// Developed by Kelin.Lyu.
 #ifndef common_h
 #define common_h
 #include <iostream>
@@ -33,6 +34,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "assimp_helper.h"
+#include "glm_helper.h"
 #include "keys.h"
 using namespace std;
 using namespace glm;

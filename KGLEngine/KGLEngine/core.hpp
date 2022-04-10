@@ -11,9 +11,11 @@
 #include "SkeletalAnimation/animation.hpp"
 #include "SkeletalAnimation/animator.hpp"
 #include "Node/node.hpp"
+#include "Others/skybox.hpp"
 class Node;
 class CameraNode;
 class LightNode;
+class Skybox;
 class Engine final {
 private:
     bool useAbsolutePaths;
@@ -41,6 +43,8 @@ public:
     Input* input;
     Node* root;
     CameraNode* camera;
+    Skybox* skybox;
+    unsigned int currentShaderProgramID;
     Engine(const char* windowTitle,
            float resolutionScaleFactor,
            bool fullscreenMode,

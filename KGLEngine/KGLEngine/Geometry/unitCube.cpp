@@ -1,10 +1,13 @@
 // Developed by Kelin.Lyu.
 #include "geometry.hpp"
 UnitCube::UnitCube() {
+    this->cullMode = 0;
     this->shader = NULL;
     this->bonesCount = 0;
     this->isHidden = false;
     this->renderingOrder = 0;
+    this->lightMask = -1;
+    this->shadowMask = -1;
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     Vertex vertex1 = Vertex();
@@ -211,8 +214,7 @@ UnitCube::UnitCube() {
     indices.push_back(20);
     indices.push_back(22);
     indices.push_back(23);
-    this->vertices = vertices;
-    this->indices = indices;
+    this->indiceCount = (unsigned int)indices.size();
     // create buffers:
     glGenVertexArrays(1, &this->vertexArrays);
     glGenBuffers(1, &this->vertexBuffers);
