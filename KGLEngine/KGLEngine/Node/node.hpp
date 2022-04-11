@@ -24,7 +24,7 @@ public:
     bool isHidden;
     Node();
     void loadUnitCube();
-    void loadGeometry(string file);
+    void loadFile(string file);
     Animator* loadAnimator(string file);
     void addChild(Node* node);
     void update(mat4 parentTransform, float deltaTime);

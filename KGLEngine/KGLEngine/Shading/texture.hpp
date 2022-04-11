@@ -5,7 +5,7 @@
 class Texture final {
 public:
     unsigned int data;
-    Texture(string file, GLint wrapMode, float maxAnisotropy);
+    Texture(string file, float maxAnisotropy, bool generateMipmaps);
     Texture(string right, string left,
             string top, string bottom,
             string front, string back,

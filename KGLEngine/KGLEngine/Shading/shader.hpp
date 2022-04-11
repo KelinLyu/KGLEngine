@@ -8,7 +8,7 @@ class Shader final {
 private:
     int blendMode;
     void compileShaders(string vertexShaderCode, string fragmentShaderCode);
-    void checkCompileErrors(unsigned int shader, string type);
+    bool checkCompileErrors(unsigned int shader, string type);
     void setActivate() const;
 public:
     unsigned int programID;

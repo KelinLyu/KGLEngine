@@ -11,7 +11,7 @@ Node::Node() {
 void Node::loadUnitCube() {
     this->geometries.push_back(new UnitCube());
 }
-void Node::loadGeometry(string file) {
+void Node::loadFile(string file) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(Engine::main->getProgramDirectory() + file, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     if(scene == NULL || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
