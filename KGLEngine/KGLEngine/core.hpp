@@ -3,9 +3,10 @@
 #define core_hpp
 #include "Toolkit/common.h"
 #include "input.hpp"
-#include "image.hpp"
-#include "texture.hpp"
-#include "shader.hpp"
+#include "Shading/image.hpp"
+#include "Shading/texture.hpp"
+#include "Shading/shader.hpp"
+#include "Shading/material.hpp"
 #include "Geometry/geometry.hpp"
 #include "SkeletalAnimation/bone.hpp"
 #include "SkeletalAnimation/animation.hpp"

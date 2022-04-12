@@ -16,11 +16,13 @@ struct Vertex {
 struct BoneInfo;
 struct AssimpNode;
 class Shader;
+class Material;
 class Animation;
 class LightNode;
 class Geometry {
 protected:
     Shader* shader;
+    Material* material;
     unsigned int vertexArrays;
     unsigned int vertexBuffers;
     unsigned int elementBuffers;
@@ -43,6 +45,7 @@ public:
     void cullFront();
     void doubleSided();
     void setShader(Shader* shader);
+    void setMaterial(Material* material);
     void addAnimation(Animation* animation);
     void update(mat4 worldTransform);
     void prepareForRendering();

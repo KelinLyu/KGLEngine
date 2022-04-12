@@ -3,6 +3,7 @@
 UnitCube::UnitCube() {
     this->cullMode = 0;
     this->shader = NULL;
+    this->material = NULL;
     this->bonesCount = 0;
     this->isHidden = false;
     this->renderingOrder = 0;

@@ -57,7 +57,8 @@ public:
 class LightNode: public Node {
 public:
     int type;
-    vec3 color;
+    vec3 colorFactor;
+    vec3 highlightFactor;
     float attenuationExponent;
     float range;
     float innerAngle;
@@ -69,6 +70,6 @@ public:
     void setDirectionalLight();
     void setPointLight(float attenuationExponent, float range);
     void setSpotLight(float attenuationExponent, float range, float innerAngle, float outerAngle);
-    void configurateShader(Shader* shader, int index, mat4 worldTransform);
+    void configurateShader(Shader* shader, int index);
 };
 #endif

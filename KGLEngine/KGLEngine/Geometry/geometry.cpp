@@ -3,6 +3,7 @@
 Geometry::Geometry(aiMesh* mesh) {
     this->cullMode = 0;
     this->shader = NULL;
+    this->material = NULL;
     this->bonesCount = 0;
     this->isHidden = false;
     this->renderingOrder = 0;
@@ -111,6 +112,10 @@ void Geometry::doubleSided() {
 void Geometry::setShader(Shader* shader) {
     this->shader = shader;
 }
+void Geometry::setMaterial(Material* material) {
+    this->material = material;
+    this->shader = material->shader;
+}
 void Geometry::addAnimation(Animation* animation) {
     this->animations.push_back(animation);
 }
@@ -152,10 +157,13 @@ void Geometry::render(vector<LightNode*>* lights) {
     }
     for(unsigned int i = 0; i < LIGHTS_LIMIT; i += 1) {
         if(i < lights->size()) {
-            (*lights)[i]->configurateShader(this->shader, i, this->worldTransform);
+            (*lights)[i]->configurateShader(this->shader, i);
         }else{
             this->shader->setInt("lights[" + to_string(i) + "].type", -1);
         }
+    }
+    if(this->material != NULL) {
+        this->material->render();
     }
     this->shader->render(this->worldTransform);
     glBindVertexArray(this->vertexArrays);
@@ -237,4 +245,6 @@ Geometry::~Geometry() {
         delete(this->animations[i]);
     }
     this->animations.clear();
+    this->shader = NULL;
+    this->material = NULL;
 }

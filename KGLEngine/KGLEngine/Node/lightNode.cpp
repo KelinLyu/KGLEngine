@@ -8,7 +8,8 @@ LightNode::LightNode(vec3 color) {
     this->parent = NULL;
     this->isHidden = false;
     this->type = -1;
-    this->color = color;
+    this->colorFactor = color;
+    this->highlightFactor = color;
     this->attenuationExponent = 0.0f;
     this->range = 0.0f;
     this->innerAngle = 0.0f;
@@ -34,9 +35,10 @@ void LightNode::setSpotLight(float attenuationExponent, float range, float inner
     this->innerAngle = innerAngle;
     this->outerAngle = outerAngle;
 }
-void LightNode::configurateShader(Shader* shader, int index, mat4 worldTransform) {
+void LightNode::configurateShader(Shader* shader, int index) {
     shader->setInt("lights[" + to_string(index) + "].type", this->type);
-    shader->setVec3("lights[" + to_string(index) + "].color", this->color);
+    shader->setVec3("lights[" + to_string(index) + "].colorFactor", this->colorFactor);
+    shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->highlightFactor);
     shader->setVec3("lights[" + to_string(index) + "].position", this->getWorldPosition());
     shader->setVec3("lights[" + to_string(index) + "].direction", this->getFrontVectorInWorld());
     shader->setFloat("lights[" + to_string(index) + "].attenuationExponent", this->attenuationExponent);
