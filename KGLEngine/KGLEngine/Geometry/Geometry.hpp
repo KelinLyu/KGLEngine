@@ -24,6 +24,7 @@ protected:
     unsigned int cullMode;
     Shader* shader;
     Material* material;
+    UIMaterial* uiMaterial;
     unsigned int vertexArrays;
     unsigned int vertexBuffers;
     unsigned int elementBuffers;
@@ -35,8 +36,9 @@ protected:
     mat4 modelTransform;
 public:
     bool isHidden;
-    int renderingOrder;
+    float renderingOrder;
     unsigned int lightMask;
+    bool clearDepthBuffer;
     Geometry() = default;
     Geometry(aiMesh* mesh);
     void cullBack();
@@ -44,9 +46,12 @@ public:
     void doubleSided();
     void setShader(Shader* shader);
     void setMaterial(Material* material);
+    void setUIMaterial(UIMaterial* material);
     ~Geometry();
     void engineInitializeGeometry();
     mat4 engineGetGeometryModelTransform();
+    unsigned int engineGetGeometryVertexArrays();
+    unsigned int engineGetGeometryIndiceCount();
     bool engineCheckIfGeometryHasBones();
     int& engineGetGeometryBonesCountReference();
     map<string, BoneInfo>& engineGetGeometryBonesInfoMapReference();
@@ -73,21 +78,8 @@ public:
     ~Skybox();
     void engineRenderSkybox();
 };
-
-
-
 class Sprite: public Geometry {
 public:
     Sprite();
-    
-    void render();
 };
-
-
-
-
-
-
-
-
 #endif

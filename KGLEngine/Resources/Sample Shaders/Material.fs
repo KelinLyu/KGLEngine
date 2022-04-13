@@ -10,8 +10,6 @@ in fragment_data {
 } fragment;
 out vec4 color;
 struct frame_data {
-    float time;
-    float random;
     vec3 cameraPosition;
     vec3 cameraDirection;
 };
@@ -64,11 +62,11 @@ uniform float reflectionIntensity;
 uniform bool useAmbientOcclusionMap;
 uniform sampler2D ambientOcclusionMap;
 uniform float ambientOcclusionIntensity;
-uniform vec4 defaultMultiplyColor;
+uniform vec3 defaultMultiplyColor;
 uniform bool useMultiplyMap;
 uniform sampler2D multiplyMap;
 uniform float multiplyIntensity;
-uniform vec4 defaultEmissionColor;
+uniform vec3 defaultEmissionColor;
 uniform bool useEmissionMap;
 uniform sampler2D emissionMap;
 uniform float emissionIntensity;
@@ -203,14 +201,14 @@ void main() {
         color.rgb *= ambientOcclusion;
     }
     color.rgb = color.rgb / (color.rgb + vec3(1.0f));
-    vec3 multiplyColor = defaultMultiplyColor.rgb;
+    vec3 multiplyColor = defaultMultiplyColor;
     if(useMultiplyMap) {
         multiplyColor = texture(multiplyMap, UV).rgb;
     }
     vec3 inverseMultiplyColor = vec3(1.0f) - multiplyColor;
     multiplyColor = vec3(1.0f) - inverseMultiplyColor * multiplyIntensity;
     color.rgb *= multiplyColor;
-    vec3 emissionColor = defaultEmissionColor.rgb;
+    vec3 emissionColor = defaultEmissionColor;
     if(useEmissionMap) {
         emissionColor = texture(emissionMap, UV).rgb * emissionIntensity;
     }

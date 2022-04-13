@@ -45,16 +45,14 @@ Engine::Engine(const char* windowTitle,
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
     // create the window:
-    this->screenWidth = (float)mode->width;
-    this->screenHeight = (float)mode->height;
-    int width = (int)(this->screenWidth * resolutionScaleFactor);
-    int height = (int)(this->screenHeight * resolutionScaleFactor);
+    this->screenResolution = vec2(mode->width, mode->height);
+    this->windowResolution = this->screenResolution * resolutionScaleFactor;
     if(fullscreenMode) {
-        this->window = glfwCreateWindow(width, height, windowTitle, monitor, NULL);
+        this->window = glfwCreateWindow(this->windowResolution.x, this->windowResolution.y, windowTitle, monitor, NULL);
     }else{
-        this->window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
+        this->window = glfwCreateWindow(this->windowResolution.x, this->windowResolution.y, windowTitle, NULL, NULL);
     }
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, this->windowResolution.x, this->windowResolution.y);
     if(this->window == NULL) {
         cout << "\nFailed to initialize the glfw window!\n" << endl;
         exit(1);
@@ -85,10 +83,9 @@ Engine::Engine(const char* windowTitle,
     this->skybox = NULL;
 }
 void Engine::changeResolution(float resolutionScaleFactor) {
-    int width = (int)(this->screenWidth * resolutionScaleFactor);
-    int height = (int)(this->screenHeight * resolutionScaleFactor);
-    glfwSetWindowSize(this->window, width, height);
-    glViewport(0, 0, width, height);
+    this->windowResolution = this->screenResolution * resolutionScaleFactor;
+    glfwSetWindowSize(this->window, this->windowResolution.x, this->windowResolution.y);
+    glViewport(0, 0, this->windowResolution.x, this->windowResolution.y);
 }
 void Engine::hideCursor() {
     this->cursorHidden = true;
@@ -151,7 +148,10 @@ void Engine::render() {
     glfwSwapBuffers(this->window);
 }
 vec2 Engine::getScreenResolution() {
-    return(vec2(this->screenWidth, this->screenHeight));
+    return(this->screenResolution);
+}
+vec2 Engine::getWindowResolution() {
+    return(this->windowResolution);
 }
 float Engine::getTime() {
     return(this->currentTime);

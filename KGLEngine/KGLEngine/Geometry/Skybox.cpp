@@ -75,6 +75,7 @@ void main() {
 }
 )"""";
     this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
+    this->shader->setInt("skybox", 0);
 }
 Skybox::~Skybox() {
     glDeleteVertexArrays(1, &this->vertexArrays);
@@ -91,7 +92,6 @@ void Skybox::engineRenderSkybox() {
     mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
     this->shader->setMat4("frame.viewProjectionTransform", projectionTransform * viewTransform);
     glActiveTexture(GL_TEXTURE0);
-    this->shader->setInt("skybox", 0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->texture->data);
     glBindVertexArray(this->vertexArrays);
     glDrawArrays(GL_TRIANGLES, 0, 36);

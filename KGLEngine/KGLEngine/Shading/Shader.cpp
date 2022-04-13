@@ -23,7 +23,6 @@ void main() {
     this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
 }
 Shader::Shader(string shaderFile) {
-    // read the files:
     string vertexShaderCode;
     string fragmentShaderCode;
     ifstream vertexShaderStream;
@@ -51,6 +50,10 @@ Shader::Shader(string shaderFile) {
 }
 Shader::Shader(string vertexShaderCode, string fragmentShaderCode) {
     this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
+}
+void Shader::setAsUI() {
+    this->isUIShader = true;
+    this->blendMode = 2;
 }
 void Shader::setOpaque() {
     this->blendMode = 0;
@@ -102,7 +105,14 @@ void Shader::setMat4(string name, mat4 mat) {
     glUniformMatrix4fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 void Shader::setTexture(string name, Texture* texture) {
+    for(unsigned int i = 0; i < this->uniformTextureNames.size(); i += 1) {
+        if(this->uniformTextureNames[i] == name) {
+            this->textures[i] = texture;
+            return;
+        }
+    }
     this->textures.push_back(texture);
+    this->uniformTextureNames.push_back(name);
     this->engineActiveShader();
     int i = (int)this->textures.size() - 1;
     this->setInt(name, i);
@@ -114,22 +124,20 @@ Shader::~Shader() {
 void Shader::engineInitializeShader(string vertexShaderCode, string fragmentShaderCode) {
     this->blendMode = 0;
     this->currentModelTransform = mat4(-1.0f);
+    this->isUIShader = false;
     const char* vertexShader = vertexShaderCode.c_str();
     const char* fragmentShader = fragmentShaderCode.c_str();
     int result = 0;
-    // compile the vertex shader:
     unsigned int vertex;
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vertexShader, NULL);
     glCompileShader(vertex);
     result += this->engineCheckCompileErrors(vertex, "VERTEX");
-    // compile the fragment shader:
     unsigned int fragment;
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fragmentShader, NULL);
     glCompileShader(fragment);
     result += this->engineCheckCompileErrors(fragment, "FRAGMENT");
-    // create the shader Program:
     this->programID = glCreateProgram();
     glAttachShader(this->programID, vertex);
     glAttachShader(this->programID, fragment);
@@ -196,38 +204,52 @@ void Shader::engineRenderShader(Geometry* geometry) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
-    this->setFloat("frame.time", Engine::main->getTime());
-    this->setFloat("frame.random", linearRand(0.0f, 1.0f));
-    this->setVec3("frame.cameraPosition", Engine::main->camera->getWorldPosition());
-    this->setVec3("frame.cameraDirection", Engine::main->camera->getFrontVectorInWorld());
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
-    mat4 viewTransform = Engine::main->camera->getViewTransform();
-    mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
-    if(this->currentModelTransform != modelTransform) {
-        this->currentModelTransform = modelTransform;
-        this->setMat4("node.modelTransform", modelTransform);
-        this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));
-    }
-    this->setMat4("node.modelViewProjectionTransform", projectionTransform * viewTransform * modelTransform);
-    if(geometry->engineCheckIfGeometryHasBones()) {
-        this->setInt("hasBones", 1);
-        vector<mat4>& boneTransforms = geometry->engineGetGeometryBoneTransformsReference();
-        for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
-            this->setMat4("boneTransforms[" + to_string(i) + "]", boneTransforms[i]);
-        }
+    if(this->isUIShader) {
+        glDepthFunc(GL_ALWAYS);
+        mat4 projectionTransform = Engine::main->camera->getOrthogonalProjectionTransform();
+        this->setMat4("modelProjectionTransform", projectionTransform * modelTransform);
     }else{
-        this->setInt("hasBones", 0);
-    }
-    unsigned int count = 0;
-    while(count < LIGHTS_LIMIT && count < Engine::main->preparedLightNodes.size()) {
-        if((geometry->lightMask & Engine::main->preparedLightNodes[count]->lightMask) > 0) {
-            Engine::main->preparedLightNodes[count]->engineConfigurateShader(this, count);
+        glDepthFunc(GL_LESS);
+        this->setVec3("frame.cameraPosition", Engine::main->camera->getWorldPosition());
+        this->setVec3("frame.cameraDirection", Engine::main->camera->getFrontVectorInWorld());
+        mat4 viewTransform = Engine::main->camera->getViewTransform();
+        mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
+        if(this->currentModelTransform != modelTransform) {
+            this->currentModelTransform = modelTransform;
+            this->setMat4("node.modelTransform", modelTransform);
+            this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));
         }
-        count += 1;
+        this->setMat4("node.modelViewProjectionTransform", projectionTransform * viewTransform * modelTransform);
+        if(geometry->engineCheckIfGeometryHasBones()) {
+            this->setInt("hasBones", 1);
+            vector<mat4>& boneTransforms = geometry->engineGetGeometryBoneTransformsReference();
+            for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
+                this->setMat4("boneTransforms[" + to_string(i) + "]", boneTransforms[i]);
+            }
+        }else{
+            this->setInt("hasBones", 0);
+        }
+        unsigned int count = 0;
+        while(count < LIGHTS_LIMIT && count < Engine::main->preparedLightNodes.size()) {
+            if((geometry->lightMask & Engine::main->preparedLightNodes[count]->lightMask) > 0) {
+                Engine::main->preparedLightNodes[count]->engineConfigurateShader(this, count);
+            }
+            count += 1;
+        }
+        this->setInt("lightCount", count);
     }
-    this->setInt("lightCount", count);
     for(unsigned int i = 0; i < this->textures.size(); i += 1) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textures[i]->data);
+    }
+    if(this->isUIShader) {
+        glBindVertexArray(geometry->engineGetGeometryVertexArrays());
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+    }else{
+        glBindVertexArray(geometry->engineGetGeometryVertexArrays());
+        glDrawElements(GL_TRIANGLES, geometry->engineGetGeometryIndiceCount(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
     }
 }

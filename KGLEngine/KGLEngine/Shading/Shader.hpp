@@ -10,11 +10,14 @@ private:
     unsigned int programID;
     unsigned int blendMode;
     vector<Texture*> textures;
+    vector<string> uniformTextureNames;
     mat4 currentModelTransform;
+    bool isUIShader;
 public:
     Shader();
     Shader(string shaderFile);
     Shader(string vertexShaderCode, string fragmentShaderCode);
+    void setAsUI();
     void setOpaque();
     void setAdditive();
     void setSemitransparent();

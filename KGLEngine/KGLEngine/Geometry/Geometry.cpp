@@ -109,6 +109,10 @@ void Geometry::setMaterial(Material* material) {
     this->material = material;
     this->shader = material->engineGetMaterialShader();
 }
+void Geometry::setUIMaterial(UIMaterial* material) {
+    this->uiMaterial = material;
+    this->shader = material->engineGetUIMaterialShader();
+}
 Geometry::~Geometry() {
     glDeleteVertexArrays(1, &this->vertexArrays);
     glDeleteBuffers(1, &this->vertexBuffers);
@@ -124,14 +128,22 @@ void Geometry::engineInitializeGeometry() {
     this->cullMode = 0;
     this->shader = NULL;
     this->material = NULL;
+    this->uiMaterial = NULL;
     this->bonesCount = 0;
     this->modelTransform = mat4(0.0f);
     this->isHidden = false;
-    this->renderingOrder = 0;
+    this->renderingOrder = 0.0f;
     this->lightMask = -1;
+    this->clearDepthBuffer = false;
 }
 mat4 Geometry::engineGetGeometryModelTransform() {
     return(this->modelTransform);
+}
+unsigned int Geometry::engineGetGeometryVertexArrays() {
+    return(this->vertexArrays);
+}
+unsigned int Geometry::engineGetGeometryIndiceCount() {
+    return(this->indiceCount);
 }
 bool Geometry::engineCheckIfGeometryHasBones() {
     return(this->bonesCount > 0);
@@ -221,7 +233,7 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     if(this->shader == NULL) {
         this->setShader(new Shader());
     }
-    if(this->renderingOrder <= 0) {
+    if(this->renderingOrder <= 0.0f) {
         Engine::main->preparedGeometries.insert(Engine::main->preparedGeometries.begin(), this);
         return;
     }
@@ -234,7 +246,9 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     Engine::main->preparedGeometries.push_back(this);
 }
 void Geometry::engineRenderGeometry() {
-    glDepthFunc(GL_LESS);
+    if(this->clearDepthBuffer) {
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
     if(this->cullMode == 0) {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
@@ -247,8 +261,8 @@ void Geometry::engineRenderGeometry() {
     if(this->material != NULL) {
         this->material->engineRenderMaterial();
     }
+    if(this->uiMaterial != NULL) {
+        this->uiMaterial->engineRenderUIMaterial();
+    }
     this->shader->engineRenderShader(this);
-    glBindVertexArray(this->vertexArrays);
-    glDrawElements(GL_TRIANGLES, this->indiceCount, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
 }

@@ -72,7 +72,7 @@ string Input::getLastPressedCharacter() {
     return(result);
 }
 vec2 Input::getMousePosition() {
-    return(this->mousePosition);
+    return(this->mousePosition / Engine::main->getWindowResolution());
 }
 vec2 Input::getMouseTranslation() {
     return(this->mouseTranslation);

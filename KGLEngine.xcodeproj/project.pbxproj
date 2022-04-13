@@ -27,7 +27,9 @@
 		C2AD2E9127FF0EE700A493D6 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7A27FF0EE700A493D6 /* Animation.cpp */; };
 		C2AD2E9227FF0EE700A493D6 /* Animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7D27FF0EE700A493D6 /* Animator.cpp */; };
 		C2F7794E280666BE001A214D /* Skybox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7794D280666BE001A214D /* Skybox.cpp */; };
-		C2F779502806745D001A214D /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7794F2806745D001A214D /* Sprite.cpp */; };
+		C2F7795828072F4E001A214D /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7795728072F4E001A214D /* Sprite.cpp */; };
+		C2F7795A28072F5B001A214D /* UINode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7795928072F5B001A214D /* UINode.cpp */; };
+		C2F7795E28075612001A214D /* UIMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7795C28075612001A214D /* UIMaterial.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -81,7 +83,10 @@
 		C2AD2E8727FF0EE700A493D6 /* Image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Image.hpp; sourceTree = "<group>"; };
 		C2AD2E8827FF0EE700A493D6 /* Engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Engine.hpp; sourceTree = "<group>"; };
 		C2F7794D280666BE001A214D /* Skybox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Skybox.cpp; sourceTree = "<group>"; };
-		C2F7794F2806745D001A214D /* Sprite.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
+		C2F7795728072F4E001A214D /* Sprite.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
+		C2F7795928072F5B001A214D /* UINode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UINode.cpp; sourceTree = "<group>"; };
+		C2F7795C28075612001A214D /* UIMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UIMaterial.cpp; sourceTree = "<group>"; };
+		C2F7795D28075612001A214D /* UIMaterial.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UIMaterial.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,7 +124,7 @@
 				C2AD2E7127FF0EE700A493D6 /* Geometry.cpp */,
 				C274401E2800A7E0009DDD9F /* UnitCube.cpp */,
 				C2F7794D280666BE001A214D /* Skybox.cpp */,
-				C2F7794F2806745D001A214D /* Sprite.cpp */,
+				C2F7795728072F4E001A214D /* Sprite.cpp */,
 			);
 			path = Geometry;
 			sourceTree = "<group>";
@@ -131,6 +136,7 @@
 				C2AD2E7627FF0EE700A493D6 /* Node.cpp */,
 				C27440182800A74E009DDD9F /* CameraNode.cpp */,
 				C274401B2800A789009DDD9F /* LightNode.cpp */,
+				C2F7795928072F5B001A214D /* UINode.cpp */,
 			);
 			path = Node;
 			sourceTree = "<group>";
@@ -146,6 +152,8 @@
 				C2AD2E7927FF0EE700A493D6 /* Shader.cpp */,
 				C231B3202804AAAF0030CD85 /* Material.hpp */,
 				C231B3212804AAAF0030CD85 /* Material.cpp */,
+				C2F7795D28075612001A214D /* UIMaterial.hpp */,
+				C2F7795C28075612001A214D /* UIMaterial.cpp */,
 			);
 			path = Shading;
 			sourceTree = "<group>";
@@ -309,16 +317,18 @@
 				C274401D2800A789009DDD9F /* LightNode.cpp in Sources */,
 				C2AD2E9027FF0EE700A493D6 /* Shader.cpp in Sources */,
 				C2AD2E8C27FF0EE700A493D6 /* Image.cpp in Sources */,
+				C2F7795828072F4E001A214D /* Sprite.cpp in Sources */,
+				C2F7795E28075612001A214D /* UIMaterial.cpp in Sources */,
 				C2F7794E280666BE001A214D /* Skybox.cpp in Sources */,
 				C2AD2E8E27FF0EE700A493D6 /* Node.cpp in Sources */,
 				C274401A2800A74E009DDD9F /* CameraNode.cpp in Sources */,
 				C2AD2E9127FF0EE700A493D6 /* Animation.cpp in Sources */,
 				C2AD2E9227FF0EE700A493D6 /* Animator.cpp in Sources */,
-				C2F779502806745D001A214D /* Sprite.cpp in Sources */,
 				C231B3222804AAAF0030CD85 /* Material.cpp in Sources */,
 				C2AD2E8F27FF0EE700A493D6 /* Texture.cpp in Sources */,
 				C2AD2E8B27FF0EE700A493D6 /* Input.cpp in Sources */,
 				C2AD2E8A27FF0EE700A493D6 /* Geometry.cpp in Sources */,
+				C2F7795A28072F5B001A214D /* UINode.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

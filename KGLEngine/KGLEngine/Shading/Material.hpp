@@ -21,9 +21,9 @@ private:
     int currentReverseRoughness;
     float currentReflectionIntensity;
     float currentAmbientOcclusionIntensity;
-    vec4 currentMultiplyColor;
+    vec3 currentMultiplyColor;
     float currentMultiplyIntensity;
-    vec4 currentEmissionColor;
+    vec3 currentEmissionColor;
     float currentEmissionIntensity;
 public:
     float opacity;
@@ -41,9 +41,9 @@ public:
     bool reverseRoughness;
     float reflectionIntensity;
     float ambientOcclusionIntensity;
-    vec4 multiplyColor;
+    vec3 multiplyColor;
     float multiplyIntensity;
-    vec4 emissionColor;
+    vec3 emissionColor;
     float emissionIntensity;
     Material(float metallic, float roughness);
     void setOpaque();

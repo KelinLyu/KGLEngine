@@ -7,20 +7,22 @@
 #include "Shading/Texture.hpp"
 #include "Shading/Shader.hpp"
 #include "Shading/Material.hpp"
+#include "Shading/UIMaterial.hpp"
 #include "Geometry/Geometry.hpp"
 #include "SkeletalAnimation/Bone.hpp"
 #include "SkeletalAnimation/Animation.hpp"
 #include "SkeletalAnimation/Animator.hpp"
 #include "Node/Node.hpp"
 class Input;
+class Skybox;
 class Node;
 class CameraNode;
 class LightNode;
-class Skybox;
+class PointNode;
 class Engine final {
 private:
-    float screenWidth;
-    float screenHeight;
+    vec2 screenResolution;
+    vec2 windowResolution;
     GLFWwindow* window;
     float fps;
     float currentFps;
@@ -52,6 +54,7 @@ public:
     bool shouldUpdate();
     void render();
     vec2 getScreenResolution();
+    vec2 getWindowResolution();
     float getTime();
     float getDeltaTime();
     float getCurrentFps();

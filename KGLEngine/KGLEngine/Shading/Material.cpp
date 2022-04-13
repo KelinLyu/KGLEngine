@@ -68,8 +68,6 @@ in fragment_data {
 } fragment;
 out vec4 color;
 struct frame_data {
-    float time;
-    float random;
     vec3 cameraPosition;
     vec3 cameraDirection;
 };
@@ -122,11 +120,11 @@ uniform float reflectionIntensity;
 uniform bool useAmbientOcclusionMap;
 uniform sampler2D ambientOcclusionMap;
 uniform float ambientOcclusionIntensity;
-uniform vec4 defaultMultiplyColor;
+uniform vec3 defaultMultiplyColor;
 uniform bool useMultiplyMap;
 uniform sampler2D multiplyMap;
 uniform float multiplyIntensity;
-uniform vec4 defaultEmissionColor;
+uniform vec3 defaultEmissionColor;
 uniform bool useEmissionMap;
 uniform sampler2D emissionMap;
 uniform float emissionIntensity;
@@ -261,14 +259,14 @@ void main() {
         color.rgb *= ambientOcclusion;
     }
     color.rgb = color.rgb / (color.rgb + vec3(1.0f));
-    vec3 multiplyColor = defaultMultiplyColor.rgb;
+    vec3 multiplyColor = defaultMultiplyColor;
     if(useMultiplyMap) {
         multiplyColor = texture(multiplyMap, UV).rgb;
     }
     vec3 inverseMultiplyColor = vec3(1.0f) - multiplyColor;
     multiplyColor = vec3(1.0f) - inverseMultiplyColor * multiplyIntensity;
     color.rgb *= multiplyColor;
-    vec3 emissionColor = defaultEmissionColor.rgb;
+    vec3 emissionColor = defaultEmissionColor;
     if(useEmissionMap) {
         emissionColor = texture(emissionMap, UV).rgb * emissionIntensity;
     }
@@ -295,15 +293,15 @@ void main() {
     this->currentMultiplyIntensity = -1.0f;
     this->currentEmissionColor = vec4(-1.0f);
     this->currentEmissionIntensity = -1.0f;
-    this->shader->setInt("useDiffuseMap", 0);
-    this->shader->setInt("useNormalMap", 0);
-    this->shader->setInt("useHeightMap", 0);
-    this->shader->setInt("useMetallicMap", 0);
-    this->shader->setInt("useRoughnessMap", 0);
-    this->shader->setInt("useReflectionMap", 0);
-    this->shader->setInt("useAmbientOcclusionMap", 0);
-    this->shader->setInt("useMultiplyMap", 0);
-    this->shader->setInt("useEmissionMap", 0);
+    this->shader->setBool("useDiffuseMap", 0);
+    this->shader->setBool("useNormalMap", 0);
+    this->shader->setBool("useHeightMap", 0);
+    this->shader->setBool("useMetallicMap", 0);
+    this->shader->setBool("useRoughnessMap", 0);
+    this->shader->setBool("useReflectionMap", 0);
+    this->shader->setBool("useAmbientOcclusionMap", 0);
+    this->shader->setBool("useMultiplyMap", 0);
+    this->shader->setBool("useEmissionMap", 0);
     this->opacity = 1.0f;
     this->diffuseColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
     this->diffuseIntensity = 1.0f;
@@ -334,39 +332,39 @@ void Material::setSemitransparent() {
     this->shader->setSemitransparent();
 }
 void Material::setDiffuseMap(Texture* texture) {
-    this->shader->setInt("useDiffuseMap", 1);
+    this->shader->setBool("useDiffuseMap", true);
     this->shader->setTexture("diffuseMap", texture);
 }
 void Material::setNormalMap(Texture* texture) {
-    this->shader->setInt("useNormalMap", 1);
+    this->shader->setBool("useNormalMap", true);
     this->shader->setTexture("normalMap", texture);
 }
 void Material::setHeightMap(Texture* texture) {
-    this->shader->setInt("useHeightMap", 1);
+    this->shader->setBool("useHeightMap", true);
     this->shader->setTexture("heightMap", texture);
 }
 void Material::setMetallicMap(Texture* texture) {
-    this->shader->setInt("useMetallicMap", 1);
+    this->shader->setBool("useMetallicMap", true);
     this->shader->setTexture("metallicMap", texture);
 }
 void Material::setRoughnessMap(Texture* texture) {
-    this->shader->setInt("useRoughnessMap", 1);
+    this->shader->setBool("useRoughnessMap", true);
     this->shader->setTexture("roughnessMap", texture);
 }
 void Material::setReflectionMap(Texture* texture) {
-    this->shader->setInt("useReflectionMap", 1);
+    this->shader->setBool("useReflectionMap", true);
     this->shader->setTexture("ReflectionMap", texture);
 }
 void Material::setAmbientOcclusionMap(Texture* texture) {
-    this->shader->setInt("useAmbientOcclusionMap", 1);
+    this->shader->setBool("useAmbientOcclusionMap", true);
     this->shader->setTexture("ambientOcclusionMap", texture);
 }
 void Material::setMultiplyMap(Texture* texture) {
-    this->shader->setInt("useMultiplyMap", 1);
+    this->shader->setBool("useMultiplyMap", true);
     this->shader->setTexture("multiplyMap", texture);
 }
 void Material::setEmissionMap(Texture* texture) {
-    this->shader->setInt("useEmissionMap", 1);
+    this->shader->setBool("useEmissionMap", true);
     this->shader->setTexture("emissionMap", texture);
 }
 Material::~Material() {
@@ -438,7 +436,7 @@ void Material::engineRenderMaterial() {
     }
     if(this->currentMultiplyColor != this->multiplyColor) {
         this->currentMultiplyColor = this->multiplyColor;
-        this->shader->setVec4("defaultMultiplyColor", this->multiplyColor);
+        this->shader->setVec3("defaultMultiplyColor", this->multiplyColor);
     }
     if(this->currentMultiplyIntensity != this->multiplyIntensity) {
         this->currentMultiplyIntensity = this->multiplyIntensity;
@@ -446,7 +444,7 @@ void Material::engineRenderMaterial() {
     }
     if(this->currentEmissionColor != this->emissionColor) {
         this->currentEmissionColor = this->emissionColor;
-        this->shader->setVec4("defaultEmissionColor", this->emissionColor);
+        this->shader->setVec3("defaultEmissionColor", this->emissionColor);
     }
     if(this->currentEmissionIntensity != this->emissionIntensity) {
         this->currentEmissionIntensity = this->emissionIntensity;
