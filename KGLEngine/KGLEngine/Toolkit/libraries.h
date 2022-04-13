@@ -1,6 +1,6 @@
-// Developed by Kelin.Lyu.
-#ifndef common_h
-#define common_h
+// Developed by Kelin Lyu.
+#ifndef libraries_h
+#define libraries_h
 #include <iostream>
 #include <fstream>
 #include <sstream>

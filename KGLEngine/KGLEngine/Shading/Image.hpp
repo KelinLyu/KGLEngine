@@ -1,11 +1,12 @@
-// Developed by Kelin.Lyu.
-#ifndef image_hpp
-#define image_hpp
-#include "../core.hpp"
+// Developed by Kelin Lyu.
+#ifndef Image_hpp
+#define Image_hpp
+#include "../Engine.hpp"
 class Image final {
 public:
     unsigned char* data;
-    int width, height;
+    int width;
+    int height;
     int channelCount;
     Image(string file);
     ~Image();

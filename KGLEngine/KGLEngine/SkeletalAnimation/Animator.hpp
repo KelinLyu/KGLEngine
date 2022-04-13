@@ -1,12 +1,12 @@
-// Developed by Kelin.Lyu.
-#ifndef animator_hpp
-#define animator_hpp
-#include "../core.hpp"
+// Developed by Kelin Lyu.
+#ifndef Animator_hpp
+#define Animator_hpp
+#include "../Engine.hpp"
 class Node;
 class Animation;
 class Animator final {
 private:
-    int state;
+    unsigned int state;
     float time;
     float duration;
     float baseSpeed;
@@ -16,22 +16,22 @@ private:
     float stateChangeTime;
     float stateChangeBlendFactor;
     vector<Animation*> animations;
-    float getFadeInFactor(float progress);
-    float getFadeOutFactor(float progress);
 public:
     bool repeats;
     bool clamps;
     float speed;
     float blendFactor;
     Animator(string file, Node* node);
-    void update(float deltaTime);
     void reset();
     void play(float fadeIn, float fadeOut = 0.0f);
     void stop(float fadeOut);
     bool isPlaying();
     float getTime();
-    float getBlendFactor();
     float getCurrentBlendFactor();
     ~Animator();
+    float enginegetCurrentBlendFactor();
+    float engineGetFadeInFactor(float progress);
+    float engineGetFadeOutFactor(float progress);
+    void engineUpdateAnimator();
 };
 #endif

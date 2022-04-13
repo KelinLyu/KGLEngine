@@ -1,7 +1,7 @@
-// Developed by Kelin.Lyu.
+// Developed by Kelin Lyu.
 #ifndef skybox_hpp
 #define skybox_hpp
-#include "../core.hpp"
+#include "../Engine.hpp"
 class Skybox final {
 private:
     unsigned int vertexArrays;

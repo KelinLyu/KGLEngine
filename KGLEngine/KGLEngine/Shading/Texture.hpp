@@ -1,7 +1,7 @@
-// Developed by Kelin.Lyu.
-#ifndef texture_hpp
-#define texture_hpp
-#include "../core.hpp"
+// Developed by Kelin Lyu.
+#ifndef Texture_hpp
+#define Texture_hpp
+#include "../Engine.hpp"
 class Texture final {
 public:
     unsigned int data;

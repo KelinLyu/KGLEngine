@@ -1,4 +1,4 @@
-// Developed by Kelin.Lyu.
+// Developed by Kelin Lyu.
 #ifndef glm_helper_h
 #define glm_helper_h
 class glm_helper {

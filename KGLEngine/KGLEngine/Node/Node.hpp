@@ -1,38 +1,39 @@
-// Developed by Kelin.Lyu.
-#ifndef node_hpp
-#define node_hpp
-#include "../core.hpp"
+// Developed by Kelin Lyu.
+#ifndef Node_hpp
+#define Node_hpp
+#include "../Engine.hpp"
 #define LIGHTS_LIMIT 10
-struct Vertex;
-class Shader;
 class Geometry;
 class Animator;
+class LightNode;
 class Node {
 private:
-    void processNode(aiNode* node, const aiScene* scene);
+    vector<Node*> childNodes;
+    LightNode* lightNode;
     mat4 worldTransform;
-protected:
-    string classType;
+    map<string, Node*> boneNodes;
 public:
+    string name;
+    unsigned int tags;
+    Node* parent;
+    bool isHidden;
     vec3 position;
     vec3 eulerAngles;
     vec3 scale;
     vector<Geometry*> geometries;
     vector<Animator*> animators;
-    vector<Node*> children;
-    Node* parent;
-    bool isHidden;
     Node();
+    void addChildNode(Node* node);
+    void removeFromParentNode();
     void loadUnitCube();
-    void loadFile(string file);
+    void loadModelFile(string file);
     Animator* loadAnimator(string file);
-    void addChild(Node* node);
-    void update(mat4 parentTransform, float deltaTime);
+    Node* generateBoneNode(string boneName);
     void updateTransform();
-    void prepareForRendering(mat4 parentTransform);
-    void calculateWorldTransform(mat4 parentTransform);
-    vec3 getWorldPosition();
     mat4 getWorldTransform();
+    vec3 getWorldPosition();
+    vec3 getWorldEulerAngles();
+    vec3 getWorldScale();
     vec3 convertLocalPositionToWorld(vec3 localPosition);
     vec3 convertLocalVectorToWorld(vec3 localVector);
     vec3 getFrontVectorInWorld();
@@ -41,9 +42,13 @@ public:
     vec3 getRightVectorInWorld();
     vec3 getUpVectorInWorld();
     vec3 getDownVectorInWorld();
-    mat4 getBoneWorldTransform(string boneName);
-    void stickToBoneOfNode(string boneName, Node* node);
     ~Node();
+    void engineInitializeNode();
+    void engineNodeSetLightNode(LightNode* node);
+    void engineProcessNode(aiNode* node, const aiScene* scene);
+    void engineUpdateNodeAnimators(mat4 parentWorldTransform);
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform);
+    void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
 };
 class CameraNode: public Node {
 public:
@@ -53,10 +58,12 @@ public:
     CameraNode(float field, float near, float far);
     mat4 getProjectionTransform();
     mat4 getViewTransform();
+    ~CameraNode() = default;
 };
 class LightNode: public Node {
+private:
+    unsigned int lightType;
 public:
-    int type;
     vec3 colorFactor;
     vec3 highlightFactor;
     float attenuationExponent;
@@ -64,12 +71,12 @@ public:
     float innerAngle;
     float outerAngle;
     unsigned int lightMask;
-    unsigned int shadowMask;
     LightNode(vec3 color);
     void setAmbientLight();
     void setDirectionalLight();
     void setPointLight(float attenuationExponent, float range);
     void setSpotLight(float attenuationExponent, float range, float innerAngle, float outerAngle);
-    void configurateShader(Shader* shader, int index);
+    ~LightNode() = default;
+    void engineConfigurateShader(Shader* shader, int index);
 };
 #endif

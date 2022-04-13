@@ -1,14 +1,7 @@
-// Developed by Kelin.Lyu.
-#include "geometry.hpp"
+// Developed by Kelin Lyu.
+#include "Geometry.hpp"
 UnitCube::UnitCube() {
-    this->cullMode = 0;
-    this->shader = NULL;
-    this->material = NULL;
-    this->bonesCount = 0;
-    this->isHidden = false;
-    this->renderingOrder = 0;
-    this->lightMask = -1;
-    this->shadowMask = -1;
+    this->engineInitializeGeometry();
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     Vertex vertex1 = Vertex();

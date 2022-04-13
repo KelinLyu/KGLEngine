@@ -1,11 +1,31 @@
-// Developed by Kelin.Lyu.
-#ifndef material_hpp
-#define material_hpp
-#include "../core.hpp"
+// Developed by Kelin Lyu.
+#ifndef Material_hpp
+#define Material_hpp
+#include "../Engine.hpp"
 class Shader;
 class Material final {
-public:
+private:
     Shader* shader;
+    float currentOpacity;
+    vec4 currentDiffuseColor;
+    float currentDiffuseIntensity;
+    float currentAlphaCutThreshold;
+    float currentNormalIntensity;
+    float currentHeightIntensity;
+    vec2 currentHeightLayerRange;
+    float currentMetallic;
+    float currentMetallicIntensity;
+    int currentReverseMetallic;
+    float currentRoughness;
+    float currentRoughnessIntensity;
+    int currentReverseRoughness;
+    float currentReflectionIntensity;
+    float currentAmbientOcclusionIntensity;
+    vec4 currentMultiplyColor;
+    float currentMultiplyIntensity;
+    vec4 currentEmissionColor;
+    float currentEmissionIntensity;
+public:
     float opacity;
     vec4 diffuseColor;
     float diffuseIntensity;
@@ -38,7 +58,8 @@ public:
     void setAmbientOcclusionMap(Texture* texture);
     void setMultiplyMap(Texture* texture);
     void setEmissionMap(Texture* texture);
-    void render();
     ~Material();
+    Shader* engineGetMaterialShader();
+    void engineRenderMaterial();
 };
 #endif

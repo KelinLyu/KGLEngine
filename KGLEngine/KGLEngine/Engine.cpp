@@ -1,13 +1,11 @@
-// Developed by Kelin.Lyu.
-#include "core.hpp"
+// Developed by Kelin Lyu.
+#include "Engine.hpp"
 Engine* Engine::main;
 Engine::Engine(const char* windowTitle,
                float resolutionScaleFactor,
                bool fullscreenMode,
                int samples,
-               const char* iconFile,
-               bool useAbsolutePaths) {
-    this->useAbsolutePaths = useAbsolutePaths;
+               const char* iconFile) {
     this->fps = 1.0f / 60.0f;
     this->currentFps = 0.0f;
     this->currentTime = 0.0f;
@@ -22,7 +20,7 @@ Engine::Engine(const char* windowTitle,
         cout << "\nFailed to find the executable's location using getcwd()!\n" << endl;
         exit(1);
     }
-    this->programDirectory = string(directory);
+    this->workingDirectory = string(directory);
     // initialize the window:
     glfwTerminate();
     if(!glfwInit()) {
@@ -135,9 +133,9 @@ void Engine::keyboardInteractions(GLFWwindow* window, int key, int code,
                 }
             }
         }
-        Engine::main->input->engineKeyEvent(key, 1, Engine::main->getTime(), character);
+        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), character);
     }else if(action == GLFW_RELEASE) {
-        Engine::main->input->engineKeyEvent(key, 3, Engine::main->getTime(), "");
+        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
     }
 }
 void Engine::mouseInteractions(GLFWwindow* window, int button,
@@ -151,17 +149,17 @@ void Engine::mouseInteractions(GLFWwindow* window, int button,
         key = MOUSE_BUTTON_MIDDLE;
     }
     if(action == GLFW_PRESS) {
-        Engine::main->input->engineKeyEvent(key, 1, Engine::main->getTime(), "");
+        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), "");
     }else if(action == GLFW_RELEASE) {
-        Engine::main->input->engineKeyEvent(key, 3, Engine::main->getTime(), "");
+        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
     }
 }
 void Engine::mouseMovements(GLFWwindow* window, double x, double y) {
     vec2 position = vec2(x, y);
-    Engine::main->input->engineMouseEvent(position);
+    Engine::main->input->engineSetMouseEvent(position);
 }
 void Engine::scrollWheelInteractions(GLFWwindow* window, double dx, double dy) {
-    Engine::main->input->engineScrollWheelEvent(dy);
+    Engine::main->input->engineSetScrollWheelEvent(dy);
 }
 bool Engine::isRunning() {
     return(!glfwWindowShouldClose(this->window));
@@ -173,8 +171,8 @@ bool Engine::shouldUpdate() {
     this->deltaTime = this->currentTime - this->updateTime;
     this->currentFps = 1.0f / deltaTime;
     if(this->deltaTime >= this->fps) {
-        this->input->update();
-        this->root->update(mat4(1.0f), this->deltaTime);
+        this->input->engineUpdateInput();
+        this->root->engineUpdateNodeAnimators(mat4(1.0f));
         this->updateTime = this->currentTime;
         result = true;
     }
@@ -184,38 +182,32 @@ void Engine::render() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     if(this->camera != NULL) {
-        this->geometries.clear();
-        this->lightNodes.clear();
-        this->root->prepareForRendering(mat4(1.0f));
+        this->preparedGeometries.clear();
+        this->preparedLightNodes.clear();
+        this->root->enginePrepareNodeForRendering(mat4(1.0f));
         if(this->skybox != NULL) {
             this->skybox->render();
         }
-        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-            this->geometries[i]->render(&this->lightNodes);
+        for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
+            this->preparedGeometries[i]->engineRenderGeometry();
         }
-        this->geometries.clear();
-        this->lightNodes.clear();
+        this->preparedGeometries.clear();
+        this->preparedLightNodes.clear();
     }
     glfwSwapInterval(1);
     glfwSwapBuffers(this->window);
 }
 void Engine::prepareGeometryForRendering(Geometry* geometry) {
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        if(this->geometries[i]->renderingOrder > geometry->renderingOrder) {
-            this->geometries.insert(this->geometries.begin() + i, geometry);
+    for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
+        if(this->preparedGeometries[i]->renderingOrder > geometry->renderingOrder) {
+            this->preparedGeometries.insert(this->preparedGeometries.begin() + i, geometry);
             return;
         }
     }
-    this->geometries.push_back(geometry);
+    this->preparedGeometries.push_back(geometry);
 }
 void Engine::prepareLightNodeForRendering(LightNode* lightNode) {
-    this->lightNodes.push_back(lightNode);
-}
-string Engine::getProgramDirectory() {
-    if(this->useAbsolutePaths) {
-        return("");
-    }
-    return(this->programDirectory);
+    this->preparedLightNodes.push_back(lightNode);
 }
 vec2 Engine::getScreenResolution() {
     return(vec2(this->screenWidth, this->screenHeight));

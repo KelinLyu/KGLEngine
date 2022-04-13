@@ -1,8 +1,10 @@
-// Developed by Kelin.Lyu.
-#include "material.hpp"
+// Developed by Kelin Lyu.
+#include "Material.hpp"
 Material::Material(float metallic, float roughness) {
     string vertexShaderCode = R""""(
 #version 330 core
+const int MAX_BONE_INFLUENCE = 4;
+const int BONES_LIMIT = 120;
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
 layout (location = 2) in vec2 vertexUV;
@@ -17,33 +19,13 @@ out fragment_data {
     mat3 TBN;
     mat3 inverseTBN;
 } fragment;
-struct frame_data {
-    mat4 viewTransform;
-    mat4 inverseViewTransform;
-    mat4 projectionTransform;
-    mat4 inverseProjectionTransform;
-    mat4 viewProjectionTransform;
-    mat4 inverseViewProjectionTransform;
-    float time;
-    float random;
-    vec3 cameraPosition;
-    vec3 cameraDirection;
-    mat4 cameraTransform;
-};
 struct node_data {
     mat4 modelTransform;
-    mat4 inverseModelTransform;
     mat4 normalTransform;
-    mat4 modelViewTransform;
-    mat4 inverseModelViewTransform;
     mat4 modelViewProjectionTransform;
-    mat4 inverseModelViewProjectionTransform;
 };
-uniform frame_data frame;
 uniform node_data node;
 uniform bool hasBones;
-const int MAX_BONE_INFLUENCE = 4;
-const int BONES_LIMIT = 120;
 uniform mat4 boneTransforms[BONES_LIMIT];
 void main() {
     if(hasBones) {
@@ -76,6 +58,7 @@ void main() {
 )"""";
     string fragmentShaderCode = R""""(
 #version 330 core
+const int LIGHTS_LIMIT = 10;
 in fragment_data {
     vec3 position;
     vec3 normal;
@@ -85,30 +68,16 @@ in fragment_data {
 } fragment;
 out vec4 color;
 struct frame_data {
-    mat4 viewTransform;
-    mat4 inverseViewTransform;
-    mat4 projectionTransform;
-    mat4 inverseProjectionTransform;
-    mat4 viewProjectionTransform;
-    mat4 inverseViewProjectionTransform;
     float time;
     float random;
     vec3 cameraPosition;
     vec3 cameraDirection;
-    mat4 cameraTransform;
-    float cameraNear;
-    float cameraFar;
 };
 struct node_data {
     mat4 modelTransform;
-    mat4 inverseModelTransform;
     mat4 normalTransform;
-    mat4 modelViewTransform;
-    mat4 inverseModelViewTransform;
     mat4 modelViewProjectionTransform;
-    mat4 inverseModelViewProjectionTransform;
 };
-const int LIGHTS_LIMIT = 10;
 struct light_data {
     int type;
     vec3 colorFactor;
@@ -123,9 +92,8 @@ struct light_data {
 uniform frame_data frame;
 uniform node_data node;
 uniform light_data lights[LIGHTS_LIMIT];
-const float pi = 3.1416f;
+uniform int lightCount;
 uniform float opacity;
-uniform bool useFlatMaterial;
 uniform vec4 defaultDiffuseColor;
 uniform bool useDiffuseMap;
 uniform sampler2D diffuseMap;
@@ -186,15 +154,6 @@ void main() {
         float newHeight  = currentHeight - currentLayerHeight;
         float weight = newHeight / (newHeight - previousHeight);
         UV = previousUV * weight + currentUV * (1.0f - weight);
-        float fragmentZ = gl_FragCoord.z * 2.0f - 1.0f;
-        float depth = 2.0f * frame.cameraNear * frame.cameraFar;
-        depth /= frame.cameraFar + frame.cameraNear - fragmentZ * (frame.cameraFar - frame.cameraNear);
-        float newDepth = depth - currentHeight * 0.1f * heightIntensity;
-        newDepth = (1.0f / newDepth) - (1.0f / frame.cameraNear);
-        newDepth /= (1.0f / frame.cameraFar) - (1.0f / frame.cameraNear);
-        gl_FragDepth = newDepth;
-    }else{
-        gl_FragDepth = gl_FragCoord.z;
     }
     vec4 diffuseColor = defaultDiffuseColor;
     if(useDiffuseMap) {
@@ -204,14 +163,6 @@ void main() {
         }
     }
     diffuseColor *= diffuseIntensity;
-    if(useFlatMaterial) {
-        color = diffuseColor;
-        color.a *= opacity;
-        if(color.a < alphaCutThreshold) {
-            discard;
-        }
-        return;
-    }
     vec3 normal;
     if(useNormalMap) {
         normal = texture(normalMap, UV).rgb;
@@ -242,9 +193,11 @@ void main() {
     roughness = max(0.0f, min(roughness, 1.0f));
     roughness = 0.2f + 0.6f * roughness;
     vec3 viewVector = normalize(frame.cameraPosition - fragment.position);
-    vec3 F0 = mix(vec3(0.1f), diffuseColor.rgb, metallic);
     vec3 lightingColor = vec3(0.0f);
-    for(int i = 0; i < LIGHTS_LIMIT; i += 1) {
+    float roughness4 = roughness * roughness * roughness * roughness;
+    float roughness4OverPi = roughness4 / 3.1416f;
+    float roughness4MinusOne = roughness4 - 1.0f;
+    for(int i = 0; i < lightCount; i += 1) {
         if(lights[i].type == 0) {
             lightingColor += diffuseColor.rgb * lights[i].colorFactor;
             continue;
@@ -267,37 +220,45 @@ void main() {
             float attenuationProgress = max((lights[i].range - lightDistance) / lights[i].range, 0.0f);
             float attenuation = pow(attenuationProgress, lights[i].attenuationExponent);
             lightVector = normalize(lightVector);
-            float theta = dot(lightVector, normalize(-lights[i].direction));
+            float theta = dot(lightVector, -lights[i].direction);
             float epsilon = lights[i].innerAngle - lights[i].outerAngle;
-            attenuation *= clamp((theta - lights[i].outerAngle) / epsilon, 0.0f, 1.0f);
+            float intensity = (theta - lights[i].outerAngle) / epsilon;
+            attenuation *= clamp(intensity, 0.0f, 1.0f);
             lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
         }
+        if(lightFactor <= 0.0f) {
+            continue;
+        }
         vec3 halfwayVector = normalize(viewVector + lightVector);
-        float roughness4 = roughness * roughness * roughness * roughness;
         float NdotH = max(dot(normal, halfwayVector), 0.0f);
         float NdotH2 = NdotH * NdotH;
-        float denominator = (NdotH2 * (roughness4 - 1.0f) + 1.0f);
-        denominator = pi * denominator * denominator;
-        float NDF = roughness4 / denominator;
-        float factor = clamp(1.0f - max(dot(halfwayVector, viewVector), 0.0f), 0.0f, 1.0f);
-        factor = factor * factor * factor * factor * factor;
-        vec3 F = (F0 + (1.0 - F0) * factor);
-        lightingColor += ((vec3(1.0f) - F) * diffuseColor.rgb / pi) * lightFactor * lights[i].colorFactor;
+        float denominator = (NdotH2 * roughness4MinusOne + 1.0f);
+        denominator = denominator * denominator;
+        float NDF = roughness4OverPi / denominator;
+        float maxHdotV = max(dot(halfwayVector, viewVector), 0.0f);
+        float factor = clamp(1.0f - maxHdotV, 0.0f, 1.0f);
+        float F = (metallic + (1.0 - metallic) * factor);
+        lightingColor += ((1.0 - F) * diffuseColor.rgb / 3.1416f) * lightFactor * lights[i].colorFactor;
         lightingColor += NDF * diffuseColor.rgb * lightFactor * lights[i].highlightFactor;
     }
-    float ambientOcclusion = 1.0f;
-    if(useAmbientOcclusionMap) {
-        ambientOcclusion = texture(ambientOcclusionMap, UV).r;
-        float inverseAmbientOcclusion = 1.0f - ambientOcclusion;
-        ambientOcclusion = 1.0f - inverseAmbientOcclusion * ambientOcclusionIntensity;
-    }
-    color = vec4(lightingColor * ambientOcclusion, 1.0);
+    vec3 F0 = mix(vec3(0.1f), diffuseColor.rgb, metallic);
+    float cosTheta = max(dot(normal, viewVector), 0.0f);
+    float factor = clamp(1.0f - cosTheta, 0.0f, 1.0f);
+    vec3 F = F0 + (max(vec3(1.0f - roughness), F0) - F0) * factor;
+    vec3 kD = (1.0f - F) * (1.0f - metallic);
+    color = vec4(kD * diffuseColor.rgb + lightingColor, diffuseColor.a * opacity);
     if(useReflectionMap) {
         vec3 reflectionVector = reflect(-viewVector, normal);
         vec2 uv = vec2(atan(reflectionVector.z, reflectionVector.x), -asin(reflectionVector.y));
         uv = uv * vec2(0.1592f, 0.3183f) + 0.5f;
         vec3 reflection = texture(ReflectionMap, uv).rgb * reflectionIntensity;
-        color.rgb += reflection * metallic * (1.0 - roughness) * ambientOcclusion;
+        color.rgb += reflection * (metallic) * (1.0 - roughness);
+    }
+    if(useAmbientOcclusionMap) {
+        float ambientOcclusion = texture(ambientOcclusionMap, UV).r;
+        float inverseAmbientOcclusion = 1.0f - ambientOcclusion;
+        ambientOcclusion = 1.0f - inverseAmbientOcclusion * ambientOcclusionIntensity;
+        color.rgb *= ambientOcclusion;
     }
     color.rgb = color.rgb / (color.rgb + vec3(1.0f));
     vec3 multiplyColor = defaultMultiplyColor.rgb;
@@ -312,10 +273,37 @@ void main() {
         emissionColor = texture(emissionMap, UV).rgb * emissionIntensity;
     }
     color.rgb += emissionColor;
-    color.a *= diffuseColor.a * opacity;
 }
 )"""";
     this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
+    this->currentOpacity = -1.0f;
+    this->currentDiffuseColor = vec4(-1.0f);
+    this->currentDiffuseIntensity = -1.0f;
+    this->currentAlphaCutThreshold = -1.0f;
+    this->currentNormalIntensity = -1.0f;
+    this->currentHeightIntensity = -1.0f;
+    this->currentHeightLayerRange= vec2(-1.0f);
+    this->currentMetallic = -1.0f;
+    this->currentMetallicIntensity = -1.0f;
+    this->currentReverseMetallic = -1;
+    this->currentRoughness = -1.0f;
+    this->currentRoughnessIntensity = -1.0f;
+    this->currentReverseRoughness = -1;
+    this->currentReflectionIntensity = -1.0f;
+    this->currentAmbientOcclusionIntensity = -1.0f;
+    this->currentMultiplyColor = vec4(-1.0f);
+    this->currentMultiplyIntensity = -1.0f;
+    this->currentEmissionColor = vec4(-1.0f);
+    this->currentEmissionIntensity = -1.0f;
+    this->shader->setInt("useDiffuseMap", 0);
+    this->shader->setInt("useNormalMap", 0);
+    this->shader->setInt("useHeightMap", 0);
+    this->shader->setInt("useMetallicMap", 0);
+    this->shader->setInt("useRoughnessMap", 0);
+    this->shader->setInt("useReflectionMap", 0);
+    this->shader->setInt("useAmbientOcclusionMap", 0);
+    this->shader->setInt("useMultiplyMap", 0);
+    this->shader->setInt("useEmissionMap", 0);
     this->opacity = 1.0f;
     this->diffuseColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
     this->diffuseIntensity = 1.0f;
@@ -347,69 +335,121 @@ void Material::setSemitransparent() {
 }
 void Material::setDiffuseMap(Texture* texture) {
     this->shader->setInt("useDiffuseMap", 1);
-    this->shader->addTexture(texture, "diffuseMap");
+    this->shader->setTexture("diffuseMap", texture);
 }
 void Material::setNormalMap(Texture* texture) {
     this->shader->setInt("useNormalMap", 1);
-    this->shader->addTexture(texture, "normalMap");
+    this->shader->setTexture("normalMap", texture);
 }
 void Material::setHeightMap(Texture* texture) {
     this->shader->setInt("useHeightMap", 1);
-    this->shader->addTexture(texture, "heightMap");
+    this->shader->setTexture("heightMap", texture);
 }
 void Material::setMetallicMap(Texture* texture) {
     this->shader->setInt("useMetallicMap", 1);
-    this->shader->addTexture(texture, "metallicMap");
+    this->shader->setTexture("metallicMap", texture);
 }
 void Material::setRoughnessMap(Texture* texture) {
     this->shader->setInt("useRoughnessMap", 1);
-    this->shader->addTexture(texture, "roughnessMap");
+    this->shader->setTexture("roughnessMap", texture);
 }
 void Material::setReflectionMap(Texture* texture) {
     this->shader->setInt("useReflectionMap", 1);
-    this->shader->addTexture(texture, "ReflectionMap");
+    this->shader->setTexture("ReflectionMap", texture);
 }
 void Material::setAmbientOcclusionMap(Texture* texture) {
     this->shader->setInt("useAmbientOcclusionMap", 1);
-    this->shader->addTexture(texture, "ambientOcclusionMap");
+    this->shader->setTexture("ambientOcclusionMap", texture);
 }
 void Material::setMultiplyMap(Texture* texture) {
     this->shader->setInt("useMultiplyMap", 1);
-    this->shader->addTexture(texture, "multiplyMap");
+    this->shader->setTexture("multiplyMap", texture);
 }
 void Material::setEmissionMap(Texture* texture) {
     this->shader->setInt("useEmissionMap", 1);
-    this->shader->addTexture(texture, "emissionMap");
-}
-void Material::render() {
-    this->shader->setFloat("opacity", this->opacity);
-    this->shader->setVec4("defaultDiffuseColor", this->diffuseColor);
-    this->shader->setFloat("diffuseIntensity", this->diffuseIntensity);
-    this->shader->setFloat("alphaCutThreshold", this->alphaCutThreshold);
-    this->shader->setFloat("normalIntensity", this->normalIntensity);
-    this->shader->setFloat("heightIntensity", this->heightIntensity);
-    this->shader->setVec2("heightLayerRange", this->heightLayerRange);
-    this->shader->setFloat("defaultMetallic", this->metallic);
-    this->shader->setFloat("metallicIntensity", this->metallicIntensity);
-    if(this->reverseMetallic) {
-        this->shader->setInt("reverseMetallic", 1);
-    }else{
-        this->shader->setInt("reverseMetallic", 0);
-    }
-    this->shader->setFloat("defaultRoughness", this->roughness);
-    this->shader->setFloat("roughnessIntensity", this->roughnessIntensity);
-    if(this->reverseRoughness) {
-        this->shader->setInt("reverseRoughness", 1);
-    }else{
-        this->shader->setInt("reverseRoughness", 0);
-    }
-    this->shader->setFloat("reflectionIntensity", this->reflectionIntensity);
-    this->shader->setFloat("ambientOcclusionIntensity", this->ambientOcclusionIntensity);
-    this->shader->setVec4("defaultMultiplyColor", this->multiplyColor);
-    this->shader->setFloat("multiplyIntensity", this->multiplyIntensity);
-    this->shader->setVec4("defaultEmissionColor", this->emissionColor);
-    this->shader->setFloat("emissionIntensity", this->emissionIntensity);
+    this->shader->setTexture("emissionMap", texture);
 }
 Material::~Material() {
     delete(this->shader);
+}
+Shader* Material::engineGetMaterialShader() {
+    return(this->shader);
+}
+void Material::engineRenderMaterial() {
+    if(this->currentOpacity != this->opacity) {
+        this->currentOpacity = this->opacity;
+        this->shader->setFloat("opacity", this->opacity);
+    }
+    if(this->currentDiffuseColor != this->diffuseColor) {
+        this->currentDiffuseColor = this->diffuseColor;
+        this->shader->setVec4("defaultDiffuseColor", this->diffuseColor);
+    }
+    if(this->currentDiffuseIntensity != this->diffuseIntensity) {
+        this->currentDiffuseIntensity = this->diffuseIntensity;
+        this->shader->setFloat("diffuseIntensity", this->diffuseIntensity);
+    }
+    if(this->currentAlphaCutThreshold != this->alphaCutThreshold) {
+        this->currentAlphaCutThreshold = this->alphaCutThreshold;
+        this->shader->setFloat("alphaCutThreshold", this->alphaCutThreshold);
+    }
+    if(this->currentNormalIntensity != this->normalIntensity) {
+        this->currentNormalIntensity = this->normalIntensity;
+        this->shader->setFloat("normalIntensity", this->normalIntensity);
+    }
+    if(this->currentHeightIntensity != this->heightIntensity) {
+        this->currentHeightIntensity = this->heightIntensity;
+        this->shader->setFloat("heightIntensity", this->heightIntensity);
+    }
+    if(this->currentHeightLayerRange != this->heightLayerRange) {
+        this->currentHeightLayerRange = this->heightLayerRange;
+        this->shader->setVec2("heightLayerRange", this->heightLayerRange);
+    }
+    if(this->currentMetallic != this->metallic) {
+        this->currentMetallic = this->metallic;
+        this->shader->setFloat("defaultMetallic", this->metallic);
+    }
+    if(this->currentMetallicIntensity != this->metallicIntensity) {
+        this->currentMetallicIntensity = this->metallicIntensity;
+        this->shader->setFloat("metallicIntensity", this->metallicIntensity);
+    }
+    if(this->currentReverseMetallic != this->reverseMetallic) {
+        this->currentReverseMetallic = this->reverseMetallic;
+        this->shader->setBool("reverseMetallic", this->reverseMetallic);
+    }
+    if(this->currentRoughness != this->roughness) {
+        this->currentRoughness = this->roughness;
+        this->shader->setFloat("defaultRoughness", this->roughness);
+    }
+    if(this->currentRoughnessIntensity != this->roughnessIntensity) {
+        this->currentRoughnessIntensity = this->roughnessIntensity;
+        this->shader->setFloat("roughnessIntensity", this->roughnessIntensity);
+    }
+    if(this->currentReverseRoughness != this->reverseRoughness) {
+        this->currentReverseRoughness = this->reverseRoughness;
+        this->shader->setBool("reverseRoughness", this->reverseRoughness);
+    }
+    if(this->currentReflectionIntensity != this->reflectionIntensity) {
+        this->currentReflectionIntensity = this->reflectionIntensity;
+        this->shader->setFloat("reflectionIntensity", this->reflectionIntensity);
+    }
+    if(this->currentAmbientOcclusionIntensity != this->ambientOcclusionIntensity) {
+        this->currentAmbientOcclusionIntensity = this->ambientOcclusionIntensity;
+        this->shader->setFloat("ambientOcclusionIntensity", this->ambientOcclusionIntensity);
+    }
+    if(this->currentMultiplyColor != this->multiplyColor) {
+        this->currentMultiplyColor = this->multiplyColor;
+        this->shader->setVec4("defaultMultiplyColor", this->multiplyColor);
+    }
+    if(this->currentMultiplyIntensity != this->multiplyIntensity) {
+        this->currentMultiplyIntensity = this->multiplyIntensity;
+        this->shader->setFloat("multiplyIntensity", this->multiplyIntensity);
+    }
+    if(this->currentEmissionColor != this->emissionColor) {
+        this->currentEmissionColor = this->emissionColor;
+        this->shader->setVec4("defaultEmissionColor", this->emissionColor);
+    }
+    if(this->currentEmissionIntensity != this->emissionIntensity) {
+        this->currentEmissionIntensity = this->emissionIntensity;
+        this->shader->setFloat("emissionIntensity", this->emissionIntensity);
+    }
 }

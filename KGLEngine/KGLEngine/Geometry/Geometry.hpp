@@ -1,7 +1,7 @@
-// Developed by Kelin.Lyu.
-#ifndef geometry_hpp
-#define geometry_hpp
-#include "../core.hpp"
+// Developed by Kelin Lyu.
+#ifndef Geometry_hpp
+#define Geometry_hpp
+#include "../Engine.hpp"
 #define MAX_BONE_INFLUENCE 4
 #define BONES_LIMIT 120
 struct Vertex {
@@ -14,13 +14,13 @@ struct Vertex {
     float weights[MAX_BONE_INFLUENCE];
 };
 struct BoneInfo;
-struct AssimpNode;
+struct AnimationBoneNode;
 class Shader;
 class Material;
 class Animation;
-class LightNode;
 class Geometry {
 protected:
+    unsigned int cullMode;
     Shader* shader;
     Material* material;
     unsigned int vertexArrays;
@@ -31,14 +31,11 @@ protected:
     int bonesCount;
     map<string, BoneInfo> bonesInfoMap;
     vector<mat4> boneTransforms;
-    void calculateBoneTransforms(AssimpNode* node, mat4 parentTransform, bool first);
-    mat4 worldTransform;
-    int cullMode;
+    mat4 modelTransform;
 public:
     bool isHidden;
     int renderingOrder;
     unsigned int lightMask;
-    unsigned int shadowMask;
     Geometry() = default;
     Geometry(aiMesh* mesh);
     void cullBack();
@@ -46,15 +43,19 @@ public:
     void doubleSided();
     void setShader(Shader* shader);
     void setMaterial(Material* material);
-    void addAnimation(Animation* animation);
-    void update(mat4 worldTransform);
-    void prepareForRendering();
-    void render(vector<LightNode*>* lights);
-    bool hasBones();
-    map<string, BoneInfo>& getBonesInfoMap();
-    int& getBonesCount();
-    mat4 getBoneWorldTransform(string name);
     ~Geometry();
+    void engineInitializeGeometry();
+    mat4 engineGetGeometryModelTransform();
+    bool engineCheckIfGeometryHasBones();
+    int& engineGetGeometryBonesCountReference();
+    map<string, BoneInfo>& engineGetGeometryBonesInfoMapReference();
+    vector<mat4>& engineGetGeometryBoneTransformsReference();
+    void engineCalculateGeometryBoneTransforms(AnimationBoneNode* node, mat4 parentTransform, bool first);
+    mat4 engineGetGeometryBoneTransform(string name);
+    void engineAddAnimationToGeometry(Animation* animation);
+    void engineUpdateGeometryAnimations();
+    void enginePrepareGeometryForRendering(mat4 worldTransform);
+    void engineRenderGeometry();
 };
 class UnitCube: public Geometry {
 public:

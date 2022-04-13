@@ -1,5 +1,7 @@
-// Developed by Kelin.Lyu.
+// Developed by Kelin Lyu.
 #version 330 core
+const int MAX_BONE_INFLUENCE = 4;
+const int BONES_LIMIT = 120;
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
 layout (location = 2) in vec2 vertexUV;
@@ -14,33 +16,13 @@ out fragment_data {
     mat3 TBN;
     mat3 inverseTBN;
 } fragment;
-struct frame_data {
-    mat4 viewTransform;
-    mat4 inverseViewTransform;
-    mat4 projectionTransform;
-    mat4 inverseProjectionTransform;
-    mat4 viewProjectionTransform;
-    mat4 inverseViewProjectionTransform;
-    float time;
-    float random;
-    vec3 cameraPosition;
-    vec3 cameraDirection;
-    mat4 cameraTransform;
-};
 struct node_data {
     mat4 modelTransform;
-    mat4 inverseModelTransform;
     mat4 normalTransform;
-    mat4 modelViewTransform;
-    mat4 inverseModelViewTransform;
     mat4 modelViewProjectionTransform;
-    mat4 inverseModelViewProjectionTransform;
 };
-uniform frame_data frame;
 uniform node_data node;
 uniform bool hasBones;
-const int MAX_BONE_INFLUENCE = 4;
-const int BONES_LIMIT = 120;
 uniform mat4 boneTransforms[BONES_LIMIT];
 void main() {
     if(hasBones) {

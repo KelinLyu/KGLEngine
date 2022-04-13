@@ -1,5 +1,5 @@
-// Developed by Kelin.Lyu.
-#include "texture.hpp"
+// Developed by Kelin Lyu.
+#include "Texture.hpp"
 Texture::Texture(string file, float maxAnisotropy, bool generateMipmaps) {
     glGenTextures(1, &this->data);
     glBindTexture(GL_TEXTURE_2D, this->data);

@@ -1,46 +1,16 @@
-// Developed by Kelin.Lyu.
-#include "input.hpp"
-Input::KeyEvent::KeyEvent(int key, int state, float time) {
+// Developed by Kelin Lyu.
+#include "Input.hpp"
+Input::KeyEvent::KeyEvent(int key, unsigned int state, float time) {
     this->key = key;
     this->state = state;
     this->stateUpdateTime = time;
 }
 Input::Input() {
     this->initialized = false;
-    this->latestMousePosition = vec2(0.0f, 0.0f);
-    this->mousePosition = vec2(0.0f, 0.0f);
-    this->mouseTranslation = vec2(0.0f, 0.0f);
+    this->latestMousePosition = vec2(0.0f);
+    this->mousePosition = vec2(0.0f);
+    this->mouseTranslation = vec2(0.0f);
     this->scrollWheelAcceleration = 0.0f;
-}
-void Input::engineKeyEvent(int key, int state, float time, string character) {
-    Input::KeyEvent* targetKeyEvent = NULL;
-    int i = 0;
-    while(i < this->keyEvents.size()) {
-        if(this->keyEvents[i].key == key) {
-            targetKeyEvent = &this->keyEvents[i];
-        }
-        i += 1;
-    }
-    if(targetKeyEvent == NULL) {
-        Input::KeyEvent* newKeyEvent = new Input::KeyEvent(key, state, time);
-        this->keyEvents.push_back(*newKeyEvent);
-    }else{
-        targetKeyEvent->state = state;
-        targetKeyEvent->stateUpdateTime = time;
-    }
-    if(state == 1) {
-        this->lastCharacter = character;
-    }
-}
-void Input::engineMouseEvent(vec2 position) {
-    this->latestMousePosition = position;
-    if(!this->initialized) {
-        this->mousePosition = position;
-        this->initialized = true;
-    }
-}
-void Input::engineScrollWheelEvent(float acceleration) {
-    this->scrollWheelAcceleration = acceleration;
 }
 bool Input::isPressingKey(int key) {
     int i = 0;
@@ -112,10 +82,40 @@ float Input::getScrollWheelAcceleration() {
     this->scrollWheelAcceleration = 0.0f;
     return(result);
 }
-void Input::update() {
-    this->mouseTranslation = this->latestMousePosition - this->mousePosition;
-    this->mousePosition = this->latestMousePosition;
-}
 Input::~Input() {
     this->keyEvents.clear();
+}
+void Input::engineSetKeyEvent(int key, unsigned int state, float time, string character) {
+    Input::KeyEvent* targetKeyEvent = NULL;
+    int i = 0;
+    while(i < this->keyEvents.size()) {
+        if(this->keyEvents[i].key == key) {
+            targetKeyEvent = &this->keyEvents[i];
+        }
+        i += 1;
+    }
+    if(targetKeyEvent == NULL) {
+        Input::KeyEvent* newKeyEvent = new Input::KeyEvent(key, state, time);
+        this->keyEvents.push_back(*newKeyEvent);
+    }else{
+        targetKeyEvent->state = state;
+        targetKeyEvent->stateUpdateTime = time;
+    }
+    if(state == 1) {
+        this->lastCharacter = character;
+    }
+}
+void Input::engineSetMouseEvent(vec2 position) {
+    this->latestMousePosition = position;
+    if(!this->initialized) {
+        this->mousePosition = position;
+        this->initialized = true;
+    }
+}
+void Input::engineSetScrollWheelEvent(float acceleration) {
+    this->scrollWheelAcceleration = acceleration;
+}
+void Input::engineUpdateInput() {
+    this->mouseTranslation = this->latestMousePosition - this->mousePosition;
+    this->mousePosition = this->latestMousePosition;
 }

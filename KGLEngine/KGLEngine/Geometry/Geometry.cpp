@@ -1,14 +1,7 @@
-// Developed by Kelin.Lyu.
-#include "geometry.hpp"
+// Developed by Kelin Lyu.
+#include "Geometry.hpp"
 Geometry::Geometry(aiMesh* mesh) {
-    this->cullMode = 0;
-    this->shader = NULL;
-    this->material = NULL;
-    this->bonesCount = 0;
-    this->isHidden = false;
-    this->renderingOrder = 0;
-    this->lightMask = -1;
-    this->shadowMask = -1;
+    this->engineInitializeGeometry();
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     for(unsigned int i = 0; i < mesh->mNumVertices; i += 1) {
@@ -114,87 +107,69 @@ void Geometry::setShader(Shader* shader) {
 }
 void Geometry::setMaterial(Material* material) {
     this->material = material;
-    this->shader = material->shader;
+    this->shader = material->engineGetMaterialShader();
 }
-void Geometry::addAnimation(Animation* animation) {
-    this->animations.push_back(animation);
+Geometry::~Geometry() {
+    glDeleteVertexArrays(1, &this->vertexArrays);
+    glDeleteBuffers(1, &this->vertexBuffers);
+    glDeleteBuffers(1, &this->elementBuffers);
+    for(unsigned int i = 0; i < this->animations.size(); i += 1) {
+        delete(this->animations[i]);
+    }
+    this->animations.clear();
+    this->shader = NULL;
+    this->material = NULL;
 }
-void Geometry::update(mat4 worldTransform) {
-    this->worldTransform = worldTransform;
-    if(this->hasBones()) {
-        if(this->animations.size() > 0) {
-            this->calculateBoneTransforms(this->animations[0]->assimpRootNode, mat4(1.0f), true);
-        }
-    }
+void Geometry::engineInitializeGeometry() {
+    this->cullMode = 0;
+    this->shader = NULL;
+    this->material = NULL;
+    this->bonesCount = 0;
+    this->modelTransform = mat4(0.0f);
+    this->isHidden = false;
+    this->renderingOrder = 0;
+    this->lightMask = -1;
 }
-void Geometry::prepareForRendering() {
-    if(this->isHidden) {
-        return;
-    }
-    if(this->shader == NULL) {
-        this->setShader(new Shader(this));
-    }
-    Engine::main->prepareGeometryForRendering(this);
+mat4 Geometry::engineGetGeometryModelTransform() {
+    return(this->modelTransform);
 }
-void Geometry::render(vector<LightNode*>* lights) {
-    glDepthFunc(GL_LESS);
-    if(this->cullMode == 0) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-    }else if(this->cullMode == 1) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-    }else if(this->cullMode == 2) {
-        glDisable(GL_CULL_FACE);
-    }
-    if(this->hasBones()) {
-        this->shader->setInt("hasBones", 1);
-        for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
-            this->shader->setMat4("boneTransforms[" + to_string(i) + "]", boneTransforms[i]);
-        }
-    }else{
-        this->shader->setInt("hasBones", 0);
-    }
-    for(unsigned int i = 0; i < LIGHTS_LIMIT; i += 1) {
-        if(i < lights->size()) {
-            (*lights)[i]->configurateShader(this->shader, i);
-        }else{
-            this->shader->setInt("lights[" + to_string(i) + "].type", -1);
-        }
-    }
-    if(this->material != NULL) {
-        this->material->render();
-    }
-    this->shader->render(this->worldTransform);
-    glBindVertexArray(this->vertexArrays);
-    glDrawElements(GL_TRIANGLES, this->indiceCount, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+bool Geometry::engineCheckIfGeometryHasBones() {
+    return(this->bonesCount > 0);
 }
-void Geometry::calculateBoneTransforms(AssimpNode *node, mat4 parentTransform, bool first) {
+int& Geometry::engineGetGeometryBonesCountReference() {
+    return(this->bonesCount);
+}
+map<string, BoneInfo>& Geometry::engineGetGeometryBonesInfoMapReference() {
+    return(this->bonesInfoMap);
+}
+vector<mat4>& Geometry::engineGetGeometryBoneTransformsReference() {
+    return(this->boneTransforms);
+}
+void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, mat4 parentTransform, bool first) {
     string nodeName = node->name;
     vector<mat4> nodeTransforms;
     mat4 finalTransform = node->transform;
     for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        Bone* bone = this->animations[i]->getBone(nodeName);
-        if(bone == NULL || this->animations[i]->animator == NULL) {
+        Bone* bone = this->animations[i]->engineGetBone(nodeName);
+        if(bone == NULL || this->animations[i]->engineGetAnimator() == NULL) {
             if(first) {
                 nodeTransforms.push_back(node->transform);
             }else{
                 nodeTransforms.push_back(mat4(0.0f));
             }
         }else{
-            bone->update(this->animations[i]->animator->getTime());
-            nodeTransforms.push_back(bone->getTransform());
+            bone->engineUpdateBoneAnimation(this->animations[i]->engineGetAnimator()->getTime());
+            nodeTransforms.push_back(bone->engineGetTransform());
         }
     }
     for(unsigned int i = 0; i < nodeTransforms.size(); i += 1) {
-        if(this->animations[i]->animator == NULL) {
+        if(this->animations[i]->engineGetAnimator() == NULL) {
             continue;
         }
         if(nodeTransforms[i] == mat4(0.0f)) {
             continue;
         }
-        float blendFactor = this->animations[i]->animator->getBlendFactor();
+        float blendFactor = this->animations[i]->engineGetAnimator()->enginegetCurrentBlendFactor();
         if(blendFactor == 0.0f) {
             continue;
         }
@@ -212,39 +187,58 @@ void Geometry::calculateBoneTransforms(AssimpNode *node, mat4 parentTransform, b
         this->boneTransforms[index] = globalTransform * offset;
     }
     for(unsigned int i = 0; i < node->children.size(); i += 1) {
-        this->calculateBoneTransforms(node->children[i], globalTransform, false);
+        this->engineCalculateGeometryBoneTransforms(node->children[i], globalTransform, false);
     }
 }
-bool Geometry::hasBones() {
-    return(this->bonesCount > 0);
-}
-map<string, BoneInfo>& Geometry::getBonesInfoMap() {
-    return(this->bonesInfoMap);
-}
-int& Geometry::getBonesCount() {
-    return(this->bonesCount);
-}
-mat4 Geometry::getBoneWorldTransform(string name) {
-    if(this->hasBones()) {
+mat4 Geometry::engineGetGeometryBoneTransform(string name) {
+    if(this->engineCheckIfGeometryHasBones()) {
         if(this->bonesInfoMap.find(name) != this->bonesInfoMap.end()) {
             int index = this->bonesInfoMap[name].id;
             mat4 transform = this->boneTransforms[index];
             if(transform != mat4(0.0f)) {
                 mat4 offset = this->bonesInfoMap[name].offset;
-                return(this->worldTransform * transform * inverse(offset));
+                return(transform * inverse(offset));
             }
         }
     }
     return(mat4(0.0f));
 }
-Geometry::~Geometry() {
-    glDeleteVertexArrays(1, &this->vertexArrays);
-    glDeleteBuffers(1, &this->vertexBuffers);
-    glDeleteBuffers(1, &this->elementBuffers);
-    for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        delete(this->animations[i]);
+void Geometry::engineAddAnimationToGeometry(Animation* animation) {
+    this->animations.push_back(animation);
+}
+void Geometry::engineUpdateGeometryAnimations() {
+    if(this->engineCheckIfGeometryHasBones()) {
+        if(this->animations.size() > 0) {
+            this->engineCalculateGeometryBoneTransforms(this->animations[0]->engineGetRootAnimationBoneNode(), mat4(1.0f), true);
+        }
     }
-    this->animations.clear();
-    this->shader = NULL;
-    this->material = NULL;
+}
+void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
+    this->modelTransform = worldTransform;
+    if(this->isHidden) {
+        return;
+    }
+    if(this->shader == NULL) {
+        this->setShader(new Shader());
+    }
+    Engine::main->prepareGeometryForRendering(this);
+}
+void Geometry::engineRenderGeometry() {
+    glDepthFunc(GL_LESS);
+    if(this->cullMode == 0) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }else if(this->cullMode == 1) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+    }else if(this->cullMode == 2) {
+        glDisable(GL_CULL_FACE);
+    }
+    if(this->material != NULL) {
+        this->material->engineRenderMaterial();
+    }
+    this->shader->engineRenderShader(this);
+    glBindVertexArray(this->vertexArrays);
+    glDrawElements(GL_TRIANGLES, this->indiceCount, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }

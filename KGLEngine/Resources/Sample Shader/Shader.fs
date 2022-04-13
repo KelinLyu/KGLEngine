@@ -1,5 +1,6 @@
-// Developed by Kelin.Lyu.
+// Developed by Kelin Lyu.
 #version 330 core
+const int LIGHTS_LIMIT = 10;
 in fragment_data {
     vec3 position;
     vec3 normal;
@@ -9,30 +10,16 @@ in fragment_data {
 } fragment;
 out vec4 color;
 struct frame_data {
-    mat4 viewTransform;
-    mat4 inverseViewTransform;
-    mat4 projectionTransform;
-    mat4 inverseProjectionTransform;
-    mat4 viewProjectionTransform;
-    mat4 inverseViewProjectionTransform;
     float time;
     float random;
     vec3 cameraPosition;
     vec3 cameraDirection;
-    mat4 cameraTransform;
-    float cameraNear;
-    float cameraFar;
 };
 struct node_data {
     mat4 modelTransform;
-    mat4 inverseModelTransform;
     mat4 normalTransform;
-    mat4 modelViewTransform;
-    mat4 inverseModelViewTransform;
     mat4 modelViewProjectionTransform;
-    mat4 inverseModelViewProjectionTransform;
 };
-const int LIGHTS_LIMIT = 10;
 struct light_data {
     int type;
     vec3 colorFactor;
@@ -47,9 +34,8 @@ struct light_data {
 uniform frame_data frame;
 uniform node_data node;
 uniform light_data lights[LIGHTS_LIMIT];
-const float pi = 3.1416f;
+uniform int lightCount;
 uniform float opacity;
-uniform bool useFlatMaterial;
 uniform vec4 defaultDiffuseColor;
 uniform bool useDiffuseMap;
 uniform sampler2D diffuseMap;
@@ -110,15 +96,6 @@ void main() {
         float newHeight  = currentHeight - currentLayerHeight;
         float weight = newHeight / (newHeight - previousHeight);
         UV = previousUV * weight + currentUV * (1.0f - weight);
-        float fragmentZ = gl_FragCoord.z * 2.0f - 1.0f;
-        float depth = 2.0f * frame.cameraNear * frame.cameraFar;
-        depth /= frame.cameraFar + frame.cameraNear - fragmentZ * (frame.cameraFar - frame.cameraNear);
-        float newDepth = depth - currentHeight * 0.1f * heightIntensity;
-        newDepth = (1.0f / newDepth) - (1.0f / frame.cameraNear);
-        newDepth /= (1.0f / frame.cameraFar) - (1.0f / frame.cameraNear);
-        gl_FragDepth = newDepth;
-    }else{
-        gl_FragDepth = gl_FragCoord.z;
     }
     vec4 diffuseColor = defaultDiffuseColor;
     if(useDiffuseMap) {
@@ -128,14 +105,6 @@ void main() {
         }
     }
     diffuseColor *= diffuseIntensity;
-    if(useFlatMaterial) {
-        color = diffuseColor;
-        color.a *= opacity;
-        if(color.a < alphaCutThreshold) {
-            discard;
-        }
-        return;
-    }
     vec3 normal;
     if(useNormalMap) {
         normal = texture(normalMap, UV).rgb;
@@ -166,9 +135,11 @@ void main() {
     roughness = max(0.0f, min(roughness, 1.0f));
     roughness = 0.2f + 0.6f * roughness;
     vec3 viewVector = normalize(frame.cameraPosition - fragment.position);
-    vec3 F0 = mix(vec3(0.1f), diffuseColor.rgb, metallic);
     vec3 lightingColor = vec3(0.0f);
-    for(int i = 0; i < LIGHTS_LIMIT; i += 1) {
+    float roughness4 = roughness * roughness * roughness * roughness;
+    float roughness4OverPi = roughness4 / 3.1416f;
+    float roughness4MinusOne = roughness4 - 1.0f;
+    for(int i = 0; i < lightCount; i += 1) {
         if(lights[i].type == 0) {
             lightingColor += diffuseColor.rgb * lights[i].colorFactor;
             continue;
@@ -191,37 +162,45 @@ void main() {
             float attenuationProgress = max((lights[i].range - lightDistance) / lights[i].range, 0.0f);
             float attenuation = pow(attenuationProgress, lights[i].attenuationExponent);
             lightVector = normalize(lightVector);
-            float theta = dot(lightVector, normalize(-lights[i].direction));
+            float theta = dot(lightVector, -lights[i].direction);
             float epsilon = lights[i].innerAngle - lights[i].outerAngle;
-            attenuation *= clamp((theta - lights[i].outerAngle) / epsilon, 0.0f, 1.0f);
+            float intensity = (theta - lights[i].outerAngle) / epsilon;
+            attenuation *= clamp(intensity, 0.0f, 1.0f);
             lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
         }
+        if(lightFactor <= 0.0f) {
+            continue;
+        }
         vec3 halfwayVector = normalize(viewVector + lightVector);
-        float roughness4 = roughness * roughness * roughness * roughness;
         float NdotH = max(dot(normal, halfwayVector), 0.0f);
         float NdotH2 = NdotH * NdotH;
-        float denominator = (NdotH2 * (roughness4 - 1.0f) + 1.0f);
-        denominator = pi * denominator * denominator;
-        float NDF = roughness4 / denominator;
-        float factor = clamp(1.0f - max(dot(halfwayVector, viewVector), 0.0f), 0.0f, 1.0f);
-        factor = factor * factor * factor * factor * factor;
-        vec3 F = (F0 + (1.0 - F0) * factor);
-        lightingColor += ((vec3(1.0f) - F) * diffuseColor.rgb / pi) * lightFactor * lights[i].colorFactor;
+        float denominator = (NdotH2 * roughness4MinusOne + 1.0f);
+        denominator = denominator * denominator;
+        float NDF = roughness4OverPi / denominator;
+        float maxHdotV = max(dot(halfwayVector, viewVector), 0.0f);
+        float factor = clamp(1.0f - maxHdotV, 0.0f, 1.0f);
+        float F = (metallic + (1.0 - metallic) * factor);
+        lightingColor += ((1.0 - F) * diffuseColor.rgb / 3.1416f) * lightFactor * lights[i].colorFactor;
         lightingColor += NDF * diffuseColor.rgb * lightFactor * lights[i].highlightFactor;
     }
-    float ambientOcclusion = 1.0f;
-    if(useAmbientOcclusionMap) {
-        ambientOcclusion = texture(ambientOcclusionMap, UV).r;
-        float inverseAmbientOcclusion = 1.0f - ambientOcclusion;
-        ambientOcclusion = 1.0f - inverseAmbientOcclusion * ambientOcclusionIntensity;
-    }
-    color = vec4(lightingColor * ambientOcclusion, 1.0);
+    vec3 F0 = mix(vec3(0.1f), diffuseColor.rgb, metallic);
+    float cosTheta = max(dot(normal, viewVector), 0.0f);
+    float factor = clamp(1.0f - cosTheta, 0.0f, 1.0f);
+    vec3 F = F0 + (max(vec3(1.0f - roughness), F0) - F0) * factor;
+    vec3 kD = (1.0f - F) * (1.0f - metallic);
+    color = vec4(kD * diffuseColor.rgb + lightingColor, diffuseColor.a * opacity);
     if(useReflectionMap) {
         vec3 reflectionVector = reflect(-viewVector, normal);
         vec2 uv = vec2(atan(reflectionVector.z, reflectionVector.x), -asin(reflectionVector.y));
         uv = uv * vec2(0.1592f, 0.3183f) + 0.5f;
         vec3 reflection = texture(ReflectionMap, uv).rgb * reflectionIntensity;
-        color.rgb += reflection * metallic * (1.0 - roughness) * ambientOcclusion;
+        color.rgb += reflection * (metallic) * (1.0 - roughness);
+    }
+    if(useAmbientOcclusionMap) {
+        float ambientOcclusion = texture(ambientOcclusionMap, UV).r;
+        float inverseAmbientOcclusion = 1.0f - ambientOcclusion;
+        ambientOcclusion = 1.0f - inverseAmbientOcclusion * ambientOcclusionIntensity;
+        color.rgb *= ambientOcclusion;
     }
     color.rgb = color.rgb / (color.rgb + vec3(1.0f));
     vec3 multiplyColor = defaultMultiplyColor.rgb;
@@ -236,5 +215,4 @@ void main() {
         emissionColor = texture(emissionMap, UV).rgb * emissionIntensity;
     }
     color.rgb += emissionColor;
-    color.a *= diffuseColor.a * opacity;
 }

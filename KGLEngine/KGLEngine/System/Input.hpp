@@ -1,15 +1,15 @@
-// Developed by Kelin.Lyu.
-#ifndef input_hpp
-#define input_hpp
-#include "Toolkit/common.h"
+// Developed by Kelin Lyu.
+#ifndef Input_hpp
+#define Input_hpp
+#include "../Engine.hpp"
 class Input final {
 private:
     class KeyEvent final {
     public:
         int key;
-        int state;
+        unsigned int state;
         float stateUpdateTime;
-        KeyEvent(int key, int state, float time);
+        KeyEvent(int key, unsigned int state, float time);
     };
     bool initialized;
     vector<KeyEvent> keyEvents;
@@ -20,9 +20,6 @@ private:
     float scrollWheelAcceleration;
 public:
     Input();
-    void engineKeyEvent(int key, int state, float time, string character);
-    void engineMouseEvent(vec2 position);
-    void engineScrollWheelEvent(float acceleration);
     bool isPressingKey(int key);
     bool wasKeyPressed(int key);
     bool wasKeyReleased(int key);
@@ -31,8 +28,10 @@ public:
     vec2 getMousePosition();
     vec2 getMouseTranslation();
     float getScrollWheelAcceleration();
-    void update();
-    void clear();
     ~Input();
+    void engineSetKeyEvent(int key, unsigned int state, float time, string character);
+    void engineSetMouseEvent(vec2 position);
+    void engineSetScrollWheelEvent(float acceleration);
+    void engineUpdateInput();
 };
 #endif

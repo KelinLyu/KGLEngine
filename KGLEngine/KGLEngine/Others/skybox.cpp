@@ -1,4 +1,4 @@
-// Developed by Kelin.Lyu.
+// Developed by Kelin Lyu.
 #include "skybox.hpp"
 Skybox::Skybox(string right, string left,
                string top, string bottom,

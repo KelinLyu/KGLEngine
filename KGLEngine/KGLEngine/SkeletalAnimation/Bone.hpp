@@ -1,22 +1,22 @@
-// Developed by Kelin.Lyu.
-#ifndef bone_hpp
-#define bone_hpp
-#include "../core.hpp"
+// Developed by Kelin Lyu.
+#ifndef Bone_hpp
+#define Bone_hpp
+#include "../Engine.hpp"
 struct BoneInfo {
     int id;
     mat4 offset;
 };
 struct KeyFramePosition {
     vec3 position;
-    float timeStamp;
+    float timestamp;
 };
 struct KeyFrameRotation {
     quat orientation;
-    float timeStamp;
+    float timestamp;
 };
 struct KeyFrameScale {
     vec3 scale;
-    float timeStamp;
+    float timestamp;
 };
 class Bone final {
 private:
@@ -27,8 +27,9 @@ private:
     vector<KeyFrameScale> keyScales;
 public:
     Bone(string name, aiNodeAnim* channel);
-    void update(float animationTime);
-    string getName() const;
-    mat4 getTransform();
+    ~Bone();
+    string engineGetName() const;
+    mat4 engineGetTransform();
+    void engineUpdateBoneAnimation(float animationTime);
 };
 #endif
