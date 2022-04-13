@@ -161,7 +161,7 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform) {
         this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
     }
     if(this->lightNode != NULL) {
-        Engine::main->prepareLightNodeForRendering(this->lightNode);
+        Engine::main->preparedLightNodes.push_back(this->lightNode);
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
         this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform);

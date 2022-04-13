@@ -70,10 +70,10 @@ Engine::Engine(const char* windowTitle,
         delete(icon);
     }
     this->input = new Input();
-    glfwSetKeyCallback(this->window, Engine::keyboardInteractions);
-    glfwSetMouseButtonCallback(this->window, Engine::mouseInteractions);
-    glfwSetCursorPosCallback(this->window, Engine::mouseMovements);
-    glfwSetScrollCallback(this->window, Engine::scrollWheelInteractions);
+    glfwSetKeyCallback(this->window, Engine::engineReceiveKeyboardInteractions);
+    glfwSetMouseButtonCallback(this->window, Engine::engineReceiveMouseInteractions);
+    glfwSetCursorPosCallback(this->window, Engine::engineReceiveMouseMovements);
+    glfwSetScrollCallback(this->window, Engine::engineReceiveScrollWheelInteractions);
     glfwMakeContextCurrent(this->window);
     // initialize glew:
     glewExperimental = GL_TRUE;
@@ -114,53 +114,6 @@ void Engine::unlockCursor() {
         glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }
-void Engine::keyboardInteractions(GLFWwindow* window, int key, int code,
-                                  int action, int modifiers) {
-    if(action == GLFW_PRESS) {
-        string character = "";
-        if(key == 32) {
-            character = " ";
-        }else{
-            const char* name = glfwGetKeyName(key, code);
-            if(name != NULL) {
-                if(modifiers & 0x01) {
-                    char uppercase[1];
-                    strcpy_s(uppercase, name);
-                    uppercase[0] = toupper(uppercase[0]);
-                    character = uppercase;
-                }else{
-                    character = name;
-                }
-            }
-        }
-        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), character);
-    }else if(action == GLFW_RELEASE) {
-        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
-    }
-}
-void Engine::mouseInteractions(GLFWwindow* window, int button,
-                               int action, int modifiers) {
-    int key = KEY_UNKNOWN;
-    if(button == GLFW_MOUSE_BUTTON_LEFT) {
-        key = MOUSE_BUTTON_LEFT;
-    }else if(button == GLFW_MOUSE_BUTTON_RIGHT) {
-        key = MOUSE_BUTTON_RIGHT;
-    }else if(button == GLFW_MOUSE_BUTTON_MIDDLE) {
-        key = MOUSE_BUTTON_MIDDLE;
-    }
-    if(action == GLFW_PRESS) {
-        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), "");
-    }else if(action == GLFW_RELEASE) {
-        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
-    }
-}
-void Engine::mouseMovements(GLFWwindow* window, double x, double y) {
-    vec2 position = vec2(x, y);
-    Engine::main->input->engineSetMouseEvent(position);
-}
-void Engine::scrollWheelInteractions(GLFWwindow* window, double dx, double dy) {
-    Engine::main->input->engineSetScrollWheelEvent(dy);
-}
 bool Engine::isRunning() {
     return(!glfwWindowShouldClose(this->window));
 }
@@ -197,18 +150,6 @@ void Engine::render() {
     glfwSwapInterval(1);
     glfwSwapBuffers(this->window);
 }
-void Engine::prepareGeometryForRendering(Geometry* geometry) {
-    for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
-        if(this->preparedGeometries[i]->renderingOrder > geometry->renderingOrder) {
-            this->preparedGeometries.insert(this->preparedGeometries.begin() + i, geometry);
-            return;
-        }
-    }
-    this->preparedGeometries.push_back(geometry);
-}
-void Engine::prepareLightNodeForRendering(LightNode* lightNode) {
-    this->preparedLightNodes.push_back(lightNode);
-}
 vec2 Engine::getScreenResolution() {
     return(vec2(this->screenWidth, this->screenHeight));
 }
@@ -231,4 +172,49 @@ Engine::~Engine() {
     this->root = NULL;
     this->camera = NULL;
     Engine::main = NULL;
+}
+void Engine::engineReceiveKeyboardInteractions(GLFWwindow* window, int key, int code, int action, int modifiers) {
+    if(action == GLFW_PRESS) {
+        string character = "";
+        if(key == 32) {
+            character = " ";
+        }else{
+            const char* name = glfwGetKeyName(key, code);
+            if(name != NULL) {
+                if(modifiers & 0x01) {
+                    char uppercase[1];
+                    strcpy_s(uppercase, name);
+                    uppercase[0] = toupper(uppercase[0]);
+                    character = uppercase;
+                }else{
+                    character = name;
+                }
+            }
+        }
+        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), character);
+    }else if(action == GLFW_RELEASE) {
+        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
+    }
+}
+void Engine::engineReceiveMouseInteractions(GLFWwindow* window, int button, int action, int modifiers) {
+    int key = KEY_UNKNOWN;
+    if(button == GLFW_MOUSE_BUTTON_LEFT) {
+        key = MOUSE_BUTTON_LEFT;
+    }else if(button == GLFW_MOUSE_BUTTON_RIGHT) {
+        key = MOUSE_BUTTON_RIGHT;
+    }else if(button == GLFW_MOUSE_BUTTON_MIDDLE) {
+        key = MOUSE_BUTTON_MIDDLE;
+    }
+    if(action == GLFW_PRESS) {
+        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), "");
+    }else if(action == GLFW_RELEASE) {
+        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
+    }
+}
+void Engine::engineReceiveMouseMovements(GLFWwindow* window, double x, double y) {
+    vec2 position = vec2(x, y);
+    Engine::main->input->engineSetMouseEvent(position);
+}
+void Engine::engineReceiveScrollWheelInteractions(GLFWwindow* window, double dx, double dy) {
+    Engine::main->input->engineSetScrollWheelEvent(dy);
 }

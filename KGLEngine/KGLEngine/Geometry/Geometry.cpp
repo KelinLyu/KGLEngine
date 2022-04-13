@@ -221,7 +221,17 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     if(this->shader == NULL) {
         this->setShader(new Shader());
     }
-    Engine::main->prepareGeometryForRendering(this);
+    if(this->renderingOrder <= 0) {
+        Engine::main->preparedGeometries.insert(Engine::main->preparedGeometries.begin(), this);
+        return;
+    }
+    for(unsigned int i = 0; i < Engine::main->preparedGeometries.size(); i += 1) {
+        if(Engine::main->preparedGeometries[i]->renderingOrder > this->renderingOrder) {
+            Engine::main->preparedGeometries.insert(Engine::main->preparedGeometries.begin() + i, this);
+            return;
+        }
+    }
+    Engine::main->preparedGeometries.push_back(this);
 }
 void Geometry::engineRenderGeometry() {
     glDepthFunc(GL_LESS);
