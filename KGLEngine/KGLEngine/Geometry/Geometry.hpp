@@ -73,4 +73,21 @@ public:
     ~Skybox();
     void engineRenderSkybox();
 };
+
+
+
+class Sprite: public Geometry {
+public:
+    Sprite();
+    
+    void render();
+};
+
+
+
+
+
+
+
+
 #endif

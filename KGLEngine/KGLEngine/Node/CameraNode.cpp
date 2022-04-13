@@ -6,6 +6,10 @@ CameraNode::CameraNode(float field, float near, float far) {
     this->near = near;
     this->far = far;
 }
+mat4 CameraNode::getOrthogonalProjectionTransform() {
+    vec2 resolution = Engine::main->getScreenResolution();
+    return(glm::ortho(0.0f, resolution.x, resolution.y, 0.0f, -1.0f, 1.0f));
+}
 mat4 CameraNode::getProjectionTransform() {
     vec2 resolution = Engine::main->getScreenResolution();
     float ratio = resolution.x / resolution.y;

@@ -51,25 +51,29 @@ Skybox::Skybox(string right, string left,
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     this->texture = new Texture(right, left, top, bottom, front, back, maxAnisotropy);
-    string vertexShaderCode = "#version 330 core\n"
-    "layout (location = 0) in vec3 vertexPosition;\n"
-    "out vec3 cubeUV;\n"
-    "struct frame_data {\n"
-    "    mat4 viewProjectionTransform;\n"
-    "};\n"
-    "uniform frame_data frame;\n"
-    "void main() {\n"
-    "    vec4 destination = frame.viewProjectionTransform * vec4(vertexPosition, 1.0);\n"
-    "    gl_Position = destination.xyww;\n"
-    "    cubeUV = vertexPosition;\n"
-    "}\n";
-    string fragmentShaderCode = "#version 330 core\n"
-    "in vec3 cubeUV;\n"
-    "out vec4 color;\n"
-    "uniform samplerCube skybox;\n"
-    "void main() {\n"
-    "    color = texture(skybox, cubeUV);\n"
-    "}\n";
+    string vertexShaderCode = R""""(
+#version 330 core
+layout (location = 0) in vec3 vertexPosition;
+out vec3 cubeUV;
+struct frame_data {
+    mat4 viewProjectionTransform;
+};
+uniform frame_data frame;
+void main() {
+    vec4 destination = frame.viewProjectionTransform * vec4(vertexPosition, 1.0);
+    gl_Position = destination.xyww;
+    cubeUV = vertexPosition;
+}
+)"""";
+    string fragmentShaderCode = R""""(
+#version 330 core
+in vec3 cubeUV;
+out vec4 color;
+uniform samplerCube skybox;
+void main() {
+    color = texture(skybox, cubeUV);
+}
+)"""";
     this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
 }
 Skybox::~Skybox() {

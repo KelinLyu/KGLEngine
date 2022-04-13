@@ -56,6 +56,7 @@ public:
     float near;
     float far;
     CameraNode(float field, float near, float far);
+    mat4 getOrthogonalProjectionTransform();
     mat4 getProjectionTransform();
     mat4 getViewTransform();
     ~CameraNode() = default;

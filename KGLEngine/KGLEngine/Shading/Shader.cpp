@@ -20,7 +20,7 @@ void main() {
     color = vec4(1.0f, 0.0f, 1.0f, 1.0f);
 }
 )"""";
-    this->engineCompileShaders(vertexShaderCode, fragmentShaderCode);
+    this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
 }
 Shader::Shader(string shaderFile) {
     // read the files:
@@ -47,10 +47,10 @@ Shader::Shader(string shaderFile) {
              << Engine::main->workingDirectory + shaderFile << "!\n" << endl;
         exit(1);
     }
-    this->engineCompileShaders(vertexShaderCode, fragmentShaderCode);
+    this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
 }
 Shader::Shader(string vertexShaderCode, string fragmentShaderCode) {
-    this->engineCompileShaders(vertexShaderCode, fragmentShaderCode);
+    this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
 }
 void Shader::setOpaque() {
     this->blendMode = 0;
@@ -111,8 +111,9 @@ Shader::~Shader() {
     glDeleteProgram(this->programID);
     this->textures.clear();
 }
-void Shader::engineCompileShaders(string vertexShaderCode, string fragmentShaderCode) {
+void Shader::engineInitializeShader(string vertexShaderCode, string fragmentShaderCode) {
     this->blendMode = 0;
+    this->currentModelTransform = mat4(-1.0f);
     const char* vertexShader = vertexShaderCode.c_str();
     const char* fragmentShader = fragmentShaderCode.c_str();
     int result = 0;
@@ -155,7 +156,7 @@ void main() {
     color = vec4(1.0f, 0.0f, 1.0f, 1.0f);
 }
 )"""";
-        this->engineCompileShaders(newVertexShaderCode, newFragmentShaderCode);
+        this->engineInitializeShader(newVertexShaderCode, newFragmentShaderCode);
     }
 }
 bool Shader::engineCheckCompileErrors(unsigned int shader, string type) {
@@ -202,8 +203,11 @@ void Shader::engineRenderShader(Geometry* geometry) {
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
     mat4 viewTransform = Engine::main->camera->getViewTransform();
     mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
-    this->setMat4("node.modelTransform", modelTransform);
-    this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));
+    if(this->currentModelTransform != modelTransform) {
+        this->currentModelTransform = modelTransform;
+        this->setMat4("node.modelTransform", modelTransform);
+        this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));
+    }
     this->setMat4("node.modelViewProjectionTransform", projectionTransform * viewTransform * modelTransform);
     if(geometry->engineCheckIfGeometryHasBones()) {
         this->setInt("hasBones", 1);

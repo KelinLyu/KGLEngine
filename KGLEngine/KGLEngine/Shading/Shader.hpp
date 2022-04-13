@@ -10,6 +10,7 @@ private:
     unsigned int programID;
     unsigned int blendMode;
     vector<Texture*> textures;
+    mat4 currentModelTransform;
 public:
     Shader();
     Shader(string shaderFile);
@@ -28,7 +29,7 @@ public:
     void setMat4(string name, mat4 mat);
     void setTexture(string name, Texture* texture);
     ~Shader();
-    void engineCompileShaders(string vertexShaderCode, string fragmentShaderCode);
+    void engineInitializeShader(string vertexShaderCode, string fragmentShaderCode);
     bool engineCheckCompileErrors(unsigned int shader, string type);
     void engineActiveShader();
     void engineRenderShader(Geometry* geometry);
