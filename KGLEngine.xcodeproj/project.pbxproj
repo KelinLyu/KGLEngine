@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C231B31F280358650030CD85 /* skybox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C231B31D280358650030CD85 /* skybox.cpp */; };
 		C231B3222804AAAF0030CD85 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C231B3212804AAAF0030CD85 /* Material.cpp */; };
 		C274401A2800A74E009DDD9F /* CameraNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C27440182800A74E009DDD9F /* CameraNode.cpp */; };
 		C274401D2800A789009DDD9F /* LightNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C274401B2800A789009DDD9F /* LightNode.cpp */; };
@@ -27,6 +26,7 @@
 		C2AD2E9027FF0EE700A493D6 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7927FF0EE700A493D6 /* Shader.cpp */; };
 		C2AD2E9127FF0EE700A493D6 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7A27FF0EE700A493D6 /* Animation.cpp */; };
 		C2AD2E9227FF0EE700A493D6 /* Animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7D27FF0EE700A493D6 /* Animator.cpp */; };
+		C2F7794E280666BE001A214D /* Skybox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7794D280666BE001A214D /* Skybox.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,8 +43,6 @@
 
 /* Begin PBXFileReference section */
 		C231B31B280351120030CD85 /* glm_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glm_helper.h; sourceTree = "<group>"; };
-		C231B31D280358650030CD85 /* skybox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = skybox.cpp; sourceTree = "<group>"; };
-		C231B31E280358650030CD85 /* skybox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = skybox.hpp; sourceTree = "<group>"; };
 		C231B3202804AAAF0030CD85 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Material.hpp; sourceTree = "<group>"; };
 		C231B3212804AAAF0030CD85 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Material.cpp; sourceTree = "<group>"; };
 		C27440182800A74E009DDD9F /* CameraNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CameraNode.cpp; sourceTree = "<group>"; };
@@ -81,6 +79,7 @@
 		C2AD2E8627FF0EE700A493D6 /* assimp_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = assimp_helper.h; sourceTree = "<group>"; };
 		C2AD2E8727FF0EE700A493D6 /* Image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Image.hpp; sourceTree = "<group>"; };
 		C2AD2E8827FF0EE700A493D6 /* Engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Engine.hpp; sourceTree = "<group>"; };
+		C2F7794D280666BE001A214D /* Skybox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Skybox.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,15 +97,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		C231B31C280358320030CD85 /* Others */ = {
-			isa = PBXGroup;
-			children = (
-				C231B31E280358650030CD85 /* skybox.hpp */,
-				C231B31D280358650030CD85 /* skybox.cpp */,
-			);
-			path = Others;
-			sourceTree = "<group>";
-		};
 		C27440232800A85A009DDD9F /* SkeletalAnimation */ = {
 			isa = PBXGroup;
 			children = (
@@ -126,6 +116,7 @@
 				C2AD2E8027FF0EE700A493D6 /* Geometry.hpp */,
 				C2AD2E7127FF0EE700A493D6 /* Geometry.cpp */,
 				C274401E2800A7E0009DDD9F /* UnitCube.cpp */,
+				C2F7794D280666BE001A214D /* Skybox.cpp */,
 			);
 			path = Geometry;
 			sourceTree = "<group>";
@@ -203,7 +194,6 @@
 				C27440242800A8FC009DDD9F /* Geometry */,
 				C27440232800A85A009DDD9F /* SkeletalAnimation */,
 				C27440252800A9BE009DDD9F /* Node */,
-				C231B31C280358320030CD85 /* Others */,
 				C2AD2E8827FF0EE700A493D6 /* Engine.hpp */,
 				C2AD2E7427FF0EE700A493D6 /* Engine.cpp */,
 			);
@@ -316,10 +306,10 @@
 				C274401D2800A789009DDD9F /* LightNode.cpp in Sources */,
 				C2AD2E9027FF0EE700A493D6 /* Shader.cpp in Sources */,
 				C2AD2E8C27FF0EE700A493D6 /* Image.cpp in Sources */,
+				C2F7794E280666BE001A214D /* Skybox.cpp in Sources */,
 				C2AD2E8E27FF0EE700A493D6 /* Node.cpp in Sources */,
 				C274401A2800A74E009DDD9F /* CameraNode.cpp in Sources */,
 				C2AD2E9127FF0EE700A493D6 /* Animation.cpp in Sources */,
-				C231B31F280358650030CD85 /* skybox.cpp in Sources */,
 				C2AD2E9227FF0EE700A493D6 /* Animator.cpp in Sources */,
 				C231B3222804AAAF0030CD85 /* Material.cpp in Sources */,
 				C2AD2E8F27FF0EE700A493D6 /* Texture.cpp in Sources */,

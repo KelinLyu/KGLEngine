@@ -15,6 +15,7 @@ struct Vertex {
 };
 struct BoneInfo;
 struct AnimationBoneNode;
+class Texture;
 class Shader;
 class Material;
 class Animation;
@@ -60,5 +61,16 @@ public:
 class UnitCube: public Geometry {
 public:
     UnitCube();
+};
+class Skybox: public Geometry {
+private:
+    Texture* texture;
+public:
+    Skybox(string right, string left,
+           string top, string bottom,
+           string front, string back,
+           float maxAnisotropy);
+    ~Skybox();
+    void engineRenderSkybox();
 };
 #endif

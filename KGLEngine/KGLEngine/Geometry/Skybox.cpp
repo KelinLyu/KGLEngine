@@ -1,9 +1,10 @@
 // Developed by Kelin Lyu.
-#include "skybox.hpp"
+#include "Geometry.hpp"
 Skybox::Skybox(string right, string left,
                string top, string bottom,
                string front, string back,
                float maxAnisotropy) {
+    this->engineInitializeGeometry();
     float vertices[] = {
         -1.0f,  1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
@@ -71,7 +72,13 @@ Skybox::Skybox(string right, string left,
     "}\n";
     this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
 }
-void Skybox::render() {
+Skybox::~Skybox() {
+    glDeleteVertexArrays(1, &this->vertexArrays);
+    glDeleteBuffers(1, &this->vertexBuffers);
+    delete(this->texture);
+    delete(this->shader);
+}
+void Skybox::engineRenderSkybox() {
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -85,10 +92,4 @@ void Skybox::render() {
     glBindVertexArray(this->vertexArrays);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-}
-Skybox::~Skybox() {
-    glDeleteVertexArrays(1, &this->vertexArrays);
-    glDeleteBuffers(1, &this->vertexBuffers);
-    delete(this->texture);
-    delete(this->shader);
 }

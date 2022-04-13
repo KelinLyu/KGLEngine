@@ -16,7 +16,7 @@
 #include "SkeletalAnimation/Animator.hpp"
 #include "Node/Node.hpp"
 
-#include "Others/skybox.hpp"
+//#include "Others/skybox.hpp"
 
 class Input;
 class Node;
