@@ -90,6 +90,25 @@ vec3 Node::getUpVectorInWorld() {
 vec3 Node::getDownVectorInWorld() {
     return(this->convertLocalVectorToWorld(vec3(0.0f, -1.0f, 0.0f)));
 }
+vec3 Node::getPositionOnScreen() {
+    if(Engine::main->camera != NULL) {
+        vec4 worldPosition = vec4(this->getWorldPosition(), 1.0f);
+        mat4 viewTransform = Engine::main->camera->getViewTransform();
+        mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
+        mat4 transform = projectionTransform * viewTransform * this->worldTransform;
+        vec4 projection;
+        projection.x = worldPosition.x * transform[0][0] + worldPosition.y * transform[1][0] + worldPosition.z * transform[2][0] + transform[3][0];
+        projection.y = worldPosition.x * transform[0][1] + worldPosition.y * transform[1][1] + worldPosition.z * transform[2][1] + transform[3][1];
+        projection.z = worldPosition.x * transform[0][2] + worldPosition.y * transform[1][2] + worldPosition.z * transform[2][2] + transform[3][2];
+        projection.w = worldPosition.x * transform[0][3] + worldPosition.y * transform[1][3] + worldPosition.z * transform[2][3] + transform[3][3];
+        vec3 result;
+        result.x = projection.x * 0.5f / projection.w + 0.5f;
+        result.y = 0.5f - projection.y * 0.5f / projection.w;
+        result.z = projection.z / projection.w;
+        return(result);
+    }
+    return(vec3(0.0f));
+}
 Node::~Node() {
     this->childNodes.clear();
     this->boneNodes.clear();

@@ -47,6 +47,7 @@ public:
     vec3 getRightVectorInWorld();
     vec3 getUpVectorInWorld();
     vec3 getDownVectorInWorld();
+    vec3 getPositionOnScreen();
     ~Node();
     void engineInitializeNode();
     void engineNodeSetUINode(UINode* node);
