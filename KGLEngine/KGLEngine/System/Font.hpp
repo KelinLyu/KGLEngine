@@ -3,21 +3,19 @@
 #define Font_hpp
 #include "../Engine.hpp"
 class Texture;
+struct FontCharacter final {
+public:
+    Texture* texture;
+    ivec2 size;
+    ivec2 bearing;
+    unsigned int advance;
+};
 class Font final {
 private:
-    class Character final {
-    public:
-        Texture* texture;
-        ivec2 size;
-        ivec2 bearing;
-        unsigned int advance;
-        Character(Texture* texture, ivec2 size, ivec2 bearing, unsigned int advance);
-    };
+    map<char, FontCharacter*> characters;
 public:
-    
-    map<char, Character*> characters;
-    
     Font(FT_Face font);
     ~Font();
+    FontCharacter* engineGetFontCharacter(char character);
 };
 #endif

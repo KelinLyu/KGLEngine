@@ -2,17 +2,15 @@
 #ifndef Input_hpp
 #define Input_hpp
 #include "../Engine.hpp"
+struct InputKeyEvent final {
+    int key;
+    unsigned int state;
+    float stateUpdateTime;
+};
 class Input final {
 private:
-    class KeyEvent final {
-    public:
-        int key;
-        unsigned int state;
-        float stateUpdateTime;
-        KeyEvent(int key, unsigned int state, float time);
-    };
     bool initialized;
-    vector<KeyEvent> keyEvents;
+    vector<InputKeyEvent*> keyEvents;
     string lastCharacter;
     vec2 latestMousePosition;
     vec2 mousePosition;
@@ -29,7 +27,7 @@ public:
     vec2 getMouseTranslation();
     float getScrollWheelAcceleration();
     ~Input();
-    void engineSetKeyEvent(int key, unsigned int state, float time, string character);
+    void engineSetInputKeyEvent(int key, unsigned int state, float time, string character);
     void engineSetMouseEvent(vec2 position);
     void engineSetScrollWheelEvent(float acceleration);
     void engineUpdateInput();

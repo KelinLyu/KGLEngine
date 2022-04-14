@@ -6,7 +6,7 @@ Bone::Bone(string name, aiNodeAnim* channel) {
     for(unsigned int i = 0; i < channel->mNumPositionKeys; i += 1) {
         aiVector3D aiPosition = channel->mPositionKeys[i].mValue;
         float timestamp = channel->mPositionKeys[i].mTime;
-        KeyFramePosition data;
+        BoneKeyFramePosition data;
         data.position = assimp_helper::getVec3(aiPosition);
         data.timestamp = timestamp;
         this->keyPositions.push_back(data);
@@ -14,7 +14,7 @@ Bone::Bone(string name, aiNodeAnim* channel) {
     for(unsigned int i = 0; i < channel->mNumRotationKeys; i += 1) {
         aiQuaternion aiOrientation = channel->mRotationKeys[i].mValue;
         float timestamp = channel->mRotationKeys[i].mTime;
-        KeyFrameRotation data;
+        BoneKeyFrameRotation data;
         data.orientation = assimp_helper::getQuat(aiOrientation);
         data.timestamp = timestamp;
         this->keyRotations.push_back(data);
@@ -22,7 +22,7 @@ Bone::Bone(string name, aiNodeAnim* channel) {
     for(unsigned int i = 0; i < channel->mNumScalingKeys; i += 1) {
         aiVector3D scale = channel->mScalingKeys[i].mValue;
         float timestamp = channel->mScalingKeys[i].mTime;
-        KeyFrameScale data;
+        BoneKeyFrameScale data;
         data.scale = assimp_helper::getVec3(scale);
         data.timestamp = timestamp;
         this->keyScales.push_back(data);

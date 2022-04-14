@@ -2,19 +2,19 @@
 #ifndef Bone_hpp
 #define Bone_hpp
 #include "../Engine.hpp"
-struct BoneInfo {
+struct BoneInfo final {
     int id;
     mat4 offset;
 };
-struct KeyFramePosition {
+struct BoneKeyFramePosition final {
     vec3 position;
     float timestamp;
 };
-struct KeyFrameRotation {
+struct BoneKeyFrameRotation final {
     quat orientation;
     float timestamp;
 };
-struct KeyFrameScale {
+struct BoneKeyFrameScale final {
     vec3 scale;
     float timestamp;
 };
@@ -22,9 +22,9 @@ class Bone final {
 private:
     string name;
     mat4 transform;
-    vector<KeyFramePosition> keyPositions;
-    vector<KeyFrameRotation> keyRotations;
-    vector<KeyFrameScale> keyScales;
+    vector<BoneKeyFramePosition> keyPositions;
+    vector<BoneKeyFrameRotation> keyRotations;
+    vector<BoneKeyFrameScale> keyScales;
 public:
     Bone(string name, aiNodeAnim* channel);
     ~Bone();

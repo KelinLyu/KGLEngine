@@ -50,7 +50,7 @@ void LightNode::engineConfigurateShader(Shader* shader, int index) {
         shader->setVec3("lights[" + to_string(index) + "].direction", this->getFrontVectorInWorld());
         shader->setFloat("lights[" + to_string(index) + "].attenuationExponent", this->attenuationExponent);
         shader->setFloat("lights[" + to_string(index) + "].range", this->range);
-        shader->setFloat("lights[" + to_string(index) + "].innerAngle", cos(radians(this->innerAngle)));
-        shader->setFloat("lights[" + to_string(index) + "].outerAngle", cos(radians(this->outerAngle)));
+        shader->setFloat("lights[" + to_string(index) + "].innerAngle", glm::cos(glm::radians(this->innerAngle)));
+        shader->setFloat("lights[" + to_string(index) + "].outerAngle", glm::cos(glm::radians(this->outerAngle)));
     }
 }

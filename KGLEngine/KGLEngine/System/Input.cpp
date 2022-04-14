@@ -1,10 +1,5 @@
 // Developed by Kelin Lyu.
 #include "Input.hpp"
-Input::KeyEvent::KeyEvent(int key, unsigned int state, float time) {
-    this->key = key;
-    this->state = state;
-    this->stateUpdateTime = time;
-}
 Input::Input() {
     this->initialized = false;
     this->latestMousePosition = vec2(0.0f);
@@ -15,8 +10,8 @@ Input::Input() {
 bool Input::isPressingKey(int key) {
     int i = 0;
     while(i < this->keyEvents.size()) {
-        if(this->keyEvents[i].key == key) {
-            if(this->keyEvents[i].state == 1 || this->keyEvents[i].state == 2) {
+        if(this->keyEvents[i]->key == key) {
+            if(this->keyEvents[i]->state == 1 || this->keyEvents[i]->state == 2) {
                 return(true);
             }else{
                 return(false);
@@ -29,9 +24,9 @@ bool Input::isPressingKey(int key) {
 bool Input::wasKeyPressed(int key) {
     int i = 0;
     while(i < this->keyEvents.size()) {
-        if(this->keyEvents[i].key == key) {
-            if(this->keyEvents[i].state == 1) {
-                this->keyEvents[i].state = 2;
+        if(this->keyEvents[i]->key == key) {
+            if(this->keyEvents[i]->state == 1) {
+                this->keyEvents[i]->state = 2;
                 return(true);
             }else{
                 return(false);
@@ -44,9 +39,9 @@ bool Input::wasKeyPressed(int key) {
 bool Input::wasKeyReleased(int key) {
     int i = 0;
     while(i < this->keyEvents.size()) {
-        if(this->keyEvents[i].key == key) {
-            if(this->keyEvents[i].state == 3) {
-                this->keyEvents[i].state = 0;
+        if(this->keyEvents[i]->key == key) {
+            if(this->keyEvents[i]->state == 3) {
+                this->keyEvents[i]->state = 0;
                 return(true);
             }else{
                 return(false);
@@ -59,8 +54,8 @@ bool Input::wasKeyReleased(int key) {
 float Input::getKeyDuration(int key, float currentTime) {
     int i = 0;
     while(i < this->keyEvents.size()) {
-        if(this->keyEvents[i].key == key) {
-            return(currentTime - this->keyEvents[i].stateUpdateTime);
+        if(this->keyEvents[i]->key == key) {
+            return(currentTime - this->keyEvents[i]->stateUpdateTime);
         }
         i += 1;
     }
@@ -83,23 +78,29 @@ float Input::getScrollWheelAcceleration() {
     return(result);
 }
 Input::~Input() {
+    for(unsigned int i = 0; i < this->keyEvents.size(); i += 1) {
+        delete(this->keyEvents[i]);
+    }
     this->keyEvents.clear();
 }
-void Input::engineSetKeyEvent(int key, unsigned int state, float time, string character) {
-    Input::KeyEvent* targetKeyEvent = NULL;
+void Input::engineSetInputKeyEvent(int key, unsigned int state, float time, string character) {
+    InputKeyEvent* targetInputKeyEvent = NULL;
     int i = 0;
     while(i < this->keyEvents.size()) {
-        if(this->keyEvents[i].key == key) {
-            targetKeyEvent = &this->keyEvents[i];
+        if(this->keyEvents[i]->key == key) {
+            targetInputKeyEvent = this->keyEvents[i];
         }
         i += 1;
     }
-    if(targetKeyEvent == NULL) {
-        Input::KeyEvent* newKeyEvent = new Input::KeyEvent(key, state, time);
-        this->keyEvents.push_back(*newKeyEvent);
+    if(targetInputKeyEvent == NULL) {
+        InputKeyEvent* newInputKeyEvent = new InputKeyEvent();
+        newInputKeyEvent->key = key;
+        newInputKeyEvent->state = state;
+        newInputKeyEvent->stateUpdateTime = time;
+        this->keyEvents.push_back(newInputKeyEvent);
     }else{
-        targetKeyEvent->state = state;
-        targetKeyEvent->stateUpdateTime = time;
+        targetInputKeyEvent->state = state;
+        targetInputKeyEvent->stateUpdateTime = time;
     }
     if(state == 1) {
         this->lastCharacter = character;

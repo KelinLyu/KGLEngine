@@ -2,7 +2,7 @@
 #include "Node.hpp"
 CameraNode::CameraNode(float field, float near, float far) {
     this->engineInitializeNode();
-    this->field = field;
+    this->field = glm::radians(field);
     this->near = near;
     this->far = far;
 }

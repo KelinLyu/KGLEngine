@@ -186,9 +186,9 @@ void Engine::engineReceiveKeyboardInteractions(GLFWwindow* window, int key, int 
                 }
             }
         }
-        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), character);
+        Engine::main->input->engineSetInputKeyEvent(key, 1, Engine::main->getTime(), character);
     }else if(action == GLFW_RELEASE) {
-        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
+        Engine::main->input->engineSetInputKeyEvent(key, 3, Engine::main->getTime(), "");
     }
 }
 void Engine::engineReceiveMouseInteractions(GLFWwindow* window, int button, int action, int modifiers) {
@@ -201,9 +201,9 @@ void Engine::engineReceiveMouseInteractions(GLFWwindow* window, int button, int 
         key = MOUSE_BUTTON_MIDDLE;
     }
     if(action == GLFW_PRESS) {
-        Engine::main->input->engineSetKeyEvent(key, 1, Engine::main->getTime(), "");
+        Engine::main->input->engineSetInputKeyEvent(key, 1, Engine::main->getTime(), "");
     }else if(action == GLFW_RELEASE) {
-        Engine::main->input->engineSetKeyEvent(key, 3, Engine::main->getTime(), "");
+        Engine::main->input->engineSetInputKeyEvent(key, 3, Engine::main->getTime(), "");
     }
 }
 void Engine::engineReceiveMouseMovements(GLFWwindow* window, double x, double y) {

@@ -4,7 +4,13 @@
 #include "../Engine.hpp"
 #define MAX_BONE_INFLUENCE 4
 #define BONES_LIMIT 120
-struct Vertex {
+struct BoneInfo;
+struct AnimationBoneNode;
+class Texture;
+class Shader;
+class Material;
+class Animation;
+struct GeometryVertex {
     vec3 position;
     vec3 normal;
     vec2 uv;
@@ -13,12 +19,6 @@ struct Vertex {
     int boneIDs[MAX_BONE_INFLUENCE];
     float weights[MAX_BONE_INFLUENCE];
 };
-struct BoneInfo;
-struct AnimationBoneNode;
-class Texture;
-class Shader;
-class Material;
-class Animation;
 class Geometry {
 protected:
     unsigned int cullMode;
@@ -63,11 +63,11 @@ public:
     void enginePrepareGeometryForRendering(mat4 worldTransform);
     void engineRenderGeometry();
 };
-class UnitCube: public Geometry {
+class UnitCube final: public Geometry {
 public:
     UnitCube();
 };
-class Skybox: public Geometry {
+class Skybox final: public Geometry {
 private:
     Texture* texture;
 public:
@@ -78,7 +78,7 @@ public:
     ~Skybox();
     void engineRenderSkybox();
 };
-class Sprite: public Geometry {
+class Sprite final: public Geometry {
 public:
     Sprite();
 };

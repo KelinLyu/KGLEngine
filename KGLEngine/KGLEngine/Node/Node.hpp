@@ -9,6 +9,7 @@ class Sprite;
 class Animator;
 class LightNode;
 class UINode;
+class Font;
 class Node {
 protected:
     vector<Node*> childNodes;
@@ -117,6 +118,26 @@ public:
     void setAlpha();
     void setAdditive();
     ~SpriteNode();
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
+};
+class CharacterNode: public UINode {
+private:
+    UIMaterial* material;
+public:
+    
+    
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
+};
+class TextNode: public UINode {
+private:
+    vector<SpriteNode*> characterNodes;
+    Font* font;
+public:
+    TextNode(Font* font, unsigned int characterCount);
+    void setText(string text);
+    ~TextNode();
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };

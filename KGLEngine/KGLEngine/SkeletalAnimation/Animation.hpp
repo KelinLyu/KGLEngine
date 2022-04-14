@@ -2,14 +2,14 @@
 #ifndef Animation_hpp
 #define Animation_hpp
 #include "../Engine.hpp"
-struct AnimationBoneNode {
+class Bone;
+class Geometry;
+class Animator;
+struct AnimationBoneNode final {
     string name;
     mat4 transform;
     vector<AnimationBoneNode*> children;
 };
-class Bone;
-class Geometry;
-class Animator;
 class Animation final {
 private:
     Animator* animator;
