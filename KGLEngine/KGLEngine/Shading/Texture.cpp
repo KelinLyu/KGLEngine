@@ -1,5 +1,23 @@
 // Developed by Kelin Lyu.
 #include "Texture.hpp"
+Texture::Texture(string file) {
+    glGenTextures(1, &this->data);
+    glBindTexture(GL_TEXTURE_2D, this->data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    Image* image = new Image(file);
+    GLenum format = GL_RED;
+    if(image->channelCount == 3) {
+        format = GL_RGB;
+    }else if(image->channelCount == 4) {
+        format = GL_RGBA;
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, format, image->width, image->height, 0, format, GL_UNSIGNED_BYTE, image->data);
+    delete(image);
+}
 Texture::Texture(string file, float maxAnisotropy, bool generateMipmaps) {
     glGenTextures(1, &this->data);
     glBindTexture(GL_TEXTURE_2D, this->data);
@@ -60,6 +78,16 @@ Texture::Texture(string right, string left,
     if(maxAnisotropy > 0.0f) {
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
     }
+}
+Texture::Texture(int width, int height, unsigned char* buffer) {
+    glGenTextures(1, &this->data);
+    glBindTexture(GL_TEXTURE_2D, this->data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 Texture::~Texture() {
     glDeleteTextures(1, &this->data);

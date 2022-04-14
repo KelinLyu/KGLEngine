@@ -10,12 +10,9 @@ class Animator;
 class LightNode;
 class UINode;
 class Node {
-private:
-    UINode* uiNode;
-    LightNode* lightNode;
+protected:
     vector<Node*> childNodes;
     mat4 worldTransform;
-    mat4 uiWorldTransform;
     map<string, Node*> boneNodes;
     vector<Animator*> animators;
 public:
@@ -50,15 +47,12 @@ public:
     vec3 getPositionOnScreen();
     ~Node();
     void engineInitializeNode();
-    void engineNodeSetUINode(UINode* node);
-    void engineNodeSetLightNode(LightNode* node);
     void engineProcessNode(aiNode* node, const aiScene* scene);
     void engineUpdateNodeAnimators(mat4 parentWorldTransform);
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform);
-    void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
-    float engineGetUINodeRenderingOrder();
+    virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data);
+    virtual void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
 };
-class CameraNode: public Node {
+class CameraNode final: public Node{
 public:
     float field;
     float near;
@@ -69,7 +63,7 @@ public:
     mat4 getViewTransform();
     ~CameraNode() = default;
 };
-class LightNode: public Node {
+class LightNode final: public Node {
 private:
     unsigned int lightType;
 public:
@@ -86,12 +80,12 @@ public:
     void setPointLight(float attenuationExponent, float range);
     void setSpotLight(float attenuationExponent, float range, float innerAngle, float outerAngle);
     ~LightNode() = default;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     void engineConfigurateShader(Shader* shader, int index);
 };
 class UINode: public Node {
 private:
-    UIMaterial* material;
-    float cumulativeRenderingOrder;
+    mat4 renderingTransform;
 public:
     vec2 screenPosition;
     vec2 position;
@@ -99,6 +93,18 @@ public:
     vec2 scale;
     vec2 size;
     float alpha;
+    float renderingOrder;
+    UINode();
+    void loadSprite(Sprite* sprite);
+    ~UINode() = default;
+    void engineInitializeUINode();
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
+};
+class SpriteNode: public UINode {
+private:
+    UIMaterial* material;
+public:
     vec4 color;
     Texture* texture;
     vec3 multiplyColor;
@@ -107,15 +113,11 @@ public:
     vec3 emissionColor;
     Texture* emissionTexture;
     float emissionIntensity;
-    float renderingOrder;
-    UINode();
-    UINode(vec2 size);
-    void loadSprite(Sprite* sprite);
+    SpriteNode(vec2 size);
     void setAlpha();
     void setAdditive();
-    ~UINode();
-    void engineInitializeUINode();
-    void enginePrepareUINodeForRendering();
-    float engineGetUINodeCumulativeRenderingOrder();
+    ~SpriteNode();
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
 #endif

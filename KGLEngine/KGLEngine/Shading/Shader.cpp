@@ -42,7 +42,7 @@ Shader::Shader(string shaderFile) {
         vertexShaderCode = vertexShader.str();
         fragmentShaderCode = fragmentShader.str();
     }catch(ifstream::failure error) {
-        cout << "\nFailed to load the shaders: "
+        cout << "\nFailed to load the shaders files: "
              << Engine::main->workingDirectory + shaderFile << "!\n" << endl;
         exit(1);
     }

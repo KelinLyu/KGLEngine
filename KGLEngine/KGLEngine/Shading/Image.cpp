@@ -6,7 +6,7 @@ Image::Image(string file) {
     string path = Engine::main->workingDirectory + file;
     this->data = stbi_load(path.c_str(), &this->width, &this->height, &this->channelCount, 0);
     if(this->data == NULL) {
-        cout << "\nFailed to find the image: " << path << "!\n" << endl;
+        cout << "\nFailed to load the image file: " << path << "!\n" << endl;
         exit(0);
     }
 }

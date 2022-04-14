@@ -3,76 +3,51 @@
 UINode::UINode() {
     this->engineInitializeUINode();
 }
-UINode::UINode(vec2 size) {
-    this->engineInitializeUINode();
-    this->size = size;
-    this->material = new UIMaterial();
-    Sprite* sprite = new Sprite();
-    sprite->setUIMaterial(material);
-    this->geometries.push_back(sprite);
-}
 void UINode::loadSprite(Sprite* sprite) {
     this->geometries.push_back(sprite);
 }
 void UINode::engineInitializeUINode() {
     this->engineInitializeNode();
-    this->engineNodeSetUINode(this);
-    this->material = NULL;
     this->screenPosition = vec2(0.0f);
     this->position = vec2(0.0f);
     this->rotation = 0.0f;
     this->scale = vec2(1.0f);
     this->size = vec2(0.0f);
     this->alpha = 1.0f;
-    this->color = vec4(1.0f);
-    this->texture = NULL;
-    this->multiplyColor = vec3(1.0f);
-    this->multiplyTexture = NULL;
-    this->multiplyIntensity = 0.0f;
-    this->emissionColor = vec3(0.0f);
-    this->emissionTexture = NULL;
-    this->emissionIntensity = 0.0f;
     this->renderingOrder = 0.0f;
+    this->renderingTransform = mat4(0.0f);
 }
-void UINode::setAlpha() {
-    if(this->material != NULL) {
-        this->material->setAlpha();
+void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+    if(this->isDisabled) {
+        return;
+    }
+    this->engineCalculateNodeWorldTransform(parentWorldTransform);
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        this->geometries[i]->renderingOrder = data.y + this->renderingOrder;
+    }
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        this->geometries[i]->enginePrepareGeometryForRendering(this->renderingTransform);
+    }
+    vec2 newData = vec2(data.x * this->alpha, data.y + this->renderingOrder);
+    for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
+        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, newData);
     }
 }
-void UINode::setAdditive() {
-    if(this->material != NULL) {
-        this->material->setAdditive();
-    }
-}
-UINode::~UINode() {
-    this->material = NULL;
-    this->texture = NULL;
-    this->multiplyTexture = NULL;
-    this->emissionTexture = NULL;
-}
-void UINode::enginePrepareUINodeForRendering() {
-    if(this->geometries.size() > 0) {
-        float baseRenderingOrder = 0.0f;
-        if(this->parent != NULL) {
-            baseRenderingOrder = this->parent->engineGetUINodeRenderingOrder();
-        }
-        this->cumulativeRenderingOrder = baseRenderingOrder + this->renderingOrder;
-        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-            this->geometries[i]->renderingOrder = this->cumulativeRenderingOrder;
-        }
-    }
-    if(this->material != NULL) {
-        this->material->alpha = this->alpha;
-        this->material->defaultColor = this->color;
-        this->material->textureMap = this->texture;
-        this->material->defaultMultiplyColor = this->multiplyColor;
-        this->material->multiplyTextureMap = this->multiplyTexture;
-        this->material->multiplyIntensity = this->multiplyIntensity;
-        this->material->defaultEmissionColor = this->emissionColor;
-        this->material->emissionTextureMap = this->emissionTexture;
-        this->material->emissionIntensity = this->emissionIntensity;
-    }
-}
-float UINode::engineGetUINodeCumulativeRenderingOrder() {
-    return(this->cumulativeRenderingOrder);
+void UINode::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
+    vec2 resolution = Engine::main->getScreenResolution();
+    float minLength = glm::min(resolution.x, resolution.y);
+    vec2 uiSize = minLength * this->size * this->scale;
+    vec2 uiPosition = this->screenPosition * resolution + this->position * minLength;
+    glm::mat4 pointTransform = glm::mat4(1.0f);
+    pointTransform = glm::translate(pointTransform, vec3(uiPosition, 0.0f));
+    pointTransform = glm::rotate(pointTransform, this->rotation, vec3(0.0f, 0.0f, 1.0f));
+    pointTransform = glm::scale(pointTransform, vec3(this->scale, 1.0f));
+    this->worldTransform = parentWorldTransform * pointTransform;
+    mat4 transform = mat4(1.0f);
+    transform = glm::translate(transform, vec3(uiPosition - uiSize * 0.5f, 0.0f));
+    transform = glm::translate(transform, vec3(uiSize * 0.5f, 0.0f));
+    transform = glm::rotate(transform, this->rotation, vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::translate(transform, vec3(-uiSize * 0.5f, 0.0f));
+    transform = glm::scale(transform, vec3(uiSize, 1.0f));
+    this->renderingTransform = parentWorldTransform * transform;
 }

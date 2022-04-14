@@ -30,6 +30,10 @@
 		C2F7795828072F4E001A214D /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7795728072F4E001A214D /* Sprite.cpp */; };
 		C2F7795A28072F5B001A214D /* UINode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7795928072F5B001A214D /* UINode.cpp */; };
 		C2F7795E28075612001A214D /* UIMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7795C28075612001A214D /* UIMaterial.cpp */; };
+		C2F7796028078726001A214D /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C2F7795F28078726001A214D /* libfreetype.6.dylib */; };
+		C2F779662807B4A0001A214D /* FontLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F779642807B4A0001A214D /* FontLibrary.cpp */; };
+		C2F779692807B4AD001A214D /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F779672807B4AD001A214D /* Font.cpp */; };
+		C2F7796B2807C309001A214D /* SpriteNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7796A2807C309001A214D /* SpriteNode.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -87,6 +91,12 @@
 		C2F7795928072F5B001A214D /* UINode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UINode.cpp; sourceTree = "<group>"; };
 		C2F7795C28075612001A214D /* UIMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UIMaterial.cpp; sourceTree = "<group>"; };
 		C2F7795D28075612001A214D /* UIMaterial.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = UIMaterial.hpp; sourceTree = "<group>"; };
+		C2F7795F28078726001A214D /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../opt/homebrew/Cellar/freetype/2.12.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
+		C2F779642807B4A0001A214D /* FontLibrary.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FontLibrary.cpp; sourceTree = "<group>"; };
+		C2F779652807B4A0001A214D /* FontLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FontLibrary.hpp; sourceTree = "<group>"; };
+		C2F779672807B4AD001A214D /* Font.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Font.cpp; sourceTree = "<group>"; };
+		C2F779682807B4AD001A214D /* Font.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Font.hpp; sourceTree = "<group>"; };
+		C2F7796A2807C309001A214D /* SpriteNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteNode.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +108,7 @@
 				C294F8F727FCFB22002B6550 /* libglfw.3.3.dylib in Frameworks */,
 				C294F8F927FCFB27002B6550 /* libGLEW.2.2.0.dylib in Frameworks */,
 				C294F8FB27FCFB2E002B6550 /* libassimp.5.2.0.dylib in Frameworks */,
+				C2F7796028078726001A214D /* libfreetype.6.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +148,7 @@
 				C27440182800A74E009DDD9F /* CameraNode.cpp */,
 				C274401B2800A789009DDD9F /* LightNode.cpp */,
 				C2F7795928072F5B001A214D /* UINode.cpp */,
+				C2F7796A2807C309001A214D /* SpriteNode.cpp */,
 			);
 			path = Node;
 			sourceTree = "<group>";
@@ -188,6 +200,7 @@
 		C294F8F327FCFB19002B6550 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C2F7795F28078726001A214D /* libfreetype.6.dylib */,
 				C294F8FA27FCFB2E002B6550 /* libassimp.5.2.0.dylib */,
 				C294F8F827FCFB27002B6550 /* libGLEW.2.2.0.dylib */,
 				C294F8F627FCFB22002B6550 /* libglfw.3.3.dylib */,
@@ -228,6 +241,10 @@
 			children = (
 				C2AD2E8127FF0EE700A493D6 /* Input.hpp */,
 				C2AD2E7227FF0EE700A493D6 /* Input.cpp */,
+				C2F779652807B4A0001A214D /* FontLibrary.hpp */,
+				C2F779642807B4A0001A214D /* FontLibrary.cpp */,
+				C2F779682807B4AD001A214D /* Font.hpp */,
+				C2F779672807B4AD001A214D /* Font.cpp */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -310,16 +327,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C2F7796B2807C309001A214D /* SpriteNode.cpp in Sources */,
 				C294F8F027FCF9A6002B6550 /* main.cpp in Sources */,
 				C2AD2E8927FF0EE700A493D6 /* Bone.cpp in Sources */,
 				C27440202800A7E0009DDD9F /* UnitCube.cpp in Sources */,
 				C2AD2E8D27FF0EE700A493D6 /* Engine.cpp in Sources */,
 				C274401D2800A789009DDD9F /* LightNode.cpp in Sources */,
+				C2F779692807B4AD001A214D /* Font.cpp in Sources */,
 				C2AD2E9027FF0EE700A493D6 /* Shader.cpp in Sources */,
 				C2AD2E8C27FF0EE700A493D6 /* Image.cpp in Sources */,
 				C2F7795828072F4E001A214D /* Sprite.cpp in Sources */,
 				C2F7795E28075612001A214D /* UIMaterial.cpp in Sources */,
 				C2F7794E280666BE001A214D /* Skybox.cpp in Sources */,
+				C2F779662807B4A0001A214D /* FontLibrary.cpp in Sources */,
 				C2AD2E8E27FF0EE700A493D6 /* Node.cpp in Sources */,
 				C274401A2800A74E009DDD9F /* CameraNode.cpp in Sources */,
 				C2AD2E9127FF0EE700A493D6 /* Animation.cpp in Sources */,
@@ -451,12 +471,16 @@
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = "\"/opt/homebrew/include/\"";
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include/,
+					/opt/homebrew/Cellar/freetype/2.12.0/include/freetype2,
+				);
 				LIBRARY_SEARCH_PATHS = (
-					"\"/opt/homebrew/Cellar/glfw/3.3.6/lib\"",
-					"\"/opt/homebrew/Cellar/glew/2.2.0_1/lib\"",
-					"\"/opt/homebrew/Cellar/glm/0.9.9.8/lib\"",
-					"\"/opt/homebrew/Cellar/assimp/5.2.3/lib\"",
+					/opt/homebrew/Cellar/glfw/3.3.6/lib,
+					/opt/homebrew/Cellar/glew/2.2.0_1/lib,
+					/opt/homebrew/Cellar/glm/0.9.9.8/lib,
+					/opt/homebrew/Cellar/assimp/5.2.3/lib,
+					/opt/homebrew/Cellar/freetype/2.12.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
@@ -468,12 +492,16 @@
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = "\"/opt/homebrew/include/\"";
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include/,
+					/opt/homebrew/Cellar/freetype/2.12.0/include/freetype2,
+				);
 				LIBRARY_SEARCH_PATHS = (
-					"\"/opt/homebrew/Cellar/glfw/3.3.6/lib\"",
-					"\"/opt/homebrew/Cellar/glew/2.2.0_1/lib\"",
-					"\"/opt/homebrew/Cellar/glm/0.9.9.8/lib\"",
-					"\"/opt/homebrew/Cellar/assimp/5.2.3/lib\"",
+					/opt/homebrew/Cellar/glfw/3.3.6/lib,
+					/opt/homebrew/Cellar/glew/2.2.0_1/lib,
+					/opt/homebrew/Cellar/glm/0.9.9.8/lib,
+					/opt/homebrew/Cellar/assimp/5.2.3/lib,
+					/opt/homebrew/Cellar/freetype/2.12.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;

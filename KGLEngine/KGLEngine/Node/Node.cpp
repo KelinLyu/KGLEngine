@@ -127,16 +127,7 @@ void Node::engineInitializeNode() {
     this->position = vec3(0.0f);
     this->eulerAngles = vec3(0.0f);
     this->scale = vec3(1.0f);
-    this->uiNode = NULL;
-    this->lightNode = NULL;
     this->worldTransform = mat4(0.0f);
-    this->uiWorldTransform = mat4(0.0f);
-}
-void Node::engineNodeSetUINode(UINode* node) {
-    this->uiNode = node;
-}
-void Node::engineNodeSetLightNode(LightNode* node) {
-    this->lightNode = node;
 }
 void Node::engineProcessNode(aiNode *node, const aiScene *scene) {
     for(unsigned int i = 0; i < node->mNumMeshes; i += 1) {
@@ -177,58 +168,23 @@ void Node::engineUpdateNodeAnimators(mat4 parentWorldTransform) {
         this->childNodes[i]->engineUpdateNodeAnimators(this->worldTransform);
     }
 }
-void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform) {
+void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
     if(this->isDisabled) {
         return;
     }
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
-    if(this->uiNode != NULL) {
-        this->uiNode->enginePrepareUINodeForRendering();
-        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-            this->geometries[i]->enginePrepareGeometryForRendering(this->uiWorldTransform);
-        }
-    }else{
-        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-            this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
-        }
-    }
-    if(this->lightNode != NULL) {
-        Engine::main->preparedLightNodes.push_back(this->lightNode);
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
-        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform);
+        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, data);
     }
 }
 void Node::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
-    if(this->uiNode != NULL) {
-        vec2 resolution = Engine::main->getScreenResolution();
-        float minLength = glm::min(resolution.x, resolution.y);
-        vec2 uiSize = minLength * this->uiNode->size * this->uiNode->scale;
-        vec2 uiPosition = this->uiNode->screenPosition * resolution + this->uiNode->position * minLength;
-        glm::mat4 pointTransform = glm::mat4(1.0f);
-        pointTransform = glm::translate(pointTransform, vec3(uiPosition, 0.0f));
-        pointTransform = glm::rotate(pointTransform, this->uiNode->rotation, vec3(0.0f, 0.0f, 1.0f));
-        pointTransform = glm::scale(pointTransform, vec3(this->uiNode->scale, 1.0f));
-        this->worldTransform = parentWorldTransform * pointTransform;
-        mat4 transform = mat4(1.0f);
-        transform = glm::translate(transform, vec3(uiPosition - uiSize * 0.5f, 0.0f));
-        transform = glm::translate(transform, vec3(uiSize * 0.5f, 0.0f));
-        transform = glm::rotate(transform, this->uiNode->rotation, vec3(0.0f, 0.0f, 1.0f));
-        transform = glm::translate(transform, vec3(-uiSize * 0.5f, 0.0f));
-        transform = glm::scale(transform, vec3(uiSize, 1.0f));
-        this->uiWorldTransform = parentWorldTransform * transform;
-    }else{
-        mat4 translateMatrix = glm::translate(mat4(1.0f), this->position);
-        mat4 rotateMatrix = glm::eulerAngleXYZ(radians(this->eulerAngles.x),
-                                               radians(this->eulerAngles.y),
-                                               radians(this->eulerAngles.z));
-        mat4 scaleMatrix = glm::scale(mat4(1.0f), vec3(this->scale));
-        this->worldTransform = parentWorldTransform * (translateMatrix * rotateMatrix * scaleMatrix);
-    }
-}
-float Node::engineGetUINodeRenderingOrder() {
-    if(this->uiNode != NULL) {
-        return(this->uiNode->engineGetUINodeCumulativeRenderingOrder());
-    }
-    return(0.0f);
+    mat4 translateMatrix = glm::translate(mat4(1.0f), this->position);
+    mat4 rotateMatrix = glm::eulerAngleXYZ(radians(this->eulerAngles.x),
+                                           radians(this->eulerAngles.y),
+                                           radians(this->eulerAngles.z));
+    mat4 scaleMatrix = glm::scale(mat4(1.0f), vec3(this->scale));
+    this->worldTransform = parentWorldTransform * (translateMatrix * rotateMatrix * scaleMatrix);
 }

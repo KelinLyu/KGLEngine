@@ -2,7 +2,6 @@
 #include "Node.hpp"
 LightNode::LightNode(vec3 color) {
     this->engineInitializeNode();
-    this->engineNodeSetLightNode(this);
     this->lightType = -1;
     this->colorFactor = color;
     this->highlightFactor = color;
@@ -29,6 +28,10 @@ void LightNode::setSpotLight(float attenuationExponent, float range, float inner
     this->range = range;
     this->innerAngle = innerAngle;
     this->outerAngle = outerAngle;
+}
+void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+    this->Node::enginePrepareNodeForRendering(parentWorldTransform, data);
+    Engine::main->preparedLightNodes.push_back(this);
 }
 void LightNode::engineConfigurateShader(Shader* shader, int index) {
     shader->setInt("lights[" + to_string(index) + "].type", this->lightType);

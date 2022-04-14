@@ -3,6 +3,8 @@
 #define Engine_hpp
 #include "Toolkit/libraries.h"
 #include "System/Input.hpp"
+#include "System/FontLibrary.hpp"
+#include "System/Font.hpp"
 #include "Shading/Image.hpp"
 #include "Shading/Texture.hpp"
 #include "Shading/Shader.hpp"

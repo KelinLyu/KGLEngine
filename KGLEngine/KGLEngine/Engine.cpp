@@ -14,14 +14,12 @@ Engine::Engine(const char* windowTitle,
     this->cursorHidden = false;
     this->cursorLocked = false;
     Engine::main = this;
-    // get the executable's location:
     char directory[1024];
     if(getcwd(directory, sizeof(directory)) == NULL) {
-        cout << "\nFailed to find the executable's location using getcwd()!\n" << endl;
+        cout << "\nFailed to find the executable's location!\n" << endl;
         exit(1);
     }
     this->workingDirectory = string(directory);
-    // initialize the window:
     glfwTerminate();
     if(!glfwInit()) {
         cout << "\nFailed to initialize glfw!\n" << endl;
@@ -44,7 +42,6 @@ Engine::Engine(const char* windowTitle,
     glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-    // create the window:
     this->screenResolution = vec2(mode->width, mode->height);
     this->windowResolution = this->screenResolution * resolutionScaleFactor;
     if(fullscreenMode) {
@@ -57,7 +54,6 @@ Engine::Engine(const char* windowTitle,
         cout << "\nFailed to initialize the glfw window!\n" << endl;
         exit(1);
     }
-    // set the window's icon if provided:
     if(iconFile != NULL) {
         GLFWimage images[1];
         Image* icon = new Image(iconFile);
@@ -73,7 +69,6 @@ Engine::Engine(const char* windowTitle,
     glfwSetCursorPosCallback(this->window, Engine::engineReceiveMouseMovements);
     glfwSetScrollCallback(this->window, Engine::engineReceiveScrollWheelInteractions);
     glfwMakeContextCurrent(this->window);
-    // initialize glew:
     glewExperimental = GL_TRUE;
     glewInit();
     glEnable(GL_MULTISAMPLE);
@@ -134,7 +129,7 @@ void Engine::render() {
     if(this->camera != NULL) {
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
-        this->root->enginePrepareNodeForRendering(mat4(1.0f));
+        this->root->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f));
         if(this->skybox != NULL) {
             this->skybox->engineRenderSkybox();
         }
