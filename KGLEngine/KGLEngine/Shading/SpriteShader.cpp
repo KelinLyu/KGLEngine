@@ -1,6 +1,6 @@
 // Developed by Kelin Lyu.
-#include "Material.hpp"
-UIMaterial::UIMaterial() {
+#include "Shader.hpp"
+SpriteShader::SpriteShader() {
     string vertexShaderCode = R""""(
 #version 330 core
 layout (location = 0) in vec4 vertexData;
@@ -48,8 +48,8 @@ void main() {
     color.a *= alpha;
 }
 )"""";
-    this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
-    this->shader->setAsUI();
+    this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
+    this->setUIShader();
     this->currentAlpha = -1.0f;
     this->currentDefaultColor = vec4(-1.0f);
     this->currentTextureMap = NULL;
@@ -59,9 +59,9 @@ void main() {
     this->currentDefaultEmissionColor = vec3(-1.0f);
     this->currentEmissionTextureMap = NULL;
     this->currentEmissionIntensity = -1.0f;
-    this->shader->setBool("useTextureMap", false);
-    this->shader->setBool("useMultiplyTextureMap", false);
-    this->shader->setBool("useEmissionTextureMap", false);
+    this->setBool("useTextureMap", false);
+    this->setBool("useMultiplyTextureMap", false);
+    this->setBool("useEmissionTextureMap", false);
     this->alpha = 1.0f;
     this->defaultColor = vec4(1.0f);
     this->textureMap = NULL;
@@ -72,68 +72,66 @@ void main() {
     this->emissionTextureMap = NULL;
     this->emissionIntensity = 0.0f;
 }
-void UIMaterial::setAlpha() {
-    this->shader->setSemitransparent();
+SpriteShader::~SpriteShader() {
+    this->currentTextureMap = NULL;
+    this->currentMultiplyTextureMap = NULL;
+    this->currentEmissionTextureMap = NULL;
+    this->textureMap = NULL;
+    this->multiplyTextureMap = NULL;
+    this->emissionTextureMap = NULL;
+    delete(this);
 }
-void UIMaterial::setAdditive() {
-    this->shader->setAdditive();
-}
-UIMaterial::~UIMaterial() {
-    delete(this->shader);
-}
-Shader* UIMaterial::engineGetUIMaterialShader() {
-    return(this->shader);
-}
-void UIMaterial::engineRenderUIMaterial() {
+void SpriteShader::engineRenderShader(Geometry *geometry) {
+    this->Shader::engineRenderShader(geometry);
     if(this->currentAlpha != this->alpha) {
         this->currentAlpha = this->alpha;
-        this->shader->setFloat("alpha", this->alpha);
+        this->setFloat("alpha", this->alpha);
     }
     if(this->currentDefaultColor != this->defaultColor) {
         this->currentDefaultColor = this->defaultColor;
-        this->shader->setVec4("defaultColor", this->defaultColor);
+        this->setVec4("defaultColor", this->defaultColor);
     }
     if(this->currentTextureMap != this->textureMap) {
         this->currentTextureMap = this->textureMap;
         if(this->textureMap != NULL) {
-            this->shader->setBool("useTextureMap", true);
-            this->shader->setTexture("textureMap", this->textureMap);
+            this->setBool("useTextureMap", true);
+            this->setTexture("textureMap", this->textureMap);
         }else{
-            this->shader->setBool("useTextureMap", false);
+            this->setBool("useTextureMap", false);
         }
     }
     if(this->currentDefaultMultiplyColor != this->defaultMultiplyColor) {
         this->currentDefaultMultiplyColor = this->defaultMultiplyColor;
-        this->shader->setVec3("defaultMultiplyColor", this->defaultMultiplyColor);
+        this->setVec3("defaultMultiplyColor", this->defaultMultiplyColor);
     }
     if(this->currentMultiplyTextureMap != this->multiplyTextureMap) {
         this->currentMultiplyTextureMap = this->multiplyTextureMap;
         if(this->multiplyTextureMap != NULL) {
-            this->shader->setBool("useMultiplyTextureMap", true);
-            this->shader->setTexture("multiplyTextureMap", this->multiplyTextureMap);
+            this->setBool("useMultiplyTextureMap", true);
+            this->setTexture("multiplyTextureMap", this->multiplyTextureMap);
         }else{
-            this->shader->setBool("useMultiplyTextureMap", false);
+            this->setBool("useMultiplyTextureMap", false);
         }
     }
     if(this->currentMultiplyIntensity != this->multiplyIntensity) {
         this->currentMultiplyIntensity = this->multiplyIntensity;
-        this->shader->setFloat("multiplyIntensity", this->multiplyIntensity);
+        this->setFloat("multiplyIntensity", this->multiplyIntensity);
     }
     if(this->currentDefaultEmissionColor != this->defaultEmissionColor) {
         this->currentDefaultEmissionColor = this->defaultEmissionColor;
-        this->shader->setVec3("defaultEmissionColor", this->defaultEmissionColor);
+        this->setVec3("defaultEmissionColor", this->defaultEmissionColor);
     }
     if(this->currentEmissionTextureMap != this->emissionTextureMap) {
         this->currentEmissionTextureMap = this->emissionTextureMap;
         if(this->multiplyTextureMap != NULL) {
-            this->shader->setBool("useEmissionTextureMap", true);
-            this->shader->setTexture("emissionTextureMap", this->emissionTextureMap);
+            this->setBool("useEmissionTextureMap", true);
+            this->setTexture("emissionTextureMap", this->emissionTextureMap);
         }else{
-            this->shader->setBool("useEmissionTextureMap", false);
+            this->setBool("useEmissionTextureMap", false);
         }
     }
     if(this->currentEmissionIntensity != this->emissionIntensity) {
         this->currentEmissionIntensity = this->emissionIntensity;
-        this->shader->setFloat("emissionIntensity", this->emissionIntensity);
+        this->setFloat("emissionIntensity", this->emissionIntensity);
     }
 }

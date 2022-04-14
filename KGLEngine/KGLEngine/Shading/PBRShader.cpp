@@ -1,6 +1,6 @@
 // Developed by Kelin Lyu.
-#include "Material.hpp"
-Material::Material(float metallic, float roughness) {
+#include "Shader.hpp"
+PBRShader::PBRShader(float metallic, float roughness) {
     string vertexShaderCode = R""""(
 #version 330 core
 const int MAX_BONE_INFLUENCE = 4;
@@ -108,12 +108,12 @@ uniform float defaultMetallic;
 uniform bool useMetallicMap;
 uniform sampler2D metallicMap;
 uniform float metallicIntensity;
-uniform bool reverseMetallic;
+uniform bool invertMetallic;
 uniform float defaultRoughness;
 uniform bool useRoughnessMap;
 uniform sampler2D roughnessMap;
 uniform float roughnessIntensity;
-uniform bool reverseRoughness;
+uniform bool invertRoughness;
 uniform bool useReflectionMap;
 uniform sampler2D ReflectionMap;
 uniform float reflectionIntensity;
@@ -173,7 +173,7 @@ void main() {
     float metallic = defaultMetallic;
     if(useMetallicMap) {
         metallic = texture(metallicMap, UV).r;
-        if(reverseMetallic) {
+        if(invertMetallic) {
             metallic = 1.0f - metallic;
         }
         metallic *= metallicIntensity;
@@ -183,7 +183,7 @@ void main() {
     float roughness = defaultRoughness;
     if(useRoughnessMap) {
         roughness = texture(roughnessMap, UV).r;
-        if(reverseRoughness) {
+        if(invertRoughness) {
             roughness = 1.0f - roughness;
         }
         roughness *= roughnessIntensity;
@@ -273,7 +273,7 @@ void main() {
     color.rgb += emissionColor;
 }
 )"""";
-    this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
+    this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
     this->currentOpacity = -1.0f;
     this->currentDiffuseColor = vec4(-1.0f);
     this->currentDiffuseIntensity = -1.0f;
@@ -283,25 +283,25 @@ void main() {
     this->currentHeightLayerRange= vec2(-1.0f);
     this->currentMetallic = -1.0f;
     this->currentMetallicIntensity = -1.0f;
-    this->currentReverseMetallic = -1;
+    this->currentinvertMetallic = -1;
     this->currentRoughness = -1.0f;
     this->currentRoughnessIntensity = -1.0f;
-    this->currentReverseRoughness = -1;
+    this->currentinvertRoughness = -1;
     this->currentReflectionIntensity = -1.0f;
     this->currentAmbientOcclusionIntensity = -1.0f;
     this->currentMultiplyColor = vec4(-1.0f);
     this->currentMultiplyIntensity = -1.0f;
     this->currentEmissionColor = vec4(-1.0f);
     this->currentEmissionIntensity = -1.0f;
-    this->shader->setBool("useDiffuseMap", 0);
-    this->shader->setBool("useNormalMap", 0);
-    this->shader->setBool("useHeightMap", 0);
-    this->shader->setBool("useMetallicMap", 0);
-    this->shader->setBool("useRoughnessMap", 0);
-    this->shader->setBool("useReflectionMap", 0);
-    this->shader->setBool("useAmbientOcclusionMap", 0);
-    this->shader->setBool("useMultiplyMap", 0);
-    this->shader->setBool("useEmissionMap", 0);
+    this->setBool("useDiffuseMap", 0);
+    this->setBool("useNormalMap", 0);
+    this->setBool("useHeightMap", 0);
+    this->setBool("useMetallicMap", 0);
+    this->setBool("useRoughnessMap", 0);
+    this->setBool("useReflectionMap", 0);
+    this->setBool("useAmbientOcclusionMap", 0);
+    this->setBool("useMultiplyMap", 0);
+    this->setBool("useEmissionMap", 0);
     this->opacity = 1.0f;
     this->diffuseColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
     this->diffuseIntensity = 1.0f;
@@ -311,10 +311,10 @@ void main() {
     this->heightLayerRange = vec2(4.0f, 16.0f);
     this->metallic = metallic;
     this->metallicIntensity = 1.0f;
-    this->reverseMetallic = false;
+    this->invertMetallic = false;
     this->roughness = roughness;
     this->roughnessIntensity = 1.0f;
-    this->reverseRoughness = false;
+    this->invertRoughness = false;
     this->reflectionIntensity = 1.0f;
     this->ambientOcclusionIntensity = 1.0f;
     this->multiplyColor = vec4(1.0f);
@@ -322,132 +322,118 @@ void main() {
     this->emissionColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     this->emissionIntensity = 1.0f;
 }
-void Material::setOpaque() {
-    this->shader->setOpaque();
+void PBRShader::setDiffuseMap(Texture* texture) {
+    this->setBool("useDiffuseMap", true);
+    this->setTexture("diffuseMap", texture);
 }
-void Material::setAdditive() {
-    this->shader->setAdditive();
+void PBRShader::setNormalMap(Texture* texture) {
+    this->setBool("useNormalMap", true);
+    this->setTexture("normalMap", texture);
 }
-void Material::setSemitransparent() {
-    this->shader->setSemitransparent();
+void PBRShader::setHeightMap(Texture* texture) {
+    this->setBool("useHeightMap", true);
+    this->setTexture("heightMap", texture);
 }
-void Material::setDiffuseMap(Texture* texture) {
-    this->shader->setBool("useDiffuseMap", true);
-    this->shader->setTexture("diffuseMap", texture);
+void PBRShader::setMetallicMap(Texture* texture) {
+    this->setBool("useMetallicMap", true);
+    this->setTexture("metallicMap", texture);
 }
-void Material::setNormalMap(Texture* texture) {
-    this->shader->setBool("useNormalMap", true);
-    this->shader->setTexture("normalMap", texture);
+void PBRShader::setRoughnessMap(Texture* texture) {
+    this->setBool("useRoughnessMap", true);
+    this->setTexture("roughnessMap", texture);
 }
-void Material::setHeightMap(Texture* texture) {
-    this->shader->setBool("useHeightMap", true);
-    this->shader->setTexture("heightMap", texture);
+void PBRShader::setReflectionMap(Texture* texture) {
+    this->setBool("useReflectionMap", true);
+    this->setTexture("ReflectionMap", texture);
 }
-void Material::setMetallicMap(Texture* texture) {
-    this->shader->setBool("useMetallicMap", true);
-    this->shader->setTexture("metallicMap", texture);
+void PBRShader::setAmbientOcclusionMap(Texture* texture) {
+    this->setBool("useAmbientOcclusionMap", true);
+    this->setTexture("ambientOcclusionMap", texture);
 }
-void Material::setRoughnessMap(Texture* texture) {
-    this->shader->setBool("useRoughnessMap", true);
-    this->shader->setTexture("roughnessMap", texture);
+void PBRShader::setMultiplyMap(Texture* texture) {
+    this->setBool("useMultiplyMap", true);
+    this->setTexture("multiplyMap", texture);
 }
-void Material::setReflectionMap(Texture* texture) {
-    this->shader->setBool("useReflectionMap", true);
-    this->shader->setTexture("ReflectionMap", texture);
+void PBRShader::setEmissionMap(Texture* texture) {
+    this->setBool("useEmissionMap", true);
+    this->setTexture("emissionMap", texture);
 }
-void Material::setAmbientOcclusionMap(Texture* texture) {
-    this->shader->setBool("useAmbientOcclusionMap", true);
-    this->shader->setTexture("ambientOcclusionMap", texture);
-}
-void Material::setMultiplyMap(Texture* texture) {
-    this->shader->setBool("useMultiplyMap", true);
-    this->shader->setTexture("multiplyMap", texture);
-}
-void Material::setEmissionMap(Texture* texture) {
-    this->shader->setBool("useEmissionMap", true);
-    this->shader->setTexture("emissionMap", texture);
-}
-Material::~Material() {
-    delete(this->shader);
-}
-Shader* Material::engineGetMaterialShader() {
-    return(this->shader);
-}
-void Material::engineRenderMaterial() {
+void PBRShader::engineRenderShader(Geometry *geometry) {
+    this->Shader::engineRenderShader(geometry);
     if(this->currentOpacity != this->opacity) {
         this->currentOpacity = this->opacity;
-        this->shader->setFloat("opacity", this->opacity);
+        this->setFloat("opacity", this->opacity);
     }
     if(this->currentDiffuseColor != this->diffuseColor) {
         this->currentDiffuseColor = this->diffuseColor;
-        this->shader->setVec4("defaultDiffuseColor", this->diffuseColor);
+        this->setVec4("defaultDiffuseColor", this->diffuseColor);
     }
     if(this->currentDiffuseIntensity != this->diffuseIntensity) {
         this->currentDiffuseIntensity = this->diffuseIntensity;
-        this->shader->setFloat("diffuseIntensity", this->diffuseIntensity);
+        this->setFloat("diffuseIntensity", this->diffuseIntensity);
     }
     if(this->currentAlphaCutThreshold != this->alphaCutThreshold) {
         this->currentAlphaCutThreshold = this->alphaCutThreshold;
-        this->shader->setFloat("alphaCutThreshold", this->alphaCutThreshold);
+        this->setFloat("alphaCutThreshold", this->alphaCutThreshold);
     }
     if(this->currentNormalIntensity != this->normalIntensity) {
         this->currentNormalIntensity = this->normalIntensity;
-        this->shader->setFloat("normalIntensity", this->normalIntensity);
+        this->setFloat("normalIntensity", this->normalIntensity);
     }
     if(this->currentHeightIntensity != this->heightIntensity) {
         this->currentHeightIntensity = this->heightIntensity;
-        this->shader->setFloat("heightIntensity", this->heightIntensity);
+        this->setFloat("heightIntensity", this->heightIntensity);
     }
     if(this->currentHeightLayerRange != this->heightLayerRange) {
         this->currentHeightLayerRange = this->heightLayerRange;
-        this->shader->setVec2("heightLayerRange", this->heightLayerRange);
+        this->setVec2("heightLayerRange", this->heightLayerRange);
     }
     if(this->currentMetallic != this->metallic) {
         this->currentMetallic = this->metallic;
-        this->shader->setFloat("defaultMetallic", this->metallic);
+        this->setFloat("defaultMetallic", this->metallic);
     }
     if(this->currentMetallicIntensity != this->metallicIntensity) {
         this->currentMetallicIntensity = this->metallicIntensity;
-        this->shader->setFloat("metallicIntensity", this->metallicIntensity);
+        this->setFloat("metallicIntensity", this->metallicIntensity);
     }
-    if(this->currentReverseMetallic != this->reverseMetallic) {
-        this->currentReverseMetallic = this->reverseMetallic;
-        this->shader->setBool("reverseMetallic", this->reverseMetallic);
+    if(this->currentinvertMetallic != this->invertMetallic) {
+        this->currentinvertMetallic = this->invertMetallic;
+        this->setBool("invertMetallic", this->invertMetallic);
     }
     if(this->currentRoughness != this->roughness) {
         this->currentRoughness = this->roughness;
-        this->shader->setFloat("defaultRoughness", this->roughness);
+        this->setFloat("defaultRoughness", this->roughness);
     }
     if(this->currentRoughnessIntensity != this->roughnessIntensity) {
         this->currentRoughnessIntensity = this->roughnessIntensity;
-        this->shader->setFloat("roughnessIntensity", this->roughnessIntensity);
+        this->setFloat("roughnessIntensity", this->roughnessIntensity);
     }
-    if(this->currentReverseRoughness != this->reverseRoughness) {
-        this->currentReverseRoughness = this->reverseRoughness;
-        this->shader->setBool("reverseRoughness", this->reverseRoughness);
+    if(this->currentinvertRoughness != this->invertRoughness) {
+        this->currentinvertRoughness = this->invertRoughness;
+        this->setBool("invertRoughness", this->invertRoughness);
     }
     if(this->currentReflectionIntensity != this->reflectionIntensity) {
         this->currentReflectionIntensity = this->reflectionIntensity;
-        this->shader->setFloat("reflectionIntensity", this->reflectionIntensity);
+        this->setFloat("reflectionIntensity", this->reflectionIntensity);
     }
     if(this->currentAmbientOcclusionIntensity != this->ambientOcclusionIntensity) {
         this->currentAmbientOcclusionIntensity = this->ambientOcclusionIntensity;
-        this->shader->setFloat("ambientOcclusionIntensity", this->ambientOcclusionIntensity);
+        this->setFloat("ambientOcclusionIntensity", this->ambientOcclusionIntensity);
     }
     if(this->currentMultiplyColor != this->multiplyColor) {
         this->currentMultiplyColor = this->multiplyColor;
-        this->shader->setVec3("defaultMultiplyColor", this->multiplyColor);
+        this->setVec3("defaultMultiplyColor", this->multiplyColor);
     }
     if(this->currentMultiplyIntensity != this->multiplyIntensity) {
         this->currentMultiplyIntensity = this->multiplyIntensity;
-        this->shader->setFloat("multiplyIntensity", this->multiplyIntensity);
+        this->setFloat("multiplyIntensity", this->multiplyIntensity);
     }
     if(this->currentEmissionColor != this->emissionColor) {
         this->currentEmissionColor = this->emissionColor;
-        this->shader->setVec3("defaultEmissionColor", this->emissionColor);
+        this->setVec3("defaultEmissionColor", this->emissionColor);
     }
     if(this->currentEmissionIntensity != this->emissionIntensity) {
         this->currentEmissionIntensity = this->emissionIntensity;
-        this->shader->setFloat("emissionIntensity", this->emissionIntensity);
+        this->setFloat("emissionIntensity", this->emissionIntensity);
     }
 }

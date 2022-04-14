@@ -8,7 +8,6 @@ struct BoneInfo;
 struct AnimationBoneNode;
 class Texture;
 class Shader;
-class Material;
 class Animation;
 struct GeometryVertex {
     vec3 position;
@@ -23,8 +22,6 @@ class Geometry {
 protected:
     unsigned int cullMode;
     Shader* shader;
-    Material* material;
-    UIMaterial* uiMaterial;
     unsigned int vertexArrays;
     unsigned int vertexBuffers;
     unsigned int elementBuffers;
@@ -45,8 +42,6 @@ public:
     void cullFront();
     void doubleSided();
     void setShader(Shader* shader);
-    void setMaterial(Material* material);
-    void setUIMaterial(UIMaterial* material);
     ~Geometry();
     void engineInitializeGeometry();
     mat4 engineGetGeometryModelTransform();

@@ -105,14 +105,6 @@ void Geometry::doubleSided() {
 void Geometry::setShader(Shader* shader) {
     this->shader = shader;
 }
-void Geometry::setMaterial(Material* material) {
-    this->material = material;
-    this->shader = material->engineGetMaterialShader();
-}
-void Geometry::setUIMaterial(UIMaterial* material) {
-    this->uiMaterial = material;
-    this->shader = material->engineGetUIMaterialShader();
-}
 Geometry::~Geometry() {
     glDeleteVertexArrays(1, &this->vertexArrays);
     glDeleteBuffers(1, &this->vertexBuffers);
@@ -122,14 +114,10 @@ Geometry::~Geometry() {
     }
     this->animations.clear();
     this->shader = NULL;
-    this->material = NULL;
-    this->uiMaterial = NULL;
 }
 void Geometry::engineInitializeGeometry() {
     this->cullMode = 0;
     this->shader = NULL;
-    this->material = NULL;
-    this->uiMaterial = NULL;
     this->bonesCount = 0;
     this->modelTransform = mat4(0.0f);
     this->isHidden = false;
@@ -258,12 +246,6 @@ void Geometry::engineRenderGeometry() {
         glCullFace(GL_FRONT);
     }else if(this->cullMode == 2) {
         glDisable(GL_CULL_FACE);
-    }
-    if(this->material != NULL) {
-        this->material->engineRenderMaterial();
-    }
-    if(this->uiMaterial != NULL) {
-        this->uiMaterial->engineRenderUIMaterial();
     }
     this->shader->engineRenderShader(this);
 }

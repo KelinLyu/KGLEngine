@@ -2,7 +2,6 @@
 #include "Node.hpp"
 SpriteNode::SpriteNode(vec2 size) {
     this->engineInitializeUINode();
-    this->material = NULL;
     this->color = vec4(1.0f);
     this->texture = NULL;
     this->multiplyColor = vec3(1.0f);
@@ -12,34 +11,34 @@ SpriteNode::SpriteNode(vec2 size) {
     this->emissionTexture = NULL;
     this->emissionIntensity = 0.0f;
     this->size = size;
-    this->material = new UIMaterial();
+    this->spriteShader = new SpriteShader();
     Sprite* sprite = new Sprite();
-    sprite->setUIMaterial(material);
+    sprite->setShader(this->spriteShader);
     this->geometries.push_back(sprite);
 }
-void SpriteNode::setAlpha() {
-    this->material->setAlpha();
+void SpriteNode::setSemitransparent() {
+    this->spriteShader->setSemitransparent();
 }
 void SpriteNode::setAdditive() {
-    this->material->setAdditive();
+    this->spriteShader->setAdditive();
 }
 SpriteNode::~SpriteNode() {
-    this->material = NULL;
+    this->spriteShader = NULL;
     this->texture = NULL;
     this->multiplyTexture = NULL;
     this->emissionTexture = NULL;
 }
 void SpriteNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
     this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data);
-    this->material->alpha = this->alpha * data.x;
-    this->material->defaultColor = this->color;
-    this->material->textureMap = this->texture;
-    this->material->defaultMultiplyColor = this->multiplyColor;
-    this->material->multiplyTextureMap = this->multiplyTexture;
-    this->material->multiplyIntensity = this->multiplyIntensity;
-    this->material->defaultEmissionColor = this->emissionColor;
-    this->material->emissionTextureMap = this->emissionTexture;
-    this->material->emissionIntensity = this->emissionIntensity;
+    this->spriteShader->alpha = this->alpha * data.x;
+    this->spriteShader->defaultColor = this->color;
+    this->spriteShader->textureMap = this->texture;
+    this->spriteShader->defaultMultiplyColor = this->multiplyColor;
+    this->spriteShader->multiplyTextureMap = this->multiplyTexture;
+    this->spriteShader->multiplyIntensity = this->multiplyIntensity;
+    this->spriteShader->defaultEmissionColor = this->emissionColor;
+    this->spriteShader->emissionTextureMap = this->emissionTexture;
+    this->spriteShader->emissionIntensity = this->emissionIntensity;
 }
 void SpriteNode::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     this->UINode::engineCalculateNodeWorldTransform(parentWorldTransform);

@@ -3,7 +3,7 @@
 #define Node_hpp
 #include "../Engine.hpp"
 #define LIGHTS_LIMIT 10
-class UIMaterial;
+class SpriteShader;
 class Geometry;
 class Sprite;
 class Animator;
@@ -104,7 +104,7 @@ public:
 };
 class SpriteNode: public UINode {
 private:
-    UIMaterial* material;
+    SpriteShader* spriteShader;
 public:
     vec4 color;
     Texture* texture;
@@ -115,7 +115,7 @@ public:
     Texture* emissionTexture;
     float emissionIntensity;
     SpriteNode(vec2 size);
-    void setAlpha();
+    void setSemitransparent();
     void setAdditive();
     ~SpriteNode();
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
@@ -123,7 +123,7 @@ public:
 };
 class CharacterNode: public UINode {
 private:
-    UIMaterial* material;
+    Shader* shader;
 public:
     
     

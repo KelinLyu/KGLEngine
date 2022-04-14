@@ -51,7 +51,7 @@ Shader::Shader(string shaderFile) {
 Shader::Shader(string vertexShaderCode, string fragmentShaderCode) {
     this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
 }
-void Shader::setAsUI() {
+void Shader::setUIShader() {
     this->isUIShader = true;
     this->blendMode = 2;
 }

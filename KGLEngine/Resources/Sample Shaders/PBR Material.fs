@@ -50,12 +50,12 @@ uniform float defaultMetallic;
 uniform bool useMetallicMap;
 uniform sampler2D metallicMap;
 uniform float metallicIntensity;
-uniform bool reverseMetallic;
+uniform bool invertMetallic;
 uniform float defaultRoughness;
 uniform bool useRoughnessMap;
 uniform sampler2D roughnessMap;
 uniform float roughnessIntensity;
-uniform bool reverseRoughness;
+uniform bool invertRoughness;
 uniform bool useReflectionMap;
 uniform sampler2D ReflectionMap;
 uniform float reflectionIntensity;
@@ -115,7 +115,7 @@ void main() {
     float metallic = defaultMetallic;
     if(useMetallicMap) {
         metallic = texture(metallicMap, UV).r;
-        if(reverseMetallic) {
+        if(invertMetallic) {
             metallic = 1.0f - metallic;
         }
         metallic *= metallicIntensity;
@@ -125,7 +125,7 @@ void main() {
     float roughness = defaultRoughness;
     if(useRoughnessMap) {
         roughness = texture(roughnessMap, UV).r;
-        if(reverseRoughness) {
+        if(invertRoughness) {
             roughness = 1.0f - roughness;
         }
         roughness *= roughnessIntensity;

@@ -8,8 +8,6 @@
 #include "Shading/Image.hpp"
 #include "Shading/Texture.hpp"
 #include "Shading/Shader.hpp"
-#include "Shading/Material.hpp"
-#include "Shading/UIMaterial.hpp"
 #include "Geometry/Geometry.hpp"
 #include "SkeletalAnimation/Bone.hpp"
 #include "SkeletalAnimation/Animation.hpp"
