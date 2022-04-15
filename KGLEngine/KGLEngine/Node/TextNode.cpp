@@ -26,29 +26,21 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
     }
     vec2 newData = vec2(data.x * this->alpha, data.y + this->renderingOrder);
     this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data);
-    
-    
-    
     if(this->currentText != this->text) {
         this->currentText = this->text;
-        
         vector<vec2> sizes;
         vector<vec2> positions;
         vector<Texture*> textures;
-        
         vector<vec2> lineSizes;
         vector<vec2> linePositions;
         vector<Texture*> lineTextures;
-        
-        this->alignmentX = -1;
-        
+        vector<float> lineEndings;
+        this->alignmentX = 0;
         float x = 0.0f;
         float y = 0.0f;
-        
         bool receivedSpace = false;
         unsigned int wordArrayIndex = 0;
         unsigned int wordStringIndex = 0;
-        
         const char* characters = this->text.c_str();
         unsigned int i = 0;
         while(i < this->text.length()) {
@@ -92,21 +84,22 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
                 newPosition.y = y - character->bearing.y * this->lineHeight + character->size.y * this->lineHeight * 0.5f;
                 linePositions.push_back(newPosition);
                 lineTextures.push_back(character->texture);
+                lineEndings.push_back(x + character->advance * this->lineHeight);
             }
-            x += character->advance * this->lineHeight;
-            
-            
-            
-            if(x > this->lineLength) {
+            float newX = x + character->advance * this->lineHeight;
+            if(characters[i] != ' ' || newX <= this->lineLength) {
+                x = newX;
+            }
+            if(x > this->lineLength && lineSizes.size() > 1) {
                 if(wordArrayIndex == 0) {
                     wordArrayIndex = (unsigned int)lineSizes.size() - 1;
                     wordStringIndex = i;
                 }
                 for(unsigned int k = 0; k < wordArrayIndex; k += 1) {
                     if(this->alignmentX == 0) {
-                        linePositions[k].x -= x * 0.5f;
+                        linePositions[k].x -= lineEndings[wordArrayIndex - 1] * 0.5f;
                     }else if(this->alignmentX == 1) {
-                        linePositions[k].x -= x;
+                        linePositions[k].x -= lineEndings[wordArrayIndex - 1];
                     }
                     sizes.push_back(lineSizes[k]);
                     positions.push_back(linePositions[k]);
@@ -118,6 +111,7 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
                 lineSizes.clear();
                 linePositions.clear();
                 lineTextures.clear();
+                lineEndings.clear();
                 i = wordStringIndex - 1;
                 wordArrayIndex = 0;
                 wordStringIndex = 0;
@@ -140,6 +134,7 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
         lineSizes.clear();
         linePositions.clear();
         lineTextures.clear();
+        lineEndings.clear();
         if(this->alignmentY == -1) {
             for(unsigned int k = 0; k < sizes.size(); k += 1) {
                 positions[k].y -= y;

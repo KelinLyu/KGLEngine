@@ -20,8 +20,6 @@ TextRenderer::TextRenderer() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     this->indiceCount = 6;
-    
-    
     string vertexShaderCode = R""""(
 #version 330 core
 layout (location = 0) in vec4 vertexData;
@@ -47,8 +45,12 @@ void main() {
     this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
     this->shader->setUIShader();
     
+    
+    
     this->shader->setFloat("alpha", 1.0f);
     this->shader->setVec4("defaultColor", vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    
+    
 }
 
 
