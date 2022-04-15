@@ -6,9 +6,9 @@ class Texture;
 struct FontCharacter final {
 public:
     Texture* texture;
-    ivec2 size;
-    ivec2 bearing;
-    unsigned int advance;
+    vec2 size;
+    vec2 bearing;
+    float advance;
 };
 class Font final {
 private:

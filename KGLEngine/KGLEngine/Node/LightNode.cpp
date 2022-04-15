@@ -30,6 +30,9 @@ void LightNode::setSpotLight(float attenuationExponent, float range, float inner
     this->outerAngle = outerAngle;
 }
 void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+    if(this->isDisabled) {
+        return;
+    }
     this->Node::enginePrepareNodeForRendering(parentWorldTransform, data);
     Engine::main->preparedLightNodes.push_back(this);
 }

@@ -3,9 +3,11 @@
 #define Node_hpp
 #include "../Engine.hpp"
 #define LIGHTS_LIMIT 10
+struct FontCharacter;
 class SpriteShader;
 class Geometry;
 class Sprite;
+class TextRenderer;
 class Animator;
 class LightNode;
 class UINode;
@@ -121,22 +123,21 @@ public:
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
-class CharacterNode: public UINode {
-private:
-    Shader* shader;
-public:
-    
-    
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
-    void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
-};
 class TextNode: public UINode {
 private:
-    vector<SpriteNode*> characterNodes;
     Font* font;
+    float lineHeight;
+    float lineLength;
+    float lineDistance;
+    int alignmentX;
+    int alignmentY;
+    vec4 currentColor;
+    string currentText;
+    TextRenderer* textRenderer;
 public:
-    TextNode(Font* font, unsigned int characterCount);
-    void setText(string text);
+    vec4 color;
+    string text;
+    TextNode(Font* font, float lineHeight, float lineLength, float lineDistance);
     ~TextNode();
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;

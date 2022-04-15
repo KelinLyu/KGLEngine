@@ -23,12 +23,16 @@ void SpriteNode::setAdditive() {
     this->spriteShader->setAdditive();
 }
 SpriteNode::~SpriteNode() {
+    delete(this->spriteShader);
     this->spriteShader = NULL;
     this->texture = NULL;
     this->multiplyTexture = NULL;
     this->emissionTexture = NULL;
 }
 void SpriteNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+    if(this->isDisabled) {
+        return;
+    }
     this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data);
     this->spriteShader->alpha = this->alpha * data.x;
     this->spriteShader->defaultColor = this->color;

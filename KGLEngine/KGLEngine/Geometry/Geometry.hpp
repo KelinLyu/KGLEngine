@@ -9,6 +9,7 @@ struct AnimationBoneNode;
 class Texture;
 class Shader;
 class Animation;
+class Font;
 struct GeometryVertex {
     vec3 position;
     vec3 normal;
@@ -56,7 +57,7 @@ public:
     void engineAddAnimationToGeometry(Animation* animation);
     void engineUpdateGeometryAnimations();
     void enginePrepareGeometryForRendering(mat4 worldTransform);
-    void engineRenderGeometry();
+    virtual void engineRenderGeometry();
 };
 class UnitCube final: public Geometry {
 public:
@@ -71,10 +72,30 @@ public:
            string front, string back,
            float maxAnisotropy);
     ~Skybox();
-    void engineRenderSkybox();
+    void engineRenderGeometry() override;
 };
 class Sprite final: public Geometry {
 public:
     Sprite();
+    ~Sprite() = default;
+    void engineRenderGeometry() override;
+};
+class TextRenderer final: public Geometry {
+private:
+public:
+    
+    
+    
+    vector<Texture*> textures;
+    vector<mat4> transforms;
+    mat4 textNodeTransform;
+    
+    
+    
+    TextRenderer();
+    ~TextRenderer() = default;
+    
+    
+    void engineRenderGeometry() override;
 };
 #endif

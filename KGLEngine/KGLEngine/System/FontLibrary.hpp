@@ -8,7 +8,7 @@ private:
     FT_Library* fontLibrary;
 public:
     FontLibrary();
-    Font* loadFontFile(string file, int baseHeight);
+    Font* loadFontFile(string file, int heightResolution);
     ~FontLibrary();
 };
 #endif

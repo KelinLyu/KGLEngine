@@ -359,7 +359,6 @@ void PBRShader::setEmissionMap(Texture* texture) {
     this->setTexture("emissionMap", texture);
 }
 void PBRShader::engineRenderShader(Geometry *geometry) {
-    this->Shader::engineRenderShader(geometry);
     if(this->currentOpacity != this->opacity) {
         this->currentOpacity = this->opacity;
         this->setFloat("opacity", this->opacity);
@@ -436,4 +435,5 @@ void PBRShader::engineRenderShader(Geometry *geometry) {
         this->currentEmissionIntensity = this->emissionIntensity;
         this->setFloat("emissionIntensity", this->emissionIntensity);
     }
+    this->Shader::engineRenderShader(geometry);
 }

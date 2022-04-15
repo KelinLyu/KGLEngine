@@ -82,7 +82,6 @@ SpriteShader::~SpriteShader() {
     delete(this);
 }
 void SpriteShader::engineRenderShader(Geometry *geometry) {
-    this->Shader::engineRenderShader(geometry);
     if(this->currentAlpha != this->alpha) {
         this->currentAlpha = this->alpha;
         this->setFloat("alpha", this->alpha);
@@ -134,4 +133,5 @@ void SpriteShader::engineRenderShader(Geometry *geometry) {
         this->currentEmissionIntensity = this->emissionIntensity;
         this->setFloat("emissionIntensity", this->emissionIntensity);
     }
+    this->Shader::engineRenderShader(geometry);
 }

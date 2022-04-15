@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C226339E28088C4700054C8A /* CharacterNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C226339D28088C4700054C8A /* CharacterNode.cpp */; };
 		C231B3222804AAAF0030CD85 /* PBRShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C231B3212804AAAF0030CD85 /* PBRShader.cpp */; };
 		C274401A2800A74E009DDD9F /* CameraNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C27440182800A74E009DDD9F /* CameraNode.cpp */; };
 		C274401D2800A789009DDD9F /* LightNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C274401B2800A789009DDD9F /* LightNode.cpp */; };
 		C27440202800A7E0009DDD9F /* UnitCube.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C274401E2800A7E0009DDD9F /* UnitCube.cpp */; };
+		C2895261280923CF007BE8CD /* TextRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2895260280923CF007BE8CD /* TextRenderer.cpp */; };
 		C294F8F027FCF9A6002B6550 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C294F8E527FCF9A6002B6550 /* main.cpp */; };
 		C294F8F527FCFB19002B6550 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C294F8F427FCFB19002B6550 /* OpenGL.framework */; };
 		C294F8F727FCFB22002B6550 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C294F8F627FCFB22002B6550 /* libglfw.3.3.dylib */; };
@@ -51,12 +51,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C226339D28088C4700054C8A /* CharacterNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CharacterNode.cpp; sourceTree = "<group>"; };
 		C231B31B280351120030CD85 /* glm_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glm_helper.h; sourceTree = "<group>"; };
 		C231B3212804AAAF0030CD85 /* PBRShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PBRShader.cpp; sourceTree = "<group>"; };
 		C27440182800A74E009DDD9F /* CameraNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CameraNode.cpp; sourceTree = "<group>"; };
 		C274401B2800A789009DDD9F /* LightNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LightNode.cpp; sourceTree = "<group>"; };
 		C274401E2800A7E0009DDD9F /* UnitCube.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitCube.cpp; sourceTree = "<group>"; };
+		C2895260280923CF007BE8CD /* TextRenderer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TextRenderer.cpp; sourceTree = "<group>"; };
 		C294F8C127FCF903002B6550 /* KGLEngine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = KGLEngine; sourceTree = BUILT_PRODUCTS_DIR; };
 		C294F8E527FCF9A6002B6550 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C294F8F127FCFA37002B6550 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
@@ -138,6 +138,7 @@
 				C274401E2800A7E0009DDD9F /* UnitCube.cpp */,
 				C2F7794D280666BE001A214D /* Skybox.cpp */,
 				C2F7795728072F4E001A214D /* Sprite.cpp */,
+				C2895260280923CF007BE8CD /* TextRenderer.cpp */,
 			);
 			path = Geometry;
 			sourceTree = "<group>";
@@ -151,7 +152,6 @@
 				C274401B2800A789009DDD9F /* LightNode.cpp */,
 				C2F7795928072F5B001A214D /* UINode.cpp */,
 				C2F7796A2807C309001A214D /* SpriteNode.cpp */,
-				C226339D28088C4700054C8A /* CharacterNode.cpp */,
 				C2F7796C2807D9EF001A214D /* TextNode.cpp */,
 			);
 			path = Node;
@@ -333,8 +333,8 @@
 				C294F8F027FCF9A6002B6550 /* main.cpp in Sources */,
 				C2AD2E8927FF0EE700A493D6 /* Bone.cpp in Sources */,
 				C27440202800A7E0009DDD9F /* UnitCube.cpp in Sources */,
+				C2895261280923CF007BE8CD /* TextRenderer.cpp in Sources */,
 				C2AD2E8D27FF0EE700A493D6 /* Engine.cpp in Sources */,
-				C226339E28088C4700054C8A /* CharacterNode.cpp in Sources */,
 				C274401D2800A789009DDD9F /* LightNode.cpp in Sources */,
 				C2F779692807B4AD001A214D /* Font.cpp in Sources */,
 				C2AD2E9027FF0EE700A493D6 /* Shader.cpp in Sources */,

@@ -24,8 +24,6 @@ void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data)
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         this->geometries[i]->renderingOrder = data.y + this->renderingOrder;
-    }
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         this->geometries[i]->enginePrepareGeometryForRendering(this->renderingTransform);
     }
     vec2 newData = vec2(data.x * this->alpha, data.y + this->renderingOrder);
@@ -36,7 +34,7 @@ void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data)
 void UINode::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     vec2 resolution = Engine::main->getScreenResolution();
     float minLength = glm::min(resolution.x, resolution.y);
-    vec2 uiSize = minLength * this->size * this->scale;
+    vec2 uiSize = this->size * this->scale * minLength;
     vec2 uiPosition = this->screenPosition * resolution + this->position * minLength;
     glm::mat4 pointTransform = glm::mat4(1.0f);
     pointTransform = glm::translate(pointTransform, vec3(uiPosition, 0.0f));

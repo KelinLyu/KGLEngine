@@ -131,7 +131,7 @@ void Engine::render() {
         this->preparedLightNodes.clear();
         this->root->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f));
         if(this->skybox != NULL) {
-            this->skybox->engineRenderSkybox();
+            this->skybox->engineRenderGeometry();
         }
         for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
             this->preparedGeometries[i]->engineRenderGeometry();

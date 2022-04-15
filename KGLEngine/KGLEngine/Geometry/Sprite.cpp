@@ -21,3 +21,11 @@ Sprite::Sprite() {
     glBindVertexArray(0);
     this->indiceCount = 6;
 }
+void Sprite::engineRenderGeometry() {
+    if(this->clearDepthBuffer) {
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    this->shader->engineRenderShader(this);
+}
