@@ -10,14 +10,32 @@ TextNode::TextNode(Font* font, float lineHeight, float lineLength, float lineDis
     this->alignmentY = 0;
     this->color = vec4(1.0f);
     this->text = "";
+    this->currentAlpha = -1.0f;
     this->currentColor = vec4(-1.0f);
     this->currentText = "";
     this->textRenderer = new TextRenderer();
-    
-    
-    
+}
+void TextNode::setHorizontalAlignmentToLeft() {
+    this->alignmentX = -1;
+}
+void TextNode::setHorizontalAlignmentToCenter() {
+    this->alignmentX = 0;
+}
+void TextNode::setHorizontalAlignmentToRight() {
+    this->alignmentX = 1;
+}
+void TextNode::setVerticalAlignmentToTop() {
+    this->alignmentY = 1;
+}
+void TextNode::setVerticalAlignmentToCenter() {
+    this->alignmentY = 0;
+}
+void TextNode::setVerticalAlignmentToBottom() {
+    this->alignmentY = -1;
 }
 TextNode::~TextNode() {
+    delete(this->textRenderer);
+    this->textRenderer = NULL;
     this->font = NULL;
 }
 void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
@@ -26,6 +44,14 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
     }
     vec2 newData = vec2(data.x * this->alpha, data.y + this->renderingOrder);
     this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data);
+    if(this->currentAlpha != newData.x) {
+        this->currentAlpha = newData.x;
+        this->textRenderer->engineSetTextRendererAlpha(newData.x);
+    }
+    if(this->currentColor != this->color) {
+        this->currentColor = this->color;
+        this->textRenderer->engineSetTextRendererColor(this->color);
+    }
     if(this->currentText != this->text) {
         this->currentText = this->text;
         vector<vec2> sizes;
@@ -35,7 +61,6 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
         vector<vec2> linePositions;
         vector<Texture*> lineTextures;
         vector<float> lineEndings;
-        this->alignmentX = 0;
         float x = 0.0f;
         float y = 0.0f;
         bool receivedSpace = false;
@@ -116,9 +141,6 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
                 wordArrayIndex = 0;
                 wordStringIndex = 0;
             }
-            
-            
-            
             i += 1;
         }
         for(unsigned int k = 0; k < lineSizes.size(); k += 1) {
@@ -156,28 +178,16 @@ void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 dat
                 transform = glm::scale(transform, vec3(uiSize, 1.0f));
                 transforms.push_back(transform);
             }
-            this->textRenderer->textures = textures;
-            this->textRenderer->transforms = transforms;
+            this->textRenderer->engineSetTextRendererTexturesAndTransforms(textures, transforms);
             transforms.clear();
         }else{
-            this->textRenderer->textures.clear();
-            this->textRenderer->transforms.clear();
+            this->textRenderer->engineClearTextRendererTexturesAndTransforms();
         }
         sizes.clear();
         positions.clear();
         textures.clear();
     }
-    if(this->currentColor != this->color) {
-        this->currentColor = this->color;
-        
-        
-        
-        
-    }
-    
-    this->textRenderer->textNodeTransform = this->worldTransform;
-    
-    
+    this->textRenderer->engineSetTextRendererMainTransform(this->worldTransform);
     this->textRenderer->renderingOrder = data.y + this->renderingOrder;
     this->textRenderer->enginePrepareGeometryForRendering(mat4(0.0f));
 }

@@ -82,20 +82,17 @@ public:
 };
 class TextRenderer final: public Geometry {
 private:
-public:
-    
-    
-    
     vector<Texture*> textures;
     vector<mat4> transforms;
-    mat4 textNodeTransform;
-    
-    
-    
+    mat4 mainTransform;
+public:
     TextRenderer();
-    ~TextRenderer() = default;
-    
-    
+    ~TextRenderer();
     void engineRenderGeometry() override;
+    void engineSetTextRendererAlpha(float alpha);
+    void engineSetTextRendererColor(vec4 color);
+    void engineSetTextRendererTexturesAndTransforms(vector<Texture*> textures, vector<mat4> transforms);
+    void engineClearTextRendererTexturesAndTransforms();
+    void engineSetTextRendererMainTransform(mat4 mainTransform);
 };
 #endif

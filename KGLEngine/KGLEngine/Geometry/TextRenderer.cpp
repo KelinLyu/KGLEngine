@@ -44,18 +44,13 @@ void main() {
 )"""";
     this->shader = new Shader(vertexShaderCode, fragmentShaderCode);
     this->shader->setUIShader();
-    
-    
-    
-    this->shader->setFloat("alpha", 1.0f);
-    this->shader->setVec4("defaultColor", vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    
-    
 }
-
-
-
-
+TextRenderer::~TextRenderer() {
+    delete(this->shader);
+    this->shader = NULL;
+    this->textures.clear();
+    this->transforms.clear();
+}
 void TextRenderer::engineRenderGeometry() {
     if(this->clearDepthBuffer) {
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -63,12 +58,25 @@ void TextRenderer::engineRenderGeometry() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     for(unsigned int i = 0; i < this->transforms.size(); i += 1) {
-        this->modelTransform = this->textNodeTransform * this->transforms[i];
+        this->modelTransform = this->mainTransform * this->transforms[i];
         this->shader->setTexture("textureMap", this->textures[i]);
         this->shader->engineRenderShader(this);
-        
-        
     }
-    
-    
+}
+void TextRenderer::engineSetTextRendererAlpha(float alpha) {
+    this->shader->setFloat("alpha", alpha);
+}
+void TextRenderer::engineSetTextRendererColor(vec4 color) {
+    this->shader->setVec4("defaultColor", color);
+}
+void TextRenderer::engineSetTextRendererTexturesAndTransforms(vector<Texture*> textures, vector<mat4> transforms) {
+    this->textures = textures;
+    this->transforms = transforms;
+}
+void TextRenderer::engineClearTextRendererTexturesAndTransforms() {
+    this->textures.clear();
+    this->transforms.clear();
+}
+void TextRenderer::engineSetTextRendererMainTransform(mat4 mainTransform) {
+    this->mainTransform = mainTransform;
 }

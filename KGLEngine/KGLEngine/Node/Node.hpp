@@ -131,12 +131,19 @@ private:
     float lineDistance;
     int alignmentX;
     int alignmentY;
+    float currentAlpha;
     vec4 currentColor;
     string currentText;
     TextRenderer* textRenderer;
 public:
     vec4 color;
     string text;
+    void setHorizontalAlignmentToLeft();
+    void setHorizontalAlignmentToCenter();
+    void setHorizontalAlignmentToRight();
+    void setVerticalAlignmentToTop();
+    void setVerticalAlignmentToCenter();
+    void setVerticalAlignmentToBottom();
     TextNode(Font* font, float lineHeight, float lineLength, float lineDistance);
     ~TextNode();
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
