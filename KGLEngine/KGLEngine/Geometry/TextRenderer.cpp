@@ -55,8 +55,7 @@ void TextRenderer::engineRenderGeometry() {
     if(this->clearDepthBuffer) {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
     for(unsigned int i = 0; i < this->transforms.size(); i += 1) {
         this->modelTransform = this->mainTransform * this->transforms[i];
         this->shader->setTexture("textureMap", this->textures[i]);

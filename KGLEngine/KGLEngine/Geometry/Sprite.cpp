@@ -25,7 +25,6 @@ void Sprite::engineRenderGeometry() {
     if(this->clearDepthBuffer) {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
     this->shader->engineRenderShader(this);
 }

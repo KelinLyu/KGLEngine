@@ -214,14 +214,14 @@
 		C2AD2E6F27FF0EE700A493D6 /* KGLEngine */ = {
 			isa = PBXGroup;
 			children = (
+				C2AD2E8827FF0EE700A493D6 /* Engine.hpp */,
+				C2AD2E7427FF0EE700A493D6 /* Engine.cpp */,
 				C2AD2E8227FF0EE700A493D6 /* Toolkit */,
 				C2F7794A28062D13001A214D /* System */,
 				C27440262800AB05009DDD9F /* Shading */,
 				C27440242800A8FC009DDD9F /* Geometry */,
 				C27440232800A85A009DDD9F /* SkeletalAnimation */,
 				C27440252800A9BE009DDD9F /* Node */,
-				C2AD2E8827FF0EE700A493D6 /* Engine.hpp */,
-				C2AD2E7427FF0EE700A493D6 /* Engine.cpp */,
 			);
 			path = KGLEngine;
 			sourceTree = "<group>";

@@ -38,13 +38,13 @@ void UINode::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     vec2 uiPosition = this->screenPosition * resolution + this->position * minLength;
     glm::mat4 pointTransform = glm::mat4(1.0f);
     pointTransform = glm::translate(pointTransform, vec3(uiPosition, 0.0f));
-    pointTransform = glm::rotate(pointTransform, this->rotation, vec3(0.0f, 0.0f, 1.0f));
+    pointTransform = glm::rotate(pointTransform, glm::radians(this->rotation), vec3(0.0f, 0.0f, 1.0f));
     pointTransform = glm::scale(pointTransform, vec3(this->scale, 1.0f));
     this->worldTransform = parentWorldTransform * pointTransform;
     mat4 transform = mat4(1.0f);
     transform = glm::translate(transform, vec3(uiPosition - uiSize * 0.5f, 0.0f));
     transform = glm::translate(transform, vec3(uiSize * 0.5f, 0.0f));
-    transform = glm::rotate(transform, this->rotation, vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::rotate(transform, glm::radians(this->rotation), vec3(0.0f, 0.0f, 1.0f));
     transform = glm::translate(transform, vec3(-uiSize * 0.5f, 0.0f));
     transform = glm::scale(transform, vec3(uiSize, 1.0f));
     this->renderingTransform = parentWorldTransform * transform;
