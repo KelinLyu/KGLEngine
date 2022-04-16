@@ -10,6 +10,7 @@ in fragment_data {
 } fragment;
 out vec4 color;
 struct frame_data {
+    mat4 viewProjectionTransform;
     vec3 cameraPosition;
     vec3 cameraDirection;
 };

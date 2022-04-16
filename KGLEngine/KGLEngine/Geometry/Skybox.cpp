@@ -96,4 +96,6 @@ void Skybox::engineRenderGeometry() {
     glBindVertexArray(this->vertexArrays);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+    this->updated = false;
+    this->prepared = false;
 }

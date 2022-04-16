@@ -27,4 +27,6 @@ void Sprite::engineRenderGeometry() {
     }
     glDisable(GL_CULL_FACE);
     this->shader->engineRenderShader(this);
+    this->updated = false;
+    this->prepared = false;
 }

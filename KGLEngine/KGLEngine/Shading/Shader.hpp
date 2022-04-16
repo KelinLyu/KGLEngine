@@ -17,6 +17,7 @@ public:
     Shader();
     Shader(string shaderFile);
     Shader(string vertexShaderCode, string fragmentShaderCode);
+    void activateShader();
     void setUIShader();
     void setOpaque();
     void setAdditive();
@@ -34,7 +35,6 @@ public:
     ~Shader();
     void engineInitializeShader(string vertexShaderCode, string fragmentShaderCode);
     bool engineCheckCompileErrors(unsigned int shader, string type);
-    void engineActiveShader();
     virtual void engineRenderShader(Geometry* geometry);
 };
 class PBRShader final: public Shader {

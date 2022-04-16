@@ -38,11 +38,11 @@ Geometry::Geometry(aiMesh* mesh) {
             string boneName = mesh->mBones[i]->mName.C_Str();
             if(this->bonesInfoMap.find(boneName) == this->bonesInfoMap.end()) {
                 BoneInfo newBoneInfo;
-                newBoneInfo.id = this->bonesCount;
+                newBoneInfo.id = this->boneCount;
                 newBoneInfo.offset = assimp_helper::getMat4(mesh->mBones[i]->mOffsetMatrix);
                 this->bonesInfoMap[boneName] = newBoneInfo;
-                boneID = this->bonesCount;
-                this->bonesCount = this->bonesCount + 1;
+                boneID = this->boneCount;
+                this->boneCount = this->boneCount + 1;
             }else{
                 boneID = this->bonesInfoMap[boneName].id;
             }
@@ -66,17 +66,14 @@ Geometry::Geometry(aiMesh* mesh) {
         }
     }
     this->indiceCount = (unsigned int)indices.size();
-    // create buffers:
     glGenVertexArrays(1, &this->vertexArrays);
     glGenBuffers(1, &this->vertexBuffers);
     glGenBuffers(1, &this->elementBuffers);
     glBindVertexArray(this->vertexArrays);
-    // load data into vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffers);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GeometryVertex), &vertices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->elementBuffers);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-    // set the vertex attribute pointers:
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)0);
     glEnableVertexAttribArray(1);
@@ -116,14 +113,17 @@ Geometry::~Geometry() {
     this->shader = NULL;
 }
 void Geometry::engineInitializeGeometry() {
+    this->updated = false;
+    this->prepared = false;
     this->cullMode = 0;
     this->shader = NULL;
-    this->bonesCount = 0;
+    this->boneCount = 0;
     this->modelTransform = mat4(0.0f);
     this->isHidden = false;
     this->renderingOrder = 0.0f;
     this->lightMask = -1;
     this->clearDepthBuffer = false;
+    this->instancingNodeCount = 0;
 }
 mat4 Geometry::engineGetGeometryModelTransform() {
     return(this->modelTransform);
@@ -135,10 +135,10 @@ unsigned int Geometry::engineGetGeometryIndiceCount() {
     return(this->indiceCount);
 }
 bool Geometry::engineCheckIfGeometryHasBones() {
-    return(this->bonesCount > 0);
+    return(this->boneCount > 0);
 }
 int& Geometry::engineGetGeometryBonesCountReference() {
-    return(this->bonesCount);
+    return(this->boneCount);
 }
 map<string, BoneInfo>& Geometry::engineGetGeometryBonesInfoMapReference() {
     return(this->bonesInfoMap);
@@ -208,19 +208,88 @@ void Geometry::engineAddAnimationToGeometry(Animation* animation) {
     this->animations.push_back(animation);
 }
 void Geometry::engineUpdateGeometryAnimations() {
+    if(this->updated) {
+        return;
+    }
     if(this->engineCheckIfGeometryHasBones()) {
         if(this->animations.size() > 0) {
             this->engineCalculateGeometryBoneTransforms(this->animations[0]->engineGetRootAnimationBoneNode(), mat4(1.0f), true);
         }
     }
+    this->updated = true;
 }
 void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
-    this->modelTransform = worldTransform;
+    if(this->prepared) {
+        return;
+    }
     if(this->isHidden) {
         return;
     }
+    this->prepared = true;
+    this->modelTransform = worldTransform;
     if(this->shader == NULL) {
         this->setShader(new Shader());
+    }
+    unsigned int size = (unsigned int)this->instancingNodes.size();
+    if(size > 0) {
+        if(this->instancingNodeCount != size) {
+            if(this->instancingNodeCount == 0) {
+                glBindVertexArray(this->vertexArrays);
+                glGenBuffers(1, &this->modelTransformBuffers);
+                glBindBuffer(GL_ARRAY_BUFFER, this->modelTransformBuffers);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(mat4), &this->modelTransforms[0], GL_STATIC_DRAW);
+                glEnableVertexAttribArray(7);
+                glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+                glEnableVertexAttribArray(8);
+                glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+                glEnableVertexAttribArray(9);
+                glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+                glEnableVertexAttribArray(10);
+                glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+                glVertexAttribDivisor(7, 1);
+                glVertexAttribDivisor(8, 1);
+                glVertexAttribDivisor(9, 1);
+                glVertexAttribDivisor(10, 1);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glGenBuffers(1, &this->normalTransformBuffers);
+                glBindBuffer(GL_ARRAY_BUFFER, this->normalTransformBuffers);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(mat4), &this->normalTransforms[0], GL_STATIC_DRAW);
+                glEnableVertexAttribArray(11);
+                glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+                glEnableVertexAttribArray(12);
+                glVertexAttribPointer(12, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+                glEnableVertexAttribArray(13);
+                glVertexAttribPointer(13, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+                glEnableVertexAttribArray(14);
+                glVertexAttribPointer(14, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+                glVertexAttribDivisor(11, 1);
+                glVertexAttribDivisor(12, 1);
+                glVertexAttribDivisor(13, 1);
+                glVertexAttribDivisor(14, 1);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+            }
+            this->instancingNodeCount = size;
+            for(unsigned int i = 0; i < this->instancingNodeCount; i += 1) {
+                if(this->instancingNodes[i] == NULL) {
+                    this->modelTransforms[i] = mat4(0.0f);
+                    this->normalTransforms[i] = mat4(0.0f);
+                }else if(this->instancingNodes[i]->isDisabled) {
+                    this->modelTransforms[i] = mat4(0.0f);
+                    this->normalTransforms[i] = mat4(0.0f);
+                }else{
+                    mat4 instancingNodeModelTransform = this->instancingNodes[i]->getWorldTransform();
+                    this->modelTransforms[i] = instancingNodeModelTransform;
+                    this->normalTransforms[i] = transpose(inverse(instancingNodeModelTransform));
+                }
+            }
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, this->modelTransformBuffers);
+        glBufferData(GL_ARRAY_BUFFER, this->instancingNodeCount * sizeof(mat4), &this->modelTransforms[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, this->normalTransformBuffers);
+        glBufferData(GL_ARRAY_BUFFER, this->instancingNodeCount * sizeof(mat4), &this->normalTransforms[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     if(this->renderingOrder <= 0.0f) {
         Engine::main->preparedGeometries.insert(Engine::main->preparedGeometries.begin(), this);
@@ -248,4 +317,22 @@ void Geometry::engineRenderGeometry() {
         glDisable(GL_CULL_FACE);
     }
     this->shader->engineRenderShader(this);
+    this->updated = false;
+    this->prepared = false;
+}
+unsigned int Geometry::engineGeometryAddInstancingNode(Node* node) {
+    this->instancingNodes.push_back(node);
+    this->modelTransforms.push_back(mat4(1.0f));
+    this->normalTransforms.push_back(mat4(1.0f));
+    return((unsigned int)this->instancingNodes.size() - 1);
+}
+void Geometry::engineUpdateGeometryInstancingTransforms(unsigned int index, mat4 modelTransform) {
+    this->modelTransforms[index] = modelTransform;
+    this->normalTransforms[index] = transpose(inverse(modelTransform));
+}
+unsigned int Geometry::engineGetGeometryInstancingNodeCount() {
+    return((unsigned int)this->instancingNodes.size());
+}
+void Geometry::engineEraseGeometryInstancingNode(unsigned int index) {
+    this->instancingNodes[index] = NULL;
 }

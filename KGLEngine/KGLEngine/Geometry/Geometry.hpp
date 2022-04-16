@@ -10,6 +10,7 @@ class Texture;
 class Shader;
 class Animation;
 class Font;
+class Node;
 struct GeometryVertex {
     vec3 position;
     vec3 normal;
@@ -21,6 +22,8 @@ struct GeometryVertex {
 };
 class Geometry {
 protected:
+    bool updated;
+    bool prepared;
     unsigned int cullMode;
     Shader* shader;
     unsigned int vertexArrays;
@@ -28,10 +31,16 @@ protected:
     unsigned int elementBuffers;
     unsigned int indiceCount;
     vector<Animation*> animations;
-    int bonesCount;
+    int boneCount;
     map<string, BoneInfo> bonesInfoMap;
     vector<mat4> boneTransforms;
     mat4 modelTransform;
+    unsigned int modelTransformBuffers;
+    unsigned int normalTransformBuffers;
+    unsigned int instancingNodeCount;
+    vector<Node*> instancingNodes;
+    vector<mat4> modelTransforms;
+    vector<mat4> normalTransforms;
 public:
     bool isHidden;
     float renderingOrder;
@@ -58,6 +67,10 @@ public:
     void engineUpdateGeometryAnimations();
     void enginePrepareGeometryForRendering(mat4 worldTransform);
     virtual void engineRenderGeometry();
+    unsigned int engineGeometryAddInstancingNode(Node* node);
+    void engineUpdateGeometryInstancingTransforms(unsigned int index, mat4 modelTransform);
+    unsigned int engineGetGeometryInstancingNodeCount();
+    void engineEraseGeometryInstancingNode(unsigned int index);
 };
 class UnitCube final: public Geometry {
 public:

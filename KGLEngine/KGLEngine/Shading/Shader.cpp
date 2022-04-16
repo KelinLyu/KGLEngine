@@ -51,6 +51,12 @@ Shader::Shader(string shaderFile) {
 Shader::Shader(string vertexShaderCode, string fragmentShaderCode) {
     this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
 }
+void Shader::activateShader() {
+    if(Shader::currentProgramID != this->programID) {
+        Shader::currentProgramID = this->programID;
+        glUseProgram(this->programID);
+    }
+}
 void Shader::setUIShader() {
     this->isUIShader = true;
     this->blendMode = 2;
@@ -65,7 +71,7 @@ void Shader::setSemitransparent() {
     this->blendMode = 2;
 }
 void Shader::setBool(string name, bool value) {
-    this->engineActiveShader();
+    this->activateShader();
     if(value) {
         glUniform1i(glGetUniformLocation(this->programID, name.c_str()), 1);
     }else{
@@ -73,35 +79,35 @@ void Shader::setBool(string name, bool value) {
     }
 }
 void Shader::setInt(string name, int value) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniform1i(glGetUniformLocation(this->programID, name.c_str()), value);
 }
 void Shader::setFloat(string name, float value) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniform1f(glGetUniformLocation(this->programID, name.c_str()), value);
 }
 void Shader::setVec2(string name, vec2 value) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniform2fv(glGetUniformLocation(this->programID, name.c_str()), 1, &value[0]);
 }
 void Shader::setVec3(string name, vec3 value) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniform3fv(glGetUniformLocation(this->programID, name.c_str()), 1, &value[0]);
 }
 void Shader::setVec4(string name, vec4 value) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniform4fv(glGetUniformLocation(this->programID, name.c_str()), 1, &value[0]);
 }
 void Shader::setMat2(string name, mat2 mat) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniformMatrix2fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 void Shader::setMat3(string name, mat3 mat) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniformMatrix3fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 void Shader::setMat4(string name, mat4 mat) {
-    this->engineActiveShader();
+    this->activateShader();
     glUniformMatrix4fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 void Shader::setTexture(string name, Texture* texture) {
@@ -113,7 +119,7 @@ void Shader::setTexture(string name, Texture* texture) {
     }
     this->textures.push_back(texture);
     this->uniformTextureNames.push_back(name);
-    this->engineActiveShader();
+    this->activateShader();
     int i = (int)this->textures.size() - 1;
     this->setInt(name, i);
 }
@@ -188,12 +194,6 @@ bool Shader::engineCheckCompileErrors(unsigned int shader, string type) {
     }
     return(result);
 }
-void Shader::engineActiveShader() {
-    if(Shader::currentProgramID != this->programID) {
-        Shader::currentProgramID = this->programID;
-        glUseProgram(this->programID);
-    }
-}
 void Shader::engineRenderShader(Geometry* geometry) {
     if(this->blendMode == 0) {
         glDisable(GL_BLEND);
@@ -204,23 +204,27 @@ void Shader::engineRenderShader(Geometry* geometry) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
+    this->activateShader();
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
     if(this->isUIShader) {
         glDepthFunc(GL_ALWAYS);
         mat4 projectionTransform = Engine::main->camera->getOrthogonalProjectionTransform();
+        this->setMat4("projectionTransform", projectionTransform);
         this->setMat4("modelProjectionTransform", projectionTransform * modelTransform);
     }else{
         glDepthFunc(GL_LESS);
-        this->setVec3("frame.cameraPosition", Engine::main->camera->getWorldPosition());
-        this->setVec3("frame.cameraDirection", Engine::main->camera->getFrontVectorInWorld());
         mat4 viewTransform = Engine::main->camera->getViewTransform();
         mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
+        mat4 viewProjectionTransform = projectionTransform * viewTransform;
+        this->setMat4("frame.viewProjectionTransform", viewProjectionTransform);
+        this->setVec3("frame.cameraPosition", Engine::main->camera->getWorldPosition());
+        this->setVec3("frame.cameraDirection", Engine::main->camera->getFrontVectorInWorld());
         if(this->currentModelTransform != modelTransform) {
             this->currentModelTransform = modelTransform;
             this->setMat4("node.modelTransform", modelTransform);
             this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));
         }
-        this->setMat4("node.modelViewProjectionTransform", projectionTransform * viewTransform * modelTransform);
+        this->setMat4("node.modelViewProjectionTransform", viewProjectionTransform * modelTransform);
         if(geometry->engineCheckIfGeometryHasBones()) {
             this->setInt("hasBones", 1);
             vector<mat4>& boneTransforms = geometry->engineGetGeometryBoneTransformsReference();
@@ -243,13 +247,28 @@ void Shader::engineRenderShader(Geometry* geometry) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textures[i]->data);
     }
-    if(this->isUIShader) {
-        glBindVertexArray(geometry->engineGetGeometryVertexArrays());
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+    unsigned int amount = (unsigned int)geometry->engineGetGeometryInstancingNodeCount();
+    if(amount > 0) {
+        this->setBool("enableInstancing", true);
+        if(this->isUIShader) {
+            glBindVertexArray(geometry->engineGetGeometryVertexArrays());
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, amount);
+            glBindVertexArray(0);
+        }else{
+            glBindVertexArray(geometry->engineGetGeometryVertexArrays());
+            glDrawElementsInstanced(GL_TRIANGLES, geometry->engineGetGeometryIndiceCount(), GL_UNSIGNED_INT, 0, amount);
+            glBindVertexArray(0);
+        }
     }else{
-        glBindVertexArray(geometry->engineGetGeometryVertexArrays());
-        glDrawElements(GL_TRIANGLES, geometry->engineGetGeometryIndiceCount(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        this->setBool("enableInstancing", false);
+        if(this->isUIShader) {
+            glBindVertexArray(geometry->engineGetGeometryVertexArrays());
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindVertexArray(0);
+        }else{
+            glBindVertexArray(geometry->engineGetGeometryVertexArrays());
+            glDrawElements(GL_TRIANGLES, geometry->engineGetGeometryIndiceCount(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
     }
 }

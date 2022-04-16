@@ -61,6 +61,8 @@ void TextRenderer::engineRenderGeometry() {
         this->shader->setTexture("textureMap", this->textures[i]);
         this->shader->engineRenderShader(this);
     }
+    this->updated = false;
+    this->prepared = false;
 }
 void TextRenderer::engineSetTextRendererAlpha(float alpha) {
     this->shader->setFloat("alpha", alpha);

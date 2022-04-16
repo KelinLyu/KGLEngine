@@ -18,6 +18,7 @@ protected:
     mat4 worldTransform;
     map<string, Node*> boneNodes;
     vector<Animator*> animators;
+    int geometryInstancingIndex;
 public:
     string name;
     unsigned int tags;
@@ -34,6 +35,7 @@ public:
     void loadModelFile(string file);
     Animator* loadAnimator(string file);
     Node* generateBoneNode(string boneName);
+    Node* generateInstancingNode();
     void updateTransform();
     mat4 getWorldTransform();
     vec3 getWorldPosition();

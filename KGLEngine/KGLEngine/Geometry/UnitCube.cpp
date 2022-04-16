@@ -209,17 +209,14 @@ UnitCube::UnitCube() {
     indices.push_back(22);
     indices.push_back(23);
     this->indiceCount = (unsigned int)indices.size();
-    // create buffers:
     glGenVertexArrays(1, &this->vertexArrays);
     glGenBuffers(1, &this->vertexBuffers);
     glGenBuffers(1, &this->elementBuffers);
     glBindVertexArray(this->vertexArrays);
-    // load data into vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffers);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GeometryVertex), &vertices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->elementBuffers);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-    // set the vertex attribute pointers:
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)0);
     glEnableVertexAttribArray(1);
