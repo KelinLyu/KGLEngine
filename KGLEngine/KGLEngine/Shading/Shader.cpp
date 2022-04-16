@@ -247,7 +247,7 @@ void Shader::engineRenderShader(Geometry* geometry) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textures[i]->data);
     }
-    unsigned int amount = (unsigned int)geometry->engineGetGeometryInstancingNodeCount();
+    unsigned int amount = (unsigned int)geometry->engineGetGeometryInstanceCount();
     if(amount > 0) {
         this->setBool("enableInstancing", true);
         if(this->isUIShader) {

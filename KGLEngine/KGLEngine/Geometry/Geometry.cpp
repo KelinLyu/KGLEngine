@@ -106,6 +106,10 @@ Geometry::~Geometry() {
     glDeleteVertexArrays(1, &this->vertexArrays);
     glDeleteBuffers(1, &this->vertexBuffers);
     glDeleteBuffers(1, &this->elementBuffers);
+    glDeleteBuffers(1, &this->modelTransformBuffers);
+    glDeleteBuffers(1, &this->normalTransformBuffers);
+    this->modelTransforms.clear();
+    this->normalTransforms.clear();
     for(unsigned int i = 0; i < this->animations.size(); i += 1) {
         delete(this->animations[i]);
     }
@@ -123,7 +127,7 @@ void Geometry::engineInitializeGeometry() {
     this->renderingOrder = 0.0f;
     this->lightMask = -1;
     this->clearDepthBuffer = false;
-    this->instancingNodeCount = 0;
+    this->instanceCount = 0;
 }
 mat4 Geometry::engineGetGeometryModelTransform() {
     return(this->modelTransform);
@@ -230,10 +234,10 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     if(this->shader == NULL) {
         this->setShader(new Shader());
     }
-    unsigned int size = (unsigned int)this->instancingNodes.size();
+    unsigned int size = (unsigned int)this->modelTransforms.size();
     if(size > 0) {
-        if(this->instancingNodeCount != size) {
-            if(this->instancingNodeCount == 0) {
+        if(this->instanceCount != size) {
+            if(this->instanceCount == 0) {
                 glBindVertexArray(this->vertexArrays);
                 glGenBuffers(1, &this->modelTransformBuffers);
                 glBindBuffer(GL_ARRAY_BUFFER, this->modelTransformBuffers);
@@ -269,26 +273,13 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
             }
-            this->instancingNodeCount = size;
-            for(unsigned int i = 0; i < this->instancingNodeCount; i += 1) {
-                if(this->instancingNodes[i] == NULL) {
-                    this->modelTransforms[i] = mat4(0.0f);
-                    this->normalTransforms[i] = mat4(0.0f);
-                }else if(this->instancingNodes[i]->isDisabled) {
-                    this->modelTransforms[i] = mat4(0.0f);
-                    this->normalTransforms[i] = mat4(0.0f);
-                }else{
-                    mat4 instancingNodeModelTransform = this->instancingNodes[i]->getWorldTransform();
-                    this->modelTransforms[i] = instancingNodeModelTransform;
-                    this->normalTransforms[i] = transpose(inverse(instancingNodeModelTransform));
-                }
-            }
+            this->instanceCount = size;
         }
         glBindBuffer(GL_ARRAY_BUFFER, this->modelTransformBuffers);
-        glBufferData(GL_ARRAY_BUFFER, this->instancingNodeCount * sizeof(mat4), &this->modelTransforms[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->modelTransforms[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, this->normalTransformBuffers);
-        glBufferData(GL_ARRAY_BUFFER, this->instancingNodeCount * sizeof(mat4), &this->normalTransforms[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->normalTransforms[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     if(this->renderingOrder <= 0.0f) {
@@ -320,19 +311,15 @@ void Geometry::engineRenderGeometry() {
     this->updated = false;
     this->prepared = false;
 }
-unsigned int Geometry::engineGeometryAddInstancingNode(Node* node) {
-    this->instancingNodes.push_back(node);
-    this->modelTransforms.push_back(mat4(1.0f));
-    this->normalTransforms.push_back(mat4(1.0f));
-    return((unsigned int)this->instancingNodes.size() - 1);
+unsigned int Geometry::engineGeometryAddInstance() {
+    this->modelTransforms.push_back(mat4(0.0f));
+    this->normalTransforms.push_back(mat4(0.0f));
+    return((unsigned int)this->modelTransforms.size() - 1);
 }
-void Geometry::engineUpdateGeometryInstancingTransforms(unsigned int index, mat4 modelTransform) {
+void Geometry::engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform) {
     this->modelTransforms[index] = modelTransform;
     this->normalTransforms[index] = transpose(inverse(modelTransform));
 }
-unsigned int Geometry::engineGetGeometryInstancingNodeCount() {
-    return((unsigned int)this->instancingNodes.size());
-}
-void Geometry::engineEraseGeometryInstancingNode(unsigned int index) {
-    this->instancingNodes[index] = NULL;
+unsigned int Geometry::engineGetGeometryInstanceCount() {
+    return((unsigned int)this->modelTransforms.size());
 }

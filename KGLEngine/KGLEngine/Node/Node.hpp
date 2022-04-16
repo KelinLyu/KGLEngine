@@ -36,6 +36,11 @@ public:
     Animator* loadAnimator(string file);
     Node* generateBoneNode(string boneName);
     Node* generateInstancingNode();
+    
+    
+    void freeze();
+    
+    
     void updateTransform();
     mat4 getWorldTransform();
     vec3 getWorldPosition();

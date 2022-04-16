@@ -47,14 +47,25 @@ Node* Node::generateBoneNode(string boneName) {
 Node* Node::generateInstancingNode() {
     Node* node = new Node();
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        if(this->geometries[i]->engineGetGeometryInstancingNodeCount() == 0) {
-            this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstancingNode(this);
+        if(this->geometries[i]->engineGetGeometryInstanceCount() == 0) {
+            this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
         }
-        node->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstancingNode(node);
+        node->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
         node->geometries.push_back(this->geometries[i]);
     }
     return(node);
 }
+
+
+
+
+void Node::freeze() {
+    
+}
+
+
+
+
 void Node::updateTransform() {
     if(this->parent != NULL) {
         this->engineCalculateNodeWorldTransform(this->parent->getWorldTransform());
@@ -125,9 +136,8 @@ Node::~Node() {
     this->childNodes.clear();
     this->boneNodes.clear();
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        if(this->geometryInstancingIndex >= 0 && this->geometries[i]->engineGetGeometryInstancingNodeCount() > 1) {
-            this->geometries[i]->engineUpdateGeometryInstancingTransforms(this->geometryInstancingIndex, mat4(0.0f));
-            this->geometries[i]->engineEraseGeometryInstancingNode(this->geometryInstancingIndex);
+        if(this->geometryInstancingIndex >= 0 && this->geometries[i]->engineGetGeometryInstanceCount() > 1) {
+            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, mat4(0.0f));
         }else{
             delete(this->geometries[i]);
         }
@@ -193,7 +203,7 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         if(this->geometryInstancingIndex >= 0) {
-            this->geometries[i]->engineUpdateGeometryInstancingTransforms(this->geometryInstancingIndex, this->worldTransform);
+            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform);
         }
         this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
     }

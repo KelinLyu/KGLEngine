@@ -37,8 +37,7 @@ protected:
     mat4 modelTransform;
     unsigned int modelTransformBuffers;
     unsigned int normalTransformBuffers;
-    unsigned int instancingNodeCount;
-    vector<Node*> instancingNodes;
+    unsigned int instanceCount;
     vector<mat4> modelTransforms;
     vector<mat4> normalTransforms;
 public:
@@ -67,10 +66,9 @@ public:
     void engineUpdateGeometryAnimations();
     void enginePrepareGeometryForRendering(mat4 worldTransform);
     virtual void engineRenderGeometry();
-    unsigned int engineGeometryAddInstancingNode(Node* node);
-    void engineUpdateGeometryInstancingTransforms(unsigned int index, mat4 modelTransform);
-    unsigned int engineGetGeometryInstancingNodeCount();
-    void engineEraseGeometryInstancingNode(unsigned int index);
+    unsigned int engineGeometryAddInstance();
+    void engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform);
+    unsigned int engineGetGeometryInstanceCount();
 };
 class UnitCube final: public Geometry {
 public:
