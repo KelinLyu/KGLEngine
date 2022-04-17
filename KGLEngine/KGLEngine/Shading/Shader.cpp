@@ -233,9 +233,9 @@ void Shader::engineRenderShader(Geometry* geometry) {
         this->setMat4("node.modelViewProjectionTransform", viewProjectionTransform * modelTransform);
         if(geometry->engineCheckIfGeometryHasBones()) {
             this->setBool("hasBones", true);
-            vector<mat4>& boneTransforms = geometry->engineGetGeometryBoneTransformsReference();
+            vector<mat4>* boneTransforms = geometry->engineGetGeometryBoneTransforms();
             for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
-                this->setMat4("boneTransforms[" + to_string(i) + "]", boneTransforms[i]);
+                this->setMat4("boneTransforms[" + to_string(i) + "]", (*boneTransforms)[i]);
             }
         }else{
             this->setBool("hasBones", false);

@@ -70,22 +70,22 @@ float Animator::getCurrentBlendFactor() {
 }
 Animator::~Animator() {
     for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        this->animations[i]->engineEraseAnimator();
+        this->animations[i]->engineAnimationEraseAnimator();
     }
     this->animations.clear();
 }
-string Animator::engineGetAnimatorName() {
+string Animator::engineAnimationGetAnimatorName() {
     return(this->name);
 }
-float Animator::engineGetAnimatorCurrentBlendFactor() {
+float Animator::engineAnimationGetAnimatorCurrentBlendFactor() {
     return(this->blendFactor * this->currentBlendFactor);
 }
-float Animator::engineGetAnimatorFadeInFactor(float progress) {
+float Animator::engineAnimationGetAnimatorFadeInFactor(float progress) {
     float x = pi<float>() * progress / (this->fadeIn / this->speed);
     float value = (-cos(x) + 1) * 0.5 * (1 - this->stateChangeBlendFactor);
     return(value + this->stateChangeBlendFactor);
 }
-float Animator::engineGetAnimatorFadeOutFactor(float progress) {
+float Animator::engineAnimationGetAnimatorFadeOutFactor(float progress) {
     float x = pi<float>() * progress / (this->fadeOut / this->speed);
     float value = (cos(x) + 1) * 0.5;
     return(value * this->stateChangeBlendFactor);
@@ -109,7 +109,7 @@ void Animator::engineUpdateAnimator() {
             this->currentBlendFactor = 1.0;
             this->stateChangeTime = Engine::main->getTime();
         }else{
-            this->currentBlendFactor = this->engineGetAnimatorFadeInFactor(progress);
+            this->currentBlendFactor = this->engineAnimationGetAnimatorFadeInFactor(progress);
         }
     }else if(this->state == 3) {
         float progress = Engine::main->getTime() - this->stateChangeTime;
@@ -118,7 +118,7 @@ void Animator::engineUpdateAnimator() {
             this->currentBlendFactor = 0.0;
             this->stateChangeTime = Engine::main->getTime();
         }else{
-            this->currentBlendFactor = this->engineGetAnimatorFadeOutFactor(progress);
+            this->currentBlendFactor = this->engineAnimationGetAnimatorFadeOutFactor(progress);
         }
     }
     if(!this->repeats && !this->clamps) {

@@ -31,10 +31,10 @@ public:
     float getTime();
     float getCurrentBlendFactor();
     ~Animator();
-    string engineGetAnimatorName();
-    float engineGetAnimatorCurrentBlendFactor();
-    float engineGetAnimatorFadeInFactor(float progress);
-    float engineGetAnimatorFadeOutFactor(float progress);
+    string engineAnimationGetAnimatorName();
+    float engineAnimationGetAnimatorCurrentBlendFactor();
+    float engineAnimationGetAnimatorFadeInFactor(float progress);
+    float engineAnimationGetAnimatorFadeOutFactor(float progress);
     void engineUpdateAnimator();
     Animator* engineCopyAnimator();
 };

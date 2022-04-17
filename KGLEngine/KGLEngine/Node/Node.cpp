@@ -85,7 +85,7 @@ void Node::freeze() {
 }
 Animator* Node::getAnimator(string name) {
     for(unsigned int i = 0; i < this->animators.size(); i += 1) {
-        if(this->animators[i]->engineGetAnimatorName() == name) {
+        if(this->animators[i]->engineAnimationGetAnimatorName() == name) {
             return(this->animators[i]);
         }
     }

@@ -6,7 +6,6 @@ class Bone;
 class Geometry;
 class Animator;
 struct AnimationBoneNode final {
-    int boneIndex;
     string name;
     mat4 transform;
     vector<AnimationBoneNode*> children;
@@ -15,17 +14,16 @@ class Animation final {
 private:
     Animator* animator;
     AnimationBoneNode* rootAnimationBoneNode;
-    vector<Bone*> bones;
+    map<string, Bone*> bones;
 public:
     Animation() = default;
     Animation(const aiScene* scene, Animator* animator, Geometry* geometry);
     ~Animation();
-    void engineProcessNode(AnimationBoneNode* targetNode, aiNode* node);
-    void engineMatchAnimationBoneNodeWithBones(AnimationBoneNode* targetNode);
-    Animator* engineGetAnimator();
+    void engineAnimationProcessNode(AnimationBoneNode* targetNode, aiNode* node, map<string, BoneInfo>* bonesInfoMap);
+    Animator* engineAnimationGetAnimator();
     AnimationBoneNode* engineGetRootAnimationBoneNode();
-    Bone* engineGetBone(int index);
-    void engineEraseAnimator();
+    Bone* engineAnimationGetBone(string name);
+    void engineAnimationEraseAnimator();
     Animation* engineCopyAnimation(Animator* newAnimator);
 };
 #endif

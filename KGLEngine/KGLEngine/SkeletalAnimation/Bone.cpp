@@ -48,12 +48,13 @@ void Bone::engineUpdateBoneAnimation(float animationTime) {
         translationTransform = glm::translate(mat4(1.0f), this->keyPositions[0].position);
     }else{
         int index = this->currentKeyPositionIndex;
-        if(animationTime > this->keyPositions[index].timestamp) {
+        if(animationTime < this->keyPositions[index].timestamp) {
             index = 0;
         }
         for(unsigned int i = index; i < this->keyPositions.size() - 1; i += 1) {
             if(animationTime < this->keyPositions[i + 1].timestamp) {
                 index = i;
+                this->currentKeyPositionIndex = index;
                 break;
             }
         }
@@ -67,12 +68,13 @@ void Bone::engineUpdateBoneAnimation(float animationTime) {
         rotationTransform = glm::toMat4(normalize(this->keyRotations[0].orientation));
     }else{
         int index = this->currentKeyRotationIndex;
-        if(animationTime > this->keyRotations[index].timestamp) {
+        if(animationTime < this->keyRotations[index].timestamp) {
             index = 0;
         }
-        for(unsigned int i = 0; i < this->keyRotations.size() - 1; i += 1) {
+        for(unsigned int i = index; i < this->keyRotations.size() - 1; i += 1) {
             if(animationTime < this->keyRotations[i + 1].timestamp) {
                 index = i;
+                this->currentKeyRotationIndex = index;
                 break;
             }
         }
@@ -86,12 +88,13 @@ void Bone::engineUpdateBoneAnimation(float animationTime) {
         scaleTransform = glm::scale(mat4(1.0f), this->keyScales[0].scale);
     }else{
         int index = this->currentKeyScaleIndex;
-        if(animationTime > this->keyScales[index].timestamp) {
+        if(animationTime < this->keyScales[index].timestamp) {
             index = 0;
         }
         for(unsigned int i = index; i < this->keyScales.size() - 1; i += 1) {
             if(animationTime < this->keyScales[i + 1].timestamp) {
                 index = i;
+                this->currentKeyScaleIndex = index;
                 break;
             }
         }

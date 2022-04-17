@@ -190,52 +190,45 @@ unsigned int Geometry::engineGetGeometryIndiceCount() {
 bool Geometry::engineCheckIfGeometryHasBones() {
     return(this->boneCount > 0);
 }
-int& Geometry::engineGetGeometryBonesCountReference() {
-    return(this->boneCount);
+map<string, BoneInfo>* Geometry::engineGetGeometryBonesInfoMap() {
+    return(&this->bonesInfoMap);
 }
-map<string, BoneInfo>& Geometry::engineGetGeometryBonesInfoMapReference() {
-    return(this->bonesInfoMap);
-}
-vector<mat4>& Geometry::engineGetGeometryBoneTransformsReference() {
-    return(this->boneTransforms);
+vector<mat4>* Geometry::engineGetGeometryBoneTransforms() {
+    return(&this->boneTransforms);
 }
 void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, mat4 parentTransform, bool first) {
     string nodeName = node->name;
-    vector<mat4> nodeTransforms;
     mat4 finalTransform = node->transform;
     for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        Bone* bone = this->animations[i]->engineGetBone(node->boneIndex);
-        if(bone == NULL || this->animations[i]->engineGetAnimator() == NULL) {
-            if(first) {
-                nodeTransforms.push_back(node->transform);
-            }else{
-                nodeTransforms.push_back(mat4(0.0f));
-            }
-        }else{
-            bone->engineUpdateBoneAnimation(this->animations[i]->engineGetAnimator()->getTime());
-            nodeTransforms.push_back(bone->engineGetTransform());
-        }
-    }
-    for(unsigned int i = 0; i < nodeTransforms.size(); i += 1) {
-        if(this->animations[i]->engineGetAnimator() == NULL) {
+        if(this->animations[i]->engineAnimationGetAnimator() == NULL) {
             continue;
         }
-        if(nodeTransforms[i] == mat4(0.0f)) {
-            continue;
-        }
-        float blendFactor = this->animations[i]->engineGetAnimator()->engineGetAnimatorCurrentBlendFactor();
+        float blendFactor = this->animations[i]->engineAnimationGetAnimator()->engineAnimationGetAnimatorCurrentBlendFactor();
         if(blendFactor == 0.0f) {
             continue;
         }
+        mat4 newTransform = mat4(0.0f);
+        Bone* bone = this->animations[i]->engineAnimationGetBone(nodeName);
+        if(bone == NULL || this->animations[i]->engineAnimationGetAnimator() == NULL) {
+            if(first) {
+                newTransform = node->transform;
+            }
+        }else{
+            bone->engineUpdateBoneAnimation(this->animations[i]->engineAnimationGetAnimator()->getTime());
+            newTransform = bone->engineGetTransform();
+        }
+        if(newTransform == mat4(0.0f)) {
+            continue;
+        }
         quat rotation = quat_cast(finalTransform);
-        quat newRotation = quat_cast(nodeTransforms[i]);
+        quat newRotation = quat_cast(newTransform);
         quat blendedRotation = slerp(rotation, newRotation, blendFactor);
         mat4 matrix = mat4_cast(blendedRotation);
-        matrix[3] = finalTransform[3] * (1.0f - blendFactor) + nodeTransforms[i][3] * blendFactor;
+        matrix[3] = finalTransform[3] * (1.0f - blendFactor) + newTransform[3] * blendFactor;
         finalTransform = matrix;
     }
     mat4 globalTransform = parentTransform * finalTransform;
-    if(this->bonesInfoMap.find(nodeName) != this->bonesInfoMap.end()) {
+    if(nodeName != "") {
         int index = this->bonesInfoMap[nodeName].id;
         mat4 offset = this->bonesInfoMap[nodeName].offset;
         this->boneTransforms[index] = globalTransform * offset;

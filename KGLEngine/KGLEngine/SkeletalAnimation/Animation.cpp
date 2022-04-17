@@ -4,60 +4,49 @@ Animation::Animation(const aiScene* scene, Animator* animator, Geometry* geometr
     this->animator = animator;
     geometry->engineAddAnimationToGeometry(this);
     aiAnimation* animation = scene->mAnimations[0];
+    map<string, BoneInfo>* bonesInfoMap = geometry->engineGetGeometryBonesInfoMap();
     this->rootAnimationBoneNode = new AnimationBoneNode();
-    this->engineProcessNode(this->rootAnimationBoneNode, scene->mRootNode);
+    this->engineAnimationProcessNode(this->rootAnimationBoneNode, scene->mRootNode, bonesInfoMap);
     int size = animation->mNumChannels;
-    map<string, BoneInfo>& newBonesInfoMap = geometry->engineGetGeometryBonesInfoMapReference();
-    int& boneCount = geometry->engineGetGeometryBonesCountReference();
     for(unsigned int i = 0; i < size; i += 1) {
         aiNodeAnim* channel = animation->mChannels[i];
         string boneName = channel->mNodeName.data;
-        if(newBonesInfoMap.find(boneName) == newBonesInfoMap.end()) {
-            newBonesInfoMap[boneName].id = boneCount;
-            boneCount = boneCount + 1;
+        if((*bonesInfoMap).find(boneName) != (*bonesInfoMap).end()) {
+            this->bones[boneName] = new Bone(channel->mNodeName.data, channel);
         }
-        this->bones.push_back(new Bone(channel->mNodeName.data, channel));
     }
-    this->engineMatchAnimationBoneNodeWithBones(this->rootAnimationBoneNode);
 }
 Animation::~Animation() {
     this->rootAnimationBoneNode = NULL;
     this->bones.clear();
 }
-void Animation::engineProcessNode(AnimationBoneNode* targetNode, aiNode* node) {
-    targetNode->boneIndex = -1;
-    targetNode->name = node->mName.data;
+void Animation::engineAnimationProcessNode(AnimationBoneNode* targetNode, aiNode* node, map<string, BoneInfo>* bonesInfoMap) {
+    string name = node->mName.data;
+    if((*bonesInfoMap).find(name) != (*bonesInfoMap).end()) {
+        targetNode->name = name;
+    }else{
+        targetNode->name = "";
+    }
     targetNode->transform = assimp_helper::getMat4(node->mTransformation);
     for(unsigned int i = 0; i < node->mNumChildren; i += 1) {
         AnimationBoneNode* newNode = new AnimationBoneNode();
-        this->engineProcessNode(newNode, node->mChildren[i]);
+        this->engineAnimationProcessNode(newNode, node->mChildren[i], bonesInfoMap);
         targetNode->children.push_back(newNode);
     }
 }
-void Animation::engineMatchAnimationBoneNodeWithBones(AnimationBoneNode* targetNode) {
-    for(unsigned int i = 0; i < this->bones.size(); i += 1) {
-        if(this->bones[i]->engineGetName() == targetNode->name) {
-            targetNode->boneIndex = i;
-            break;
-        }
-    }
-    for(unsigned int i = 0; i < targetNode->children.size(); i += 1) {
-        this->engineMatchAnimationBoneNodeWithBones(targetNode->children[i]);
-    }
-}
-Animator* Animation::engineGetAnimator() {
+Animator* Animation::engineAnimationGetAnimator() {
     return(this->animator);
 }
 AnimationBoneNode* Animation::engineGetRootAnimationBoneNode() {
     return(this->rootAnimationBoneNode);
 }
-Bone* Animation::engineGetBone(int index) {
-    if(index == -1) {
-        return(NULL);
+Bone* Animation::engineAnimationGetBone(string name) {
+    if(this->bones.find(name) != this->bones.end()) {
+        return(this->bones[name]);
     }
-    return(this->bones[index]);
+    return(NULL);
 }
-void Animation::engineEraseAnimator() {
+void Animation::engineAnimationEraseAnimator() {
     this->animator = NULL;
 }
 Animation* Animation::engineCopyAnimation(Animator* newAnimator) {

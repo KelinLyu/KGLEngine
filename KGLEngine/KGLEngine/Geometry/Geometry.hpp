@@ -61,9 +61,8 @@ public:
     unsigned int engineGetGeometryVertexArrays();
     unsigned int engineGetGeometryIndiceCount();
     bool engineCheckIfGeometryHasBones();
-    int& engineGetGeometryBonesCountReference();
-    map<string, BoneInfo>& engineGetGeometryBonesInfoMapReference();
-    vector<mat4>& engineGetGeometryBoneTransformsReference();
+    map<string, BoneInfo>* engineGetGeometryBonesInfoMap();
+    vector<mat4>* engineGetGeometryBoneTransforms();
     void engineCalculateGeometryBoneTransforms(AnimationBoneNode* node, mat4 parentTransform, bool first);
     mat4 engineGetGeometryBoneTransform(string name);
     void engineAddAnimationToGeometry(Animation* animation);
