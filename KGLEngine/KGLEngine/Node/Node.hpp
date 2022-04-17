@@ -18,6 +18,7 @@ protected:
     map<string, Node*> boneNodes;
     vector<Animator*> animators;
     int geometryInstancingIndex;
+    map<Geometry*, vector<unsigned int>> frozenNodeGeometryInstancingIndices;
 public:
     string name;
     unsigned int tags;
@@ -59,7 +60,7 @@ public:
     void engineUpdateNodeAnimators(mat4 parentWorldTransform);
     virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data);
     virtual void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
-    void engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries);
+    void engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries, map<Geometry*, vector<unsigned int>>* indices);
 };
 class CameraNode final: public Node{
 public:

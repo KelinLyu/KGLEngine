@@ -317,12 +317,6 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
             }
             this->instanceCount = size;
         }
-        for(unsigned int i = 0; i < this->modelTransforms.size(); i += 1) {
-            if(this->frozenTransforms[i] == false) {
-                this->modelTransforms[i] = mat4(0.0f);
-                this->normalTransforms[i] = mat4(0.0f);
-            }
-        }
     }
     if(this->renderingOrder <= 0.0f) {
         Engine::main->preparedGeometries.insert(Engine::main->preparedGeometries.begin(), this);

@@ -10,6 +10,11 @@ void Node::addChildNode(Node* node) {
 }
 void Node::removeFromParentNode() {
     if(this->parent != NULL) {
+        if(this->geometryInstancingIndex >= 0) {
+            for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+                this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, mat4(0.0f), false);
+            }
+        }
         for(unsigned int i = 0; i < this->parent->childNodes.size(); i += 1) {
             if(this == this->parent->childNodes[i]) {
                 this->parent->childNodes.erase(this->parent->childNodes.begin() + i);
@@ -81,7 +86,7 @@ Node* Node::clone() {
 }
 void Node::freeze() {
     this->updateTransform();
-    this->engineRecursivelyFreezeChildNodes(&this->geometries);
+    this->engineRecursivelyFreezeChildNodes(&this->geometries, &this->frozenNodeGeometryInstancingIndices);
 }
 Animator* Node::getAnimator(string name) {
     for(unsigned int i = 0; i < this->animators.size(); i += 1) {
@@ -167,12 +172,28 @@ Node::~Node() {
     this->removeFromParentNode();
     this->childNodes.clear();
     this->boneNodes.clear();
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        delete(this->animators[i]);
+    }
     this->animators.clear();
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        if(this->geometryInstancingIndex >= 0 && this->geometries[i]->engineGetGeometryInstanceCount() > 1) {
-            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, mat4(0.0f), true);
-        }else{
-            delete(this->geometries[i]);
+    if(this->frozenNodeGeometryInstancingIndices.size() > 0) {
+        map<Geometry*, vector<unsigned int>>::iterator iterator;
+        for(iterator = this->frozenNodeGeometryInstancingIndices.begin();
+            iterator != this->frozenNodeGeometryInstancingIndices.end();
+            iterator++) {
+            for(unsigned i = 0; i < iterator->second.size(); i += 1) {
+                iterator->first->engineUpdateGeometryInstanceTransform(iterator->second[i], mat4(0.0f), true);
+            }
+            iterator->second.clear();
+        }
+        this->frozenNodeGeometryInstancingIndices.clear();
+    }else if(this->geometryInstancingIndex == -1) {
+        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+            if(this->geometryInstancingIndex >= 0 && this->geometries[i]->engineGetGeometryInstanceCount() > 1) {
+                this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, mat4(0.0f), true);
+            }else{
+                delete(this->geometries[i]);
+            }
         }
     }
     this->geometries.clear();
@@ -252,7 +273,7 @@ void Node::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     mat4 scaleMatrix = glm::scale(mat4(1.0f), vec3(this->scale));
     this->worldTransform = parentWorldTransform * (translateMatrix * rotateMatrix * scaleMatrix);
 }
-void Node::engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries) {
+void Node::engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries, map<Geometry*, vector<unsigned int>>* indices) {
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         if(find(allGeometries->begin(), allGeometries->end(), this->geometries[i]) == allGeometries->end()) {
             allGeometries->push_back(this->geometries[i]);
@@ -262,13 +283,33 @@ void Node::engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries) {
         }
         if(this->geometryInstancingIndex != -1) {
             this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, true);
+            if(indices->find(this->geometries[i]) == indices->end()) {
+                vector<unsigned int> array;
+                array.push_back(this->geometryInstancingIndex);
+                (*indices)[this->geometries[i]] = array;
+            }else{
+                (*indices)[this->geometries[i]].push_back(this->geometryInstancingIndex);
+            }
         }
     }
     this->geometryInstancingIndex = -1;
+    this->animators.clear();
     while(this->childNodes.size() > 0) {
-        this->childNodes[0]->engineRecursivelyFreezeChildNodes(allGeometries);
+        this->childNodes[0]->engineRecursivelyFreezeChildNodes(allGeometries, indices);
         this->childNodes[0]->geometryInstancingIndex = -1;
         this->childNodes[0]->geometries.clear();
+        map<Geometry*, vector<unsigned int>>::iterator iterator;
+        for(iterator = this->childNodes[0]->frozenNodeGeometryInstancingIndices.begin();
+            iterator != this->childNodes[0]->frozenNodeGeometryInstancingIndices.end();
+            iterator++) {
+            if(indices->find(iterator->first) == indices->end()) {
+                (*indices)[iterator->first] = iterator->second;
+            }else{
+                (*indices)[iterator->first].insert((*indices)[iterator->first].end(), iterator->second.begin(), iterator->second.end());
+            }
+            iterator->second.clear();
+        }
+        this->childNodes[0]->frozenNodeGeometryInstancingIndices.clear();
         delete(this->childNodes[0]);
     }
 }
