@@ -260,10 +260,11 @@ void Node::engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries) {
         if(this->geometries[i]->engineGetGeometryInstanceCount() == 0) {
             this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
         }
-        if(this->geometryInstancingIndex >= 0) {
+        if(this->geometryInstancingIndex != -1) {
             this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, true);
         }
     }
+    this->geometryInstancingIndex = -1;
     while(this->childNodes.size() > 0) {
         this->childNodes[0]->engineRecursivelyFreezeChildNodes(allGeometries);
         this->childNodes[0]->geometryInstancingIndex = -1;
