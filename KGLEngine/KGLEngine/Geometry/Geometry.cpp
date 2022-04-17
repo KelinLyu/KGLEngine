@@ -90,6 +90,43 @@ Geometry::Geometry(aiMesh* mesh) {
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, weights));
     glBindVertexArray(0);
 }
+Geometry* Geometry::copy() {
+    Geometry* geometry = new Geometry();
+    geometry->engineInitializeGeometry();
+    geometry->indiceCount = this->indiceCount;
+    glGenVertexArrays(1, &geometry->vertexArrays);
+    glGenBuffers(1, &geometry->vertexBuffers);
+    glGenBuffers(1, &geometry->elementBuffers);
+    glBindVertexArray(geometry->vertexArrays);
+    int size = 0;
+    glBindBuffer(GL_COPY_READ_BUFFER, this->vertexBuffers);
+    glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
+    glBindBuffer(GL_ARRAY_BUFFER, geometry->vertexBuffers);
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_ARRAY_BUFFER, 0, 0, size);
+    glBindBuffer(GL_COPY_READ_BUFFER, this->elementBuffers);
+    glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->elementBuffers);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_ELEMENT_ARRAY_BUFFER, 0, 0, size);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, normal));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, uv));
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, tangent));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, bitangent));
+    glEnableVertexAttribArray(5);
+    glVertexAttribIPointer(5, 4, GL_INT, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, boneIDs));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, weights));
+    glBindVertexArray(0);
+    geometry->setShader(this->shader);
+    return(geometry);
+}
 void Geometry::cullBack() {
     this->cullMode = 0;
 }
@@ -128,6 +165,7 @@ void Geometry::engineInitializeGeometry() {
     this->lightMask = -1;
     this->clearDepthBuffer = false;
     this->instanceCount = 0;
+    this->requiresInstanceUpdate = false;
 }
 mat4 Geometry::engineGetGeometryModelTransform() {
     return(this->modelTransform);
@@ -235,7 +273,7 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
         this->setShader(new Shader());
     }
     unsigned int size = (unsigned int)this->modelTransforms.size();
-    if(size > 0) {
+    if(size > 0 && this->requiresInstanceUpdate) {
         if(this->instanceCount != size) {
             if(this->instanceCount == 0) {
                 glBindVertexArray(this->vertexArrays);
@@ -275,12 +313,12 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
             }
             this->instanceCount = size;
         }
-        glBindBuffer(GL_ARRAY_BUFFER, this->modelTransformBuffers);
-        glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->modelTransforms[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, this->normalTransformBuffers);
-        glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->normalTransforms[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        for(unsigned int i = 0; i < this->modelTransforms.size(); i += 1) {
+            if(this->frozenTransforms[i] == false) {
+                this->modelTransforms[i] = mat4(0.0f);
+                this->normalTransforms[i] = mat4(0.0f);
+            }
+        }
     }
     if(this->renderingOrder <= 0.0f) {
         Engine::main->preparedGeometries.insert(Engine::main->preparedGeometries.begin(), this);
@@ -307,18 +345,31 @@ void Geometry::engineRenderGeometry() {
     }else if(this->cullMode == 2) {
         glDisable(GL_CULL_FACE);
     }
+    if(this->instanceCount > 0 && this->requiresInstanceUpdate) {
+        glBindBuffer(GL_ARRAY_BUFFER, this->modelTransformBuffers);
+        glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->modelTransforms[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, this->normalTransformBuffers);
+        glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->normalTransforms[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        this->requiresInstanceUpdate = false;
+    }
     this->shader->engineRenderShader(this);
     this->updated = false;
     this->prepared = false;
 }
 unsigned int Geometry::engineGeometryAddInstance() {
+    this->frozenTransforms.push_back(false);
     this->modelTransforms.push_back(mat4(0.0f));
     this->normalTransforms.push_back(mat4(0.0f));
+    this->requiresInstanceUpdate = true;
     return((unsigned int)this->modelTransforms.size() - 1);
 }
-void Geometry::engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform) {
+void Geometry::engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform, bool freeze) {
+    this->frozenTransforms[index] = freeze;
     this->modelTransforms[index] = modelTransform;
     this->normalTransforms[index] = transpose(inverse(modelTransform));
+    this->requiresInstanceUpdate = true;
 }
 unsigned int Geometry::engineGetGeometryInstanceCount() {
     return((unsigned int)this->modelTransforms.size());

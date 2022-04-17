@@ -31,11 +31,11 @@ private:
     float deltaTime;
     bool cursorHidden;
     bool cursorLocked;
+    Node* rootNode;
 public:
     string workingDirectory;
     static Engine* main;
     Input* input;
-    Node* root;
     CameraNode* camera;
     Skybox* skybox;
     vector<Geometry*> preparedGeometries;
@@ -52,6 +52,7 @@ public:
     void unlockCursor();
     bool isRunning();
     bool shouldUpdate();
+    void addNode(Node* node);
     void render();
     vec2 getScreenResolution();
     vec2 getWindowResolution();

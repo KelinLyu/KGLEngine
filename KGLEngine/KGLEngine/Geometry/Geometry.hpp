@@ -38,8 +38,10 @@ protected:
     unsigned int modelTransformBuffers;
     unsigned int normalTransformBuffers;
     unsigned int instanceCount;
+    vector<bool> frozenTransforms;
     vector<mat4> modelTransforms;
     vector<mat4> normalTransforms;
+    bool requiresInstanceUpdate;
 public:
     bool isHidden;
     float renderingOrder;
@@ -47,6 +49,7 @@ public:
     bool clearDepthBuffer;
     Geometry() = default;
     Geometry(aiMesh* mesh);
+    Geometry* copy();
     void cullBack();
     void cullFront();
     void doubleSided();
@@ -67,7 +70,7 @@ public:
     void enginePrepareGeometryForRendering(mat4 worldTransform);
     virtual void engineRenderGeometry();
     unsigned int engineGeometryAddInstance();
-    void engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform);
+    void engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform, bool freeze);
     unsigned int engineGetGeometryInstanceCount();
 };
 class UnitCube final: public Geometry {

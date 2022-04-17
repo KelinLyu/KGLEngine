@@ -44,8 +44,21 @@ Node* Node::generateBoneNode(string boneName) {
     this->addChildNode(boneNode);
     return(boneNode);
 }
-Node* Node::generateInstancingNode() {
+Node* Node::copy() {
     Node* node = new Node();
+    node->position = this->position;
+    node->eulerAngles = this->eulerAngles;
+    node->scale = this->scale;
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        node->geometries.push_back(this->geometries[i]->copy());
+    }
+    return(node);
+}
+Node* Node::clone() {
+    Node* node = new Node();
+    node->position = this->position;
+    node->eulerAngles = this->eulerAngles;
+    node->scale = this->scale;
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         if(this->geometries[i]->engineGetGeometryInstanceCount() == 0) {
             this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
@@ -53,19 +66,15 @@ Node* Node::generateInstancingNode() {
         node->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
         node->geometries.push_back(this->geometries[i]);
     }
+    for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
+        node->addChildNode(this->childNodes[i]->clone());
+    }
     return(node);
 }
-
-
-
-
 void Node::freeze() {
-    
+    this->updateTransform();
+    this->engineRecursivelyFreezeChildNodes(&this->geometries);
 }
-
-
-
-
 void Node::updateTransform() {
     if(this->parent != NULL) {
         this->engineCalculateNodeWorldTransform(this->parent->getWorldTransform());
@@ -75,6 +84,13 @@ void Node::updateTransform() {
     }
 }
 mat4 Node::getWorldTransform() {
+    if(this->worldTransform == mat4(-1.0f)) {
+        if(this->parent != NULL) {
+            this->engineCalculateNodeWorldTransform(this->parent->getWorldTransform());
+        }else{
+            this->engineCalculateNodeWorldTransform(mat4(1.0f));
+        }
+    }
     return(this->worldTransform);
 }
 vec3 Node::getWorldPosition() {
@@ -137,7 +153,7 @@ Node::~Node() {
     this->boneNodes.clear();
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         if(this->geometryInstancingIndex >= 0 && this->geometries[i]->engineGetGeometryInstanceCount() > 1) {
-            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, mat4(0.0f));
+            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, mat4(0.0f), true);
         }else{
             delete(this->geometries[i]);
         }
@@ -154,7 +170,7 @@ void Node::engineInitializeNode() {
     this->position = vec3(0.0f);
     this->eulerAngles = vec3(0.0f);
     this->scale = vec3(1.0f);
-    this->worldTransform = mat4(0.0f);
+    this->worldTransform = mat4(-1.0f);
     this->geometryInstancingIndex = -1;
 }
 void Node::engineProcessNode(aiNode *node, const aiScene *scene) {
@@ -202,10 +218,10 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
     }
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        if(this->geometryInstancingIndex >= 0) {
-            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform);
-        }
         this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
+        if(this->geometryInstancingIndex >= 0) {
+            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, false);
+        }
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
         this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, data);
@@ -218,4 +234,23 @@ void Node::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
                                            glm::radians(this->eulerAngles.z));
     mat4 scaleMatrix = glm::scale(mat4(1.0f), vec3(this->scale));
     this->worldTransform = parentWorldTransform * (translateMatrix * rotateMatrix * scaleMatrix);
+}
+void Node::engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries) {
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        if(find(allGeometries->begin(), allGeometries->end(), this->geometries[i]) == allGeometries->end()) {
+            allGeometries->push_back(this->geometries[i]);
+        }
+        if(this->geometries[i]->engineGetGeometryInstanceCount() == 0) {
+            this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
+        }
+        if(this->geometryInstancingIndex >= 0) {
+            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, true);
+        }
+    }
+    while(this->childNodes.size() > 0) {
+        this->childNodes[0]->engineRecursivelyFreezeChildNodes(allGeometries);
+        this->childNodes[0]->geometryInstancingIndex = -1;
+        this->childNodes[0]->geometries.clear();
+        delete(this->childNodes[0]);
+    }
 }

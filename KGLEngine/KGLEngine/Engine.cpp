@@ -73,7 +73,7 @@ Engine::Engine(const char* windowTitle,
     glewInit();
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
-    this->root = new Node();
+    this->rootNode = new Node();
     this->camera = NULL;
     this->skybox = NULL;
 }
@@ -117,11 +117,14 @@ bool Engine::shouldUpdate() {
     this->currentFps = 1.0f / deltaTime;
     if(this->deltaTime >= this->fps) {
         this->input->engineUpdateInput();
-        this->root->engineUpdateNodeAnimators(mat4(1.0f));
+        this->rootNode->engineUpdateNodeAnimators(mat4(1.0f));
         this->updateTime = this->currentTime;
         result = true;
     }
     return(result);
+}
+void Engine::addNode(Node* node) {
+    this->rootNode->addChildNode(node);
 }
 void Engine::render() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -129,7 +132,7 @@ void Engine::render() {
     if(this->camera != NULL) {
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
-        this->root->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f));
+        this->rootNode->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f));
         if(this->skybox != NULL) {
             this->skybox->engineRenderGeometry();
         }
@@ -163,8 +166,8 @@ void Engine::terminate() {
 Engine::~Engine() {
     glfwTerminate();
     delete(this->input);
-    delete(this->root);
-    this->root = NULL;
+    delete(this->rootNode);
+    this->rootNode = NULL;
     this->camera = NULL;
     Engine::main = NULL;
 }

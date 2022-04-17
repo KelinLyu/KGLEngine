@@ -14,7 +14,6 @@ class UINode;
 class Font;
 class Node {
 protected:
-    vector<Node*> childNodes;
     mat4 worldTransform;
     map<string, Node*> boneNodes;
     vector<Animator*> animators;
@@ -23,6 +22,7 @@ public:
     string name;
     unsigned int tags;
     Node* parent;
+    vector<Node*> childNodes;
     bool isDisabled;
     vec3 position;
     vec3 eulerAngles;
@@ -35,12 +35,9 @@ public:
     void loadModelFile(string file);
     Animator* loadAnimator(string file);
     Node* generateBoneNode(string boneName);
-    Node* generateInstancingNode();
-    
-    
+    Node* copy();
+    Node* clone();
     void freeze();
-    
-    
     void updateTransform();
     mat4 getWorldTransform();
     vec3 getWorldPosition();
@@ -61,6 +58,7 @@ public:
     void engineUpdateNodeAnimators(mat4 parentWorldTransform);
     virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data);
     virtual void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
+    void engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries);
 };
 class CameraNode final: public Node{
 public:
