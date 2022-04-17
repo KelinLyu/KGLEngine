@@ -45,6 +45,9 @@ Node* Node::generateBoneNode(string boneName) {
 }
 Node* Node::copy() {
     Node* node = new Node();
+    node->name = this->name;
+    node->tags = this->tags;
+    node->isDisabled = this->isDisabled;
     node->position = this->position;
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;

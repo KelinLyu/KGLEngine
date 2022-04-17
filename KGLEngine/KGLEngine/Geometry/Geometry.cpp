@@ -204,7 +204,7 @@ void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, ma
     vector<mat4> nodeTransforms;
     mat4 finalTransform = node->transform;
     for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        Bone* bone = this->animations[i]->engineGetBone(nodeName);
+        Bone* bone = this->animations[i]->engineGetBone(node->boneIndex);
         if(bone == NULL || this->animations[i]->engineGetAnimator() == NULL) {
             if(first) {
                 nodeTransforms.push_back(node->transform);

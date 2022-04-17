@@ -22,6 +22,9 @@ class Bone final {
 private:
     string name;
     mat4 transform;
+    unsigned int currentKeyPositionIndex;
+    unsigned int currentKeyRotationIndex;
+    unsigned int currentKeyScaleIndex;
     vector<BoneKeyFramePosition> keyPositions;
     vector<BoneKeyFrameRotation> keyRotations;
     vector<BoneKeyFrameScale> keyScales;
