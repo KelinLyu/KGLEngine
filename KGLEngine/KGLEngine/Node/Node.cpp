@@ -52,6 +52,9 @@ Node* Node::copy() {
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         node->geometries.push_back(this->geometries[i]->copy());
     }
+    for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
+        node->addChildNode(this->childNodes[i]->copy());
+    }
     return(node);
 }
 Node* Node::clone() {
