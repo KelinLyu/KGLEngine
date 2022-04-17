@@ -5,10 +5,12 @@
 class Texture;
 class Geometry;
 class Shader {
-private:
+protected:
     static int currentProgramID;
     unsigned int programID;
     unsigned int blendMode;
+    string vertexShaderSourceCode;
+    string fragmentShaderSourceCode;
     vector<Texture*> textures;
     vector<string> uniformTextureNames;
     mat4 currentModelTransform;
@@ -17,6 +19,7 @@ public:
     Shader();
     Shader(string shaderFile);
     Shader(string vertexShaderCode, string fragmentShaderCode);
+    Shader* copy();
     void activateShader();
     void setUIShader();
     void setOpaque();
@@ -58,6 +61,7 @@ private:
     float currentMultiplyIntensity;
     vec3 currentEmissionColor;
     float currentEmissionIntensity;
+    PBRShader() = default;
 public:
     float opacity;
     vec4 diffuseColor;
@@ -79,6 +83,7 @@ public:
     vec3 emissionColor;
     float emissionIntensity;
     PBRShader(float metallic, float roughness);
+    PBRShader* copy();
     void setDiffuseMap(Texture* texture);
     void setNormalMap(Texture* texture);
     void setHeightMap(Texture* texture);

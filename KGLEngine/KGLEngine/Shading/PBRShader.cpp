@@ -133,7 +133,7 @@ uniform sampler2D roughnessMap;
 uniform float roughnessIntensity;
 uniform bool invertRoughness;
 uniform bool useReflectionMap;
-uniform sampler2D ReflectionMap;
+uniform sampler2D reflectionMap;
 uniform float reflectionIntensity;
 uniform bool useAmbientOcclusionMap;
 uniform sampler2D ambientOcclusionMap;
@@ -239,7 +239,8 @@ void main() {
             float theta = dot(lightVector, -lights[i].direction);
             float epsilon = lights[i].innerAngle - lights[i].outerAngle;
             float intensity = (theta - lights[i].outerAngle) / epsilon;
-            attenuation *= clamp(intensity, 0.0f, 1.0f);
+            intensity *= clamp(intensity, 0.0f, 1.0f);
+            attenuation *= intensity * intensity;
             lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
         }
         if(lightFactor <= 0.0f) {
@@ -267,7 +268,7 @@ void main() {
         vec3 reflectionVector = reflect(-viewVector, normal);
         vec2 uv = vec2(atan(reflectionVector.z, reflectionVector.x), -asin(reflectionVector.y));
         uv = uv * vec2(0.1592f, 0.3183f) + 0.5f;
-        vec3 reflection = texture(ReflectionMap, uv).rgb * reflectionIntensity;
+        vec3 reflection = texture(reflectionMap, uv).rgb * reflectionIntensity;
         color.rgb += reflection * (metallic) * (1.0 - roughness);
     }
     if(useAmbientOcclusionMap) {
@@ -311,15 +312,15 @@ void main() {
     this->currentMultiplyIntensity = -1.0f;
     this->currentEmissionColor = vec4(-1.0f);
     this->currentEmissionIntensity = -1.0f;
-    this->setBool("useDiffuseMap", 0);
-    this->setBool("useNormalMap", 0);
-    this->setBool("useHeightMap", 0);
-    this->setBool("useMetallicMap", 0);
-    this->setBool("useRoughnessMap", 0);
-    this->setBool("useReflectionMap", 0);
-    this->setBool("useAmbientOcclusionMap", 0);
-    this->setBool("useMultiplyMap", 0);
-    this->setBool("useEmissionMap", 0);
+    this->setBool("useDiffuseMap", false);
+    this->setBool("useNormalMap", false);
+    this->setBool("useHeightMap", false);
+    this->setBool("useMetallicMap", false);
+    this->setBool("useRoughnessMap", false);
+    this->setBool("useReflectionMap", false);
+    this->setBool("useAmbientOcclusionMap", false);
+    this->setBool("useMultiplyMap", false);
+    this->setBool("useEmissionMap", false);
     this->opacity = 1.0f;
     this->diffuseColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
     this->diffuseIntensity = 1.0f;
@@ -339,6 +340,81 @@ void main() {
     this->multiplyIntensity = 1.0f;
     this->emissionColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     this->emissionIntensity = 1.0f;
+}
+PBRShader* PBRShader::copy() {
+    PBRShader* shader = new PBRShader();
+    shader->engineInitializeShader(this->vertexShaderSourceCode, this->fragmentShaderSourceCode);
+    shader->currentOpacity = -1.0f;
+    shader->currentDiffuseColor = vec4(-1.0f);
+    shader->currentDiffuseIntensity = -1.0f;
+    shader->currentAlphaCutThreshold = -1.0f;
+    shader->currentNormalIntensity = -1.0f;
+    shader->currentHeightIntensity = -1.0f;
+    shader->currentHeightLayerRange= vec2(-1.0f);
+    shader->currentMetallic = -1.0f;
+    shader->currentMetallicIntensity = -1.0f;
+    shader->currentinvertMetallic = -1;
+    shader->currentRoughness = -1.0f;
+    shader->currentRoughnessIntensity = -1.0f;
+    shader->currentinvertRoughness = -1;
+    shader->currentReflectionIntensity = -1.0f;
+    shader->currentAmbientOcclusionIntensity = -1.0f;
+    shader->currentMultiplyColor = vec4(-1.0f);
+    shader->currentMultiplyIntensity = -1.0f;
+    shader->currentEmissionColor = vec4(-1.0f);
+    shader->currentEmissionIntensity = -1.0f;
+    shader->setBool("useDiffuseMap", false);
+    shader->setBool("useNormalMap", false);
+    shader->setBool("useHeightMap", false);
+    shader->setBool("useMetallicMap", false);
+    shader->setBool("useRoughnessMap", false);
+    shader->setBool("useReflectionMap", false);
+    shader->setBool("useAmbientOcclusionMap", false);
+    shader->setBool("useMultiplyMap", false);
+    shader->setBool("useEmissionMap", false);
+    for(unsigned int i = 0; i < this->uniformTextureNames.size(); i += 1) {
+        shader->uniformTextureNames.push_back(this->uniformTextureNames[i]);
+        shader->textures.push_back(this->textures[i]);
+        if(this->uniformTextureNames[i] == "diffuseMap") {
+            this->setBool("useDiffuseMap", true);
+        }else if(this->uniformTextureNames[i] == "normalMap") {
+            this->setBool("useNormalMap", true);
+        }else if(this->uniformTextureNames[i] == "heightMap") {
+            this->setBool("useHeightMap", true);
+        }else if(this->uniformTextureNames[i] == "metallicMap") {
+            this->setBool("useMetallicMap", true);
+        }else if(this->uniformTextureNames[i] == "roughnessMap") {
+            this->setBool("useRoughnessMap", true);
+        }else if(this->uniformTextureNames[i] == "reflectionMap") {
+            this->setBool("useReflectionMap", true);
+        }else if(this->uniformTextureNames[i] == "ambientOcclusionMap") {
+            this->setBool("useAmbientOcclusionMap", true);
+        }else if(this->uniformTextureNames[i] == "multiplyMap") {
+            this->setBool("useMultiplyMap", true);
+        }else if(this->uniformTextureNames[i] == "emissionMap") {
+            this->setBool("useEmissionMap", true);
+        }
+    }
+    shader->opacity = this->opacity;
+    shader->diffuseColor = this->diffuseColor;
+    shader->diffuseIntensity = this->diffuseIntensity;
+    shader->alphaCutThreshold = this->alphaCutThreshold;
+    shader->normalIntensity = this->normalIntensity;
+    shader->heightIntensity = this->heightIntensity;
+    shader->heightLayerRange = this->heightLayerRange;
+    shader->metallic = this->metallic;
+    shader->metallicIntensity = this->metallicIntensity;
+    shader->invertMetallic = this->invertMetallic;
+    shader->roughness = this->roughness;
+    shader->roughnessIntensity = this->roughnessIntensity;
+    shader->invertRoughness = this->invertRoughness;
+    shader->reflectionIntensity = this->reflectionIntensity;
+    shader->ambientOcclusionIntensity = this->ambientOcclusionIntensity;
+    shader->multiplyColor = this->multiplyColor;
+    shader->multiplyIntensity = this->multiplyIntensity;
+    shader->emissionColor = this->emissionColor;
+    shader->emissionIntensity = this->emissionIntensity;
+    return(shader);
 }
 void PBRShader::setDiffuseMap(Texture* texture) {
     this->setBool("useDiffuseMap", true);
@@ -362,7 +438,7 @@ void PBRShader::setRoughnessMap(Texture* texture) {
 }
 void PBRShader::setReflectionMap(Texture* texture) {
     this->setBool("useReflectionMap", true);
-    this->setTexture("ReflectionMap", texture);
+    this->setTexture("reflectionMap", texture);
 }
 void PBRShader::setAmbientOcclusionMap(Texture* texture) {
     this->setBool("useAmbientOcclusionMap", true);

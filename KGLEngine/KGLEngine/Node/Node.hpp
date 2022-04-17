@@ -74,6 +74,7 @@ public:
 class LightNode final: public Node {
 private:
     unsigned int lightType;
+    float cameraNodeDistance;
 public:
     vec3 colorFactor;
     vec3 highlightFactor;

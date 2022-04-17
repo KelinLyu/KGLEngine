@@ -51,6 +51,10 @@ Shader::Shader(string shaderFile) {
 Shader::Shader(string vertexShaderCode, string fragmentShaderCode) {
     this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
 }
+Shader* Shader::copy() {
+    Shader* shader = new Shader(this->vertexShaderSourceCode, this->fragmentShaderSourceCode);
+    return(shader);
+}
 void Shader::activateShader() {
     if(Shader::currentProgramID != this->programID) {
         Shader::currentProgramID = this->programID;
@@ -131,26 +135,28 @@ void Shader::engineInitializeShader(string vertexShaderCode, string fragmentShad
     this->blendMode = 0;
     this->currentModelTransform = mat4(-1.0f);
     this->isUIShader = false;
-    const char* vertexShader = vertexShaderCode.c_str();
-    const char* fragmentShader = fragmentShaderCode.c_str();
+    this->vertexShaderSourceCode = vertexShaderCode;
+    this->fragmentShaderSourceCode = fragmentShaderCode;
+    const char* vertexShaderString = vertexShaderCode.c_str();
+    const char* fragmentShaderString = fragmentShaderCode.c_str();
     int result = 0;
-    unsigned int vertex;
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vertexShader, NULL);
-    glCompileShader(vertex);
-    result += this->engineCheckCompileErrors(vertex, "VERTEX");
-    unsigned int fragment;
-    fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fragmentShader, NULL);
-    glCompileShader(fragment);
-    result += this->engineCheckCompileErrors(fragment, "FRAGMENT");
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
+    glCompileShader(vertexShader);
+    result += this->engineCheckCompileErrors(vertexShader, "VERTEX");
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderString, NULL);
+    glCompileShader(fragmentShader);
+    result += this->engineCheckCompileErrors(fragmentShader, "FRAGMENT");
     this->programID = glCreateProgram();
-    glAttachShader(this->programID, vertex);
-    glAttachShader(this->programID, fragment);
+    glAttachShader(this->programID, vertexShader);
+    glAttachShader(this->programID, fragmentShader);
     glLinkProgram(this->programID);
     result += this->engineCheckCompileErrors(this->programID, "PROGRAM");
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
     if(result > 0) {
         string newVertexShaderCode = R""""(
 #version 330 core
@@ -208,17 +214,17 @@ void Shader::engineRenderShader(Geometry* geometry) {
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
     if(this->isUIShader) {
         glDepthFunc(GL_ALWAYS);
-        mat4 projectionTransform = Engine::main->camera->getOrthogonalProjectionTransform();
+        mat4 projectionTransform = Engine::main->mainCameraNode->getOrthogonalProjectionTransform();
         this->setMat4("projectionTransform", projectionTransform);
         this->setMat4("modelProjectionTransform", projectionTransform * modelTransform);
     }else{
         glDepthFunc(GL_LESS);
-        mat4 viewTransform = Engine::main->camera->getViewTransform();
-        mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
+        mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
+        mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
         mat4 viewProjectionTransform = projectionTransform * viewTransform;
         this->setMat4("frame.viewProjectionTransform", viewProjectionTransform);
-        this->setVec3("frame.cameraPosition", Engine::main->camera->getWorldPosition());
-        this->setVec3("frame.cameraDirection", Engine::main->camera->getFrontVectorInWorld());
+        this->setVec3("frame.cameraPosition", Engine::main->mainCameraNode->getWorldPosition());
+        this->setVec3("frame.cameraDirection", Engine::main->mainCameraNode->getFrontVectorInWorld());
         if(this->currentModelTransform != modelTransform) {
             this->currentModelTransform = modelTransform;
             this->setMat4("node.modelTransform", modelTransform);
@@ -226,13 +232,13 @@ void Shader::engineRenderShader(Geometry* geometry) {
         }
         this->setMat4("node.modelViewProjectionTransform", viewProjectionTransform * modelTransform);
         if(geometry->engineCheckIfGeometryHasBones()) {
-            this->setInt("hasBones", 1);
+            this->setBool("hasBones", true);
             vector<mat4>& boneTransforms = geometry->engineGetGeometryBoneTransformsReference();
             for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {
                 this->setMat4("boneTransforms[" + to_string(i) + "]", boneTransforms[i]);
             }
         }else{
-            this->setInt("hasBones", 0);
+            this->setBool("hasBones", false);
         }
         unsigned int count = 0;
         while(count < LIGHTS_LIMIT && count < Engine::main->preparedLightNodes.size()) {

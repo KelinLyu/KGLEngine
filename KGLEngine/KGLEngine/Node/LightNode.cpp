@@ -3,6 +3,7 @@
 LightNode::LightNode(vec3 color) {
     this->engineInitializeNode();
     this->lightType = -1;
+    this->cameraNodeDistance = 0.0f;
     this->colorFactor = color;
     this->highlightFactor = color;
     this->attenuationExponent = 0.0f;
@@ -34,6 +35,17 @@ void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 da
         return;
     }
     this->Node::enginePrepareNodeForRendering(parentWorldTransform, data);
+    if(Engine::main->mainCameraNode != NULL) {
+        this->cameraNodeDistance = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
+    }else{
+        this->cameraNodeDistance = 0.0f;
+    }
+    for(unsigned int i = 0; i < Engine::main->preparedLightNodes.size(); i += 1) {
+        if(Engine::main->preparedLightNodes[i]->cameraNodeDistance > this->cameraNodeDistance) {
+            Engine::main->preparedLightNodes.insert(Engine::main->preparedLightNodes.begin() + i, this);
+            return;
+        }
+    }
     Engine::main->preparedLightNodes.push_back(this);
 }
 void LightNode::engineConfigurateShader(Shader* shader, int index) {

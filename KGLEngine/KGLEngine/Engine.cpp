@@ -74,7 +74,7 @@ Engine::Engine(const char* windowTitle,
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     this->rootNode = new Node();
-    this->camera = NULL;
+    this->mainCameraNode = NULL;
     this->skybox = NULL;
 }
 void Engine::changeResolution(float resolutionScaleFactor) {
@@ -129,7 +129,7 @@ void Engine::addNode(Node* node) {
 void Engine::render() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    if(this->camera != NULL) {
+    if(this->mainCameraNode != NULL) {
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
         this->rootNode->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f));
@@ -168,7 +168,7 @@ Engine::~Engine() {
     delete(this->input);
     delete(this->rootNode);
     this->rootNode = NULL;
-    this->camera = NULL;
+    this->mainCameraNode = NULL;
     Engine::main = NULL;
 }
 void Engine::engineReceiveKeyboardInteractions(GLFWwindow* window, int key, int code, int action, int modifiers) {

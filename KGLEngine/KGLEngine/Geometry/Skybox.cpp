@@ -87,9 +87,9 @@ void Skybox::engineRenderGeometry() {
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    mat4 viewTransform = Engine::main->camera->getViewTransform();
+    mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
     viewTransform = mat4(mat3(viewTransform));
-    mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
+    mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
     this->shader->setMat4("frame.viewProjectionTransform", projectionTransform * viewTransform);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->texture->data);

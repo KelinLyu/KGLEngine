@@ -36,7 +36,7 @@ public:
     string workingDirectory;
     static Engine* main;
     Input* input;
-    CameraNode* camera;
+    CameraNode* mainCameraNode;
     Skybox* skybox;
     vector<Geometry*> preparedGeometries;
     vector<LightNode*> preparedLightNodes;

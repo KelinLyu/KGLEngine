@@ -58,7 +58,7 @@ uniform sampler2D roughnessMap;
 uniform float roughnessIntensity;
 uniform bool invertRoughness;
 uniform bool useReflectionMap;
-uniform sampler2D ReflectionMap;
+uniform sampler2D reflectionMap;
 uniform float reflectionIntensity;
 uniform bool useAmbientOcclusionMap;
 uniform sampler2D ambientOcclusionMap;
@@ -164,7 +164,8 @@ void main() {
             float theta = dot(lightVector, -lights[i].direction);
             float epsilon = lights[i].innerAngle - lights[i].outerAngle;
             float intensity = (theta - lights[i].outerAngle) / epsilon;
-            attenuation *= clamp(intensity, 0.0f, 1.0f);
+            intensity *= clamp(intensity, 0.0f, 1.0f);
+            attenuation *= intensity * intensity;
             lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
         }
         if(lightFactor <= 0.0f) {
@@ -192,7 +193,7 @@ void main() {
         vec3 reflectionVector = reflect(-viewVector, normal);
         vec2 uv = vec2(atan(reflectionVector.z, reflectionVector.x), -asin(reflectionVector.y));
         uv = uv * vec2(0.1592f, 0.3183f) + 0.5f;
-        vec3 reflection = texture(ReflectionMap, uv).rgb * reflectionIntensity;
+        vec3 reflection = texture(reflectionMap, uv).rgb * reflectionIntensity;
         color.rgb += reflection * (metallic) * (1.0 - roughness);
     }
     if(useAmbientOcclusionMap) {

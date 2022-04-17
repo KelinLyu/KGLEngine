@@ -132,10 +132,10 @@ vec3 Node::getDownVectorInWorld() {
     return(this->convertLocalVectorToWorld(vec3(0.0f, -1.0f, 0.0f)));
 }
 vec3 Node::getPositionOnScreen() {
-    if(Engine::main->camera != NULL) {
+    if(Engine::main->mainCameraNode != NULL) {
         vec4 worldPosition = vec4(this->getWorldPosition(), 1.0f);
-        mat4 viewTransform = Engine::main->camera->getViewTransform();
-        mat4 projectionTransform = Engine::main->camera->getProjectionTransform();
+        mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
+        mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
         mat4 transform = projectionTransform * viewTransform * this->worldTransform;
         vec4 projection;
         projection.x = worldPosition.x * transform[0][0] + worldPosition.y * transform[1][0] + worldPosition.z * transform[2][0] + transform[3][0];
