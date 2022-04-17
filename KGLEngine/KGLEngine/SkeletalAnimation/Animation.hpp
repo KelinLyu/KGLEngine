@@ -14,9 +14,9 @@ class Animation final {
 private:
     Animator* animator;
     AnimationBoneNode* rootAnimationBoneNode;
-    vector<AnimationBoneNode*> animationBoneNodes;
     vector<Bone*> bones;
 public:
+    Animation() = default;
     Animation(const aiScene* scene, Animator* animator, Geometry* geometry);
     ~Animation();
     void engineProcessNode(AnimationBoneNode* target, aiNode* node);
@@ -24,5 +24,6 @@ public:
     AnimationBoneNode* engineGetRootAnimationBoneNode();
     Bone* engineGetBone(string name);
     void engineEraseAnimator();
+    Animation* engineCopyAnimation(Animator* newAnimator);
 };
 #endif

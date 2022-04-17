@@ -342,36 +342,7 @@ void main() {
     this->emissionIntensity = 1.0f;
 }
 PBRShader* PBRShader::copy() {
-    PBRShader* shader = new PBRShader();
-    shader->engineInitializeShader(this->vertexShaderSourceCode, this->fragmentShaderSourceCode);
-    shader->currentOpacity = -1.0f;
-    shader->currentDiffuseColor = vec4(-1.0f);
-    shader->currentDiffuseIntensity = -1.0f;
-    shader->currentAlphaCutThreshold = -1.0f;
-    shader->currentNormalIntensity = -1.0f;
-    shader->currentHeightIntensity = -1.0f;
-    shader->currentHeightLayerRange= vec2(-1.0f);
-    shader->currentMetallic = -1.0f;
-    shader->currentMetallicIntensity = -1.0f;
-    shader->currentinvertMetallic = -1;
-    shader->currentRoughness = -1.0f;
-    shader->currentRoughnessIntensity = -1.0f;
-    shader->currentinvertRoughness = -1;
-    shader->currentReflectionIntensity = -1.0f;
-    shader->currentAmbientOcclusionIntensity = -1.0f;
-    shader->currentMultiplyColor = vec4(-1.0f);
-    shader->currentMultiplyIntensity = -1.0f;
-    shader->currentEmissionColor = vec4(-1.0f);
-    shader->currentEmissionIntensity = -1.0f;
-    shader->setBool("useDiffuseMap", false);
-    shader->setBool("useNormalMap", false);
-    shader->setBool("useHeightMap", false);
-    shader->setBool("useMetallicMap", false);
-    shader->setBool("useRoughnessMap", false);
-    shader->setBool("useReflectionMap", false);
-    shader->setBool("useAmbientOcclusionMap", false);
-    shader->setBool("useMultiplyMap", false);
-    shader->setBool("useEmissionMap", false);
+    PBRShader* shader = new PBRShader(0.5f, 0.5f);
     for(unsigned int i = 0; i < this->uniformTextureNames.size(); i += 1) {
         shader->uniformTextureNames.push_back(this->uniformTextureNames[i]);
         shader->textures.push_back(this->textures[i]);

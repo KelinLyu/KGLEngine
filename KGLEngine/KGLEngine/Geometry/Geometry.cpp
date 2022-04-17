@@ -90,10 +90,21 @@ Geometry::Geometry(aiMesh* mesh) {
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, weights));
     glBindVertexArray(0);
 }
-Geometry* Geometry::copy() {
+Geometry* Geometry::copy(vector<Animator*>* animators) {
     Geometry* geometry = new Geometry();
     geometry->engineInitializeGeometry();
     geometry->indiceCount = this->indiceCount;
+    for(unsigned int i = 0; i < this->animations.size(); i += 1) {
+        Animation* animation = this->animations[i]->engineCopyAnimation((*animators)[i]);
+        geometry->animations.push_back(animation);
+    }
+    geometry->boneCount = this->boneCount;
+    geometry->bonesInfoMap = this->bonesInfoMap;
+    geometry->boneTransforms = this->boneTransforms;
+    geometry->isHidden = this->isHidden;
+    geometry->renderingOrder = this->renderingOrder;
+    geometry->lightMask = this->lightMask;
+    geometry->clearDepthBuffer = this->clearDepthBuffer;
     glGenVertexArrays(1, &geometry->vertexArrays);
     glGenBuffers(1, &geometry->vertexBuffers);
     glGenBuffers(1, &geometry->elementBuffers);
@@ -212,7 +223,7 @@ void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, ma
         if(nodeTransforms[i] == mat4(0.0f)) {
             continue;
         }
-        float blendFactor = this->animations[i]->engineGetAnimator()->enginegetCurrentBlendFactor();
+        float blendFactor = this->animations[i]->engineGetAnimator()->engineGetAnimatorCurrentBlendFactor();
         if(blendFactor == 0.0f) {
             continue;
         }

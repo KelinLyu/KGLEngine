@@ -7,6 +7,7 @@ class Animation;
 class Animator final {
 private:
     unsigned int state;
+    string name;
     float time;
     float duration;
     float baseSpeed;
@@ -21,7 +22,8 @@ public:
     bool clamps;
     float speed;
     float blendFactor;
-    Animator(string file, Node* node);
+    Animator() = default;
+    Animator(string name, string file, Node* node);
     void reset();
     void play(float fadeIn, float fadeOut = 0.0f);
     void stop(float fadeOut);
@@ -29,9 +31,11 @@ public:
     float getTime();
     float getCurrentBlendFactor();
     ~Animator();
-    float enginegetCurrentBlendFactor();
-    float engineGetFadeInFactor(float progress);
-    float engineGetFadeOutFactor(float progress);
+    string engineGetAnimatorName();
+    float engineGetAnimatorCurrentBlendFactor();
+    float engineGetAnimatorFadeInFactor(float progress);
+    float engineGetAnimatorFadeOutFactor(float progress);
     void engineUpdateAnimator();
+    Animator* engineCopyAnimator();
 };
 #endif

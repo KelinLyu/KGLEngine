@@ -1,6 +1,7 @@
 // Developed by Kelin Lyu.
 #include "Animator.hpp"
-Animator::Animator(string file, Node* node) {
+Animator::Animator(string name, string file, Node* node) {
+    this->name = name;
     this->state = 0;
     this->time = 0.0f;
     this->repeats = true;
@@ -73,15 +74,18 @@ Animator::~Animator() {
     }
     this->animations.clear();
 }
-float Animator::enginegetCurrentBlendFactor() {
+string Animator::engineGetAnimatorName() {
+    return(this->name);
+}
+float Animator::engineGetAnimatorCurrentBlendFactor() {
     return(this->blendFactor * this->currentBlendFactor);
 }
-float Animator::engineGetFadeInFactor(float progress) {
+float Animator::engineGetAnimatorFadeInFactor(float progress) {
     float x = pi<float>() * progress / (this->fadeIn / this->speed);
     float value = (-cos(x) + 1) * 0.5 * (1 - this->stateChangeBlendFactor);
     return(value + this->stateChangeBlendFactor);
 }
-float Animator::engineGetFadeOutFactor(float progress) {
+float Animator::engineGetAnimatorFadeOutFactor(float progress) {
     float x = pi<float>() * progress / (this->fadeOut / this->speed);
     float value = (cos(x) + 1) * 0.5;
     return(value * this->stateChangeBlendFactor);
@@ -105,7 +109,7 @@ void Animator::engineUpdateAnimator() {
             this->currentBlendFactor = 1.0;
             this->stateChangeTime = Engine::main->getTime();
         }else{
-            this->currentBlendFactor = this->engineGetFadeInFactor(progress);
+            this->currentBlendFactor = this->engineGetAnimatorFadeInFactor(progress);
         }
     }else if(this->state == 3) {
         float progress = Engine::main->getTime() - this->stateChangeTime;
@@ -114,7 +118,7 @@ void Animator::engineUpdateAnimator() {
             this->currentBlendFactor = 0.0;
             this->stateChangeTime = Engine::main->getTime();
         }else{
-            this->currentBlendFactor = this->engineGetFadeOutFactor(progress);
+            this->currentBlendFactor = this->engineGetAnimatorFadeOutFactor(progress);
         }
     }
     if(!this->repeats && !this->clamps) {
@@ -126,4 +130,22 @@ void Animator::engineUpdateAnimator() {
             }
         }
     }
+}
+Animator* Animator::engineCopyAnimator() {
+    Animator* animator = new Animator();
+    animator->name = this->name;
+    animator->state = this->state;
+    animator->time = this->time;
+    animator->repeats = this->repeats;
+    animator->clamps = this->clamps;
+    animator->speed = this->speed;
+    animator->blendFactor = this->blendFactor;
+    animator->fadeIn = this->fadeIn;
+    animator->fadeOut = this->fadeOut;
+    animator->currentBlendFactor = this->currentBlendFactor;
+    animator->stateChangeTime = this->stateChangeTime;
+    animator->stateChangeBlendFactor = this->stateChangeBlendFactor;
+    animator->duration = this->duration;
+    animator->baseSpeed = this->baseSpeed;
+    return(animator);
 }

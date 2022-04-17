@@ -26,6 +26,7 @@ private:
     vector<BoneKeyFrameRotation> keyRotations;
     vector<BoneKeyFrameScale> keyScales;
 public:
+    Bone() = default;
     Bone(string name, aiNodeAnim* channel);
     ~Bone();
     string engineGetName() const;

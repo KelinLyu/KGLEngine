@@ -33,10 +33,9 @@ void Node::loadModelFile(string file) {
     }
     this->engineProcessNode(scene->mRootNode, scene);
 }
-Animator* Node::loadAnimator(string file) {
-    Animator* animator = new Animator(file, this);
+void Node::loadAnimator(string name, string file) {
+    Animator* animator = new Animator(name, file, this);
     this->animators.push_back(animator);
-    return(animator);
 }
 Node* Node::generateBoneNode(string boneName) {
     Node* boneNode = new Node();
@@ -49,8 +48,11 @@ Node* Node::copy() {
     node->position = this->position;
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        node->animators.push_back(this->animators[i]->engineCopyAnimator());
+    }
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        node->geometries.push_back(this->geometries[i]->copy());
+        node->geometries.push_back(this->geometries[i]->copy(&node->animators));
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
         node->addChildNode(this->childNodes[i]->copy());
@@ -77,6 +79,14 @@ Node* Node::clone() {
 void Node::freeze() {
     this->updateTransform();
     this->engineRecursivelyFreezeChildNodes(&this->geometries);
+}
+Animator* Node::getAnimator(string name) {
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        if(this->animators[i]->engineGetAnimatorName() == name) {
+            return(this->animators[i]);
+        }
+    }
+    return(NULL);
 }
 void Node::updateTransform() {
     if(this->parent != NULL) {
@@ -154,6 +164,7 @@ Node::~Node() {
     this->removeFromParentNode();
     this->childNodes.clear();
     this->boneNodes.clear();
+    this->animators.clear();
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         if(this->geometryInstancingIndex >= 0 && this->geometries[i]->engineGetGeometryInstanceCount() > 1) {
             this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, mat4(0.0f), true);

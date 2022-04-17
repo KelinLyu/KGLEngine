@@ -33,11 +33,12 @@ public:
     void removeFromParentNode();
     void loadUnitCube();
     void loadModelFile(string file);
-    Animator* loadAnimator(string file);
+    void loadAnimator(string name, string file);
     Node* generateBoneNode(string boneName);
     Node* copy();
     Node* clone();
     void freeze();
+    Animator* getAnimator(string name);
     void updateTransform();
     mat4 getWorldTransform();
     vec3 getWorldPosition();

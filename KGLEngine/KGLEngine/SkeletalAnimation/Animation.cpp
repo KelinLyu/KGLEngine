@@ -21,11 +21,6 @@ Animation::Animation(const aiScene* scene, Animator* animator, Geometry* geometr
 }
 Animation::~Animation() {
     this->rootAnimationBoneNode = NULL;
-    for(unsigned int i = 0; i < this->animationBoneNodes.size(); i += 1) {
-        this->animationBoneNodes[i]->children.clear();
-        delete(this->animationBoneNodes[i]);
-    }
-    this->animationBoneNodes.clear();
     this->bones.clear();
 }
 void Animation::engineProcessNode(AnimationBoneNode* target, aiNode* node) {
@@ -36,7 +31,6 @@ void Animation::engineProcessNode(AnimationBoneNode* target, aiNode* node) {
         this->engineProcessNode(newNode, node->mChildren[i]);
         target->children.push_back(newNode);
     }
-    this->animationBoneNodes.push_back(target);
 }
 Animator* Animation::engineGetAnimator() {
     return(this->animator);
@@ -54,4 +48,11 @@ Bone* Animation::engineGetBone(string name) {
 }
 void Animation::engineEraseAnimator() {
     this->animator = NULL;
+}
+Animation* Animation::engineCopyAnimation(Animator* newAnimator) {
+    Animation* animation = new Animation();
+    animation->animator = newAnimator;
+    animation->rootAnimationBoneNode = this->rootAnimationBoneNode;
+    animation->bones = this->bones;
+    return(animation);
 }

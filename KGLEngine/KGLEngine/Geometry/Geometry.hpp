@@ -9,6 +9,7 @@ struct AnimationBoneNode;
 class Texture;
 class Shader;
 class Animation;
+class Animator;
 class Font;
 class Node;
 struct GeometryVertex {
@@ -49,7 +50,7 @@ public:
     bool clearDepthBuffer;
     Geometry() = default;
     Geometry(aiMesh* mesh);
-    Geometry* copy();
+    Geometry* copy(vector<Animator*>* animators);
     void cullBack();
     void cullFront();
     void doubleSided();

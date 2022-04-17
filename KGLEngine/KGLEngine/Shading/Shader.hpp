@@ -61,7 +61,6 @@ private:
     float currentMultiplyIntensity;
     vec3 currentEmissionColor;
     float currentEmissionIntensity;
-    PBRShader() = default;
 public:
     float opacity;
     vec4 diffuseColor;
