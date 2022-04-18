@@ -15,6 +15,7 @@ protected:
     vector<string> uniformTextureNames;
     mat4 currentModelTransform;
     bool isUIShader;
+    bool isParticleShader;
 public:
     Shader();
     Shader(string shaderFile);
@@ -118,6 +119,26 @@ public:
     float emissionIntensity;
     SpriteShader();
     ~SpriteShader();
+    void engineRenderShader(Geometry* geometry) override;
+};
+
+
+
+
+
+
+
+
+class ParticleShader final: public Shader {
+private:
+public:
+    ParticleShader();
+    
+    
+    ~ParticleShader() = default;
+    
+    
+    
     void engineRenderShader(Geometry* geometry) override;
 };
 #endif

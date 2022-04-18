@@ -135,6 +135,7 @@ void Shader::engineInitializeShader(string vertexShaderCode, string fragmentShad
     this->blendMode = 0;
     this->currentModelTransform = mat4(-1.0f);
     this->isUIShader = false;
+    this->isParticleShader = false;
     this->vertexShaderSourceCode = vertexShaderCode;
     this->fragmentShaderSourceCode = fragmentShaderCode;
     const char* vertexShaderString = vertexShaderCode.c_str();
@@ -217,6 +218,27 @@ void Shader::engineRenderShader(Geometry* geometry) {
         mat4 projectionTransform = Engine::main->mainCameraNode->getOrthogonalProjectionTransform();
         this->setMat4("projectionTransform", projectionTransform);
         this->setMat4("modelProjectionTransform", projectionTransform * modelTransform);
+    }else if(this->isParticleShader) {
+        glDepthFunc(GL_LESS);
+        this->setFloat("time", Engine::main->getTime());
+        
+        
+        
+        
+        mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
+        mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
+        
+        
+        
+        
+        this->setMat4("projectionTransform", projectionTransform);
+        this->setMat4("viewTransform", viewTransform);
+        this->setMat4("modelViewTransform", viewTransform * modelTransform);
+        
+        
+        
+        
+        
     }else{
         glDepthFunc(GL_LESS);
         mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();

@@ -144,7 +144,7 @@ void Geometry::cullBack() {
 void Geometry::cullFront() {
     this->cullMode = 1;
 }
-void Geometry::doubleSided() {
+void Geometry::setDoubleSided() {
     this->cullMode = 2;
 }
 void Geometry::setShader(Shader* shader) {

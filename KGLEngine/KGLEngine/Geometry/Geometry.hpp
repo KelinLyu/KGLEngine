@@ -53,7 +53,7 @@ public:
     Geometry* copy(vector<Animator*>* animators);
     void cullBack();
     void cullFront();
-    void doubleSided();
+    void setDoubleSided();
     void setShader(Shader* shader);
     ~Geometry();
     void engineInitializeGeometry();
@@ -76,6 +76,10 @@ public:
 class UnitCube final: public Geometry {
 public:
     UnitCube();
+};
+class ParticleRenderer final: public Geometry {
+public:
+    ParticleRenderer();
 };
 class Skybox final: public Geometry {
 private:

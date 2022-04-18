@@ -5,7 +5,9 @@
 #define LIGHTS_LIMIT 10
 struct FontCharacter;
 class SpriteShader;
+class ParticleShader;
 class Geometry;
+class ParticleRenderer;
 class Sprite;
 class TextRenderer;
 class Animator;
@@ -79,7 +81,7 @@ private:
     float cameraNodeDistance;
 public:
     vec3 colorFactor;
-    vec3 highlightFactor;
+    float highlightIntensity;
     float attenuationExponent;
     float range;
     float innerAngle;
@@ -94,6 +96,41 @@ public:
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     void engineConfigurateShader(Shader* shader, int index);
 };
+
+
+
+
+
+
+class ParticleNode final: public Node {
+private:
+    
+    ParticleRenderer* renderer;
+    
+    ParticleShader* shader;
+    
+public:
+    
+    float renderingOrder;
+    
+    
+    
+    
+    ParticleNode(int birthrate, float duration, float durationVariation);
+    
+    
+    
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    
+};
+
+
+
+
+
+
+
+
 class UINode: public Node {
 private:
     mat4 renderingTransform;
@@ -131,7 +168,7 @@ public:
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
-class TextNode: public UINode {
+class TextNode final: public UINode {
 private:
     Font* font;
     float lineHeight;

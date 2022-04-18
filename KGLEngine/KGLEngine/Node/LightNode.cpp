@@ -5,7 +5,7 @@ LightNode::LightNode(vec3 color) {
     this->lightType = -1;
     this->cameraNodeDistance = 0.0f;
     this->colorFactor = color;
-    this->highlightFactor = color;
+    this->highlightIntensity = 1.0f;
     this->attenuationExponent = 0.0f;
     this->range = 0.0f;
     this->innerAngle = 0.0f;
@@ -52,15 +52,15 @@ void LightNode::engineConfigurateShader(Shader* shader, int index) {
     shader->setInt("lights[" + to_string(index) + "].type", this->lightType);
     shader->setVec3("lights[" + to_string(index) + "].colorFactor", this->colorFactor);
     if(this->lightType == 1) {
-        shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->highlightFactor);
+        shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->colorFactor * this->highlightIntensity);
         shader->setVec3("lights[" + to_string(index) + "].direction", this->getFrontVectorInWorld());
     }else if(this->lightType == 2) {
-        shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->highlightFactor);
+        shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->colorFactor * this->highlightIntensity);
         shader->setVec3("lights[" + to_string(index) + "].position", this->getWorldPosition());
         shader->setFloat("lights[" + to_string(index) + "].attenuationExponent", this->attenuationExponent);
         shader->setFloat("lights[" + to_string(index) + "].range", this->range);
     }else if(this->lightType == 3) {
-        shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->highlightFactor);
+        shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->colorFactor * this->highlightIntensity);
         shader->setVec3("lights[" + to_string(index) + "].position", this->getWorldPosition());
         shader->setVec3("lights[" + to_string(index) + "].direction", this->getFrontVectorInWorld());
         shader->setFloat("lights[" + to_string(index) + "].attenuationExponent", this->attenuationExponent);
