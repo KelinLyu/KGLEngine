@@ -18,10 +18,12 @@ void ParticleNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2
         return;
     }
     this->Node::enginePrepareNodeForRendering(parentWorldTransform, data);
+    this->renderer->renderingOrder = this->renderingOrder;
     this->renderer->enginePrepareGeometryForRendering(this->worldTransform);
     
     
     this->shader->setVec3("baseWorldPosition", this->getWorldPosition());
+    
     
     
     

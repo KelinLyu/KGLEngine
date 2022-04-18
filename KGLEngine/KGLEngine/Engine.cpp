@@ -6,8 +6,8 @@ Engine::Engine(const char* windowTitle,
                bool fullscreenMode,
                int samples,
                const char* iconFile) {
-    this->fps = 1.0f / 60.0f;
-    this->currentFps = 0.0f;
+    this->FPS = 1.0f / 60.0f;
+    this->currentFPS = 0.0f;
     this->currentTime = 0.0f;
     this->updateTime = 0.0f;
     this->deltaTime = 0.0f;
@@ -114,8 +114,8 @@ bool Engine::shouldUpdate() {
     bool result = false;
     this->currentTime = glfwGetTime();
     this->deltaTime = this->currentTime - this->updateTime;
-    this->currentFps = 1.0f / deltaTime;
-    if(this->deltaTime >= this->fps) {
+    this->currentFPS = 1.0f / deltaTime;
+    if(this->deltaTime >= this->FPS) {
         this->input->engineUpdateInput();
         this->rootNode->engineUpdateNodeAnimators(mat4(1.0f));
         this->updateTime = this->currentTime;
@@ -157,8 +157,8 @@ float Engine::getTime() {
 float Engine::getDeltaTime() {
     return(this->deltaTime);
 }
-float Engine::getCurrentFps() {
-    return(this->currentFps);
+float Engine::getCurrentFPS() {
+    return(this->currentFPS);
 }
 void Engine::terminate() {
     glfwSetWindowShouldClose(this->window, GL_TRUE);

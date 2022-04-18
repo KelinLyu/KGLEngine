@@ -231,6 +231,8 @@ void Shader::engineRenderShader(Geometry* geometry) {
         
         
         
+        
+        
         this->setMat4("projectionTransform", projectionTransform);
         this->setMat4("viewTransform", viewTransform);
         this->setMat4("modelViewTransform", viewTransform * modelTransform);

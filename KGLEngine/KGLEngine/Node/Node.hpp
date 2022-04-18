@@ -30,6 +30,7 @@ public:
     vec3 position;
     vec3 eulerAngles;
     vec3 scale;
+    Node* orientationTargetNode;
     vector<Geometry*> geometries;
     Node();
     void addChildNode(Node* node);
@@ -102,6 +103,7 @@ public:
 
 
 
+
 class ParticleNode final: public Node {
 private:
     
@@ -109,20 +111,85 @@ private:
     
     ParticleShader* shader;
     
+    float productionTime;
+    unsigned int productionAmount;
+    
+    // - isHidden
+    int particleBirthrate; // - birth time
+    float particleDuration; // - death time
+    float particleDurationVariation;
+    
+    bool hasSpriteSheetAnimation;
+    unsigned int spriteSheetAnimationRows;
+    unsigned int spriteSheetAnimationColumns;
+    unsigned int spriteSheetAnimationInitialFrameRange; // - initial frame
+    unsigned int spriteSheetAnimationFPS;
+    unsigned int spriteSheetAnimationFPSVariation; // - FPS
+    unsigned int spriteSheetAnimationBehavior;
+    
+    vector<float> colorizationTimestamps;
+    vector<vec3> colorizationColors;
+    
 public:
     
     float renderingOrder;
+    bool isLocal;
+    bool isAdditive;
     
+    float birthrateFactor;
+    float speedFactor;
     
+    float volumeRadius; // - initial location, float
+    float spreadingAngle; // - start direction, float
     
+    float initialSpeed; // - speed
+    float initialSpeedVariation;
+    float speedAcceleration; // - speed acceleration, float
+    float speedAccelerationVariation;
+    
+    float initialRotation; // - initial rotation, float
+    float initialRotationVariation;
+    float rotatingSpeed; // - rotating speed, float
+    float rotatingSpeedVariation;
+    
+    float initialScale; // - initial scale, float
+    float initialScaleVariation;
+    float scalingSpeed; // - scaling speed, float
+    float scalingSpeedVariation;
+    
+    vec3 worldAcceleration; // - world acceleration, vec3
+    vec3 worldAccelerationVariation;
+    
+    Texture* texture;
     
     ParticleNode(int birthrate, float duration, float durationVariation);
     
+    void initializeSpriteSheetAnimation(unsigned int rows, unsigned int columns,
+                                        unsigned int initialFrameRange,
+                                        unsigned int FPS, unsigned int FPSVariation);
+    void setSpriteSheetAnimationClamp();
+    void setSpriteSheetAnimationRepeat();
     
+    void setColor(vec3 color, float progress);
+    
+    ~ParticleNode();
     
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

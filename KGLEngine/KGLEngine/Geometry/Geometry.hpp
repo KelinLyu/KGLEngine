@@ -77,10 +77,19 @@ class UnitCube final: public Geometry {
 public:
     UnitCube();
 };
+
+
+
+
 class ParticleRenderer final: public Geometry {
 public:
     ParticleRenderer();
 };
+
+
+
+
+
 class Skybox final: public Geometry {
 private:
     Texture* texture;

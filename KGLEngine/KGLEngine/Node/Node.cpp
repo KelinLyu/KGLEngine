@@ -208,6 +208,7 @@ void Node::engineInitializeNode() {
     this->position = vec3(0.0f);
     this->eulerAngles = vec3(0.0f);
     this->scale = vec3(1.0f);
+    this->orientationTargetNode = NULL;
     this->worldTransform = mat4(-1.0f);
     this->geometryInstancingIndex = -1;
 }
@@ -255,6 +256,12 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
         return;
     }
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
+    if(this->orientationTargetNode != NULL) {
+        vec3 front = this->orientationTargetNode->getWorldPosition();
+        mat4 matrix = glm::lookAt(this->getWorldPosition(), front, vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::inverse(matrix);
+        this->worldTransform = glm::scale(matrix, this->scale);
+    }
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
         if(this->geometryInstancingIndex >= 0) {

@@ -254,8 +254,8 @@ void main() {
         float NDF = roughness4OverPi / denominator;
         float maxHdotV = max(dot(halfwayVector, viewVector), 0.0f);
         float factor = clamp(1.0f - maxHdotV, 0.0f, 1.0f);
-        float F = (metallic + (1.0 - metallic) * factor);
-        lightingColor += ((1.0 - F) * diffuseColor.rgb / 3.1416f) * lightFactor * lights[i].colorFactor;
+        float F = (1.0f - metallic - (1.0f - metallic) * factor) * roughness;
+        lightingColor += F * diffuseColor.rgb * lightFactor * lights[i].colorFactor;
         lightingColor += NDF * diffuseColor.rgb * lightFactor * lights[i].highlightFactor;
     }
     vec3 F0 = mix(vec3(0.1f), diffuseColor.rgb, metallic);

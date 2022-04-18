@@ -17,6 +17,5 @@ mat4 CameraNode::getProjectionTransform() {
 }
 mat4 CameraNode::getViewTransform() {
     vec3 front = this->getFrontVectorInWorld() + this->getWorldPosition();
-    vec3 up = this->getUpVectorInWorld();
-    return(glm::lookAt(this->getWorldPosition(), front, up));
+    return(glm::lookAt(this->getWorldPosition(), front, vec3(0.0f, 1.0f, 0.0f)));
 }

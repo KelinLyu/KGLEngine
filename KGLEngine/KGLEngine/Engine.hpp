@@ -24,8 +24,8 @@ private:
     vec2 screenResolution;
     vec2 windowResolution;
     GLFWwindow* window;
-    float fps;
-    float currentFps;
+    float FPS;
+    float currentFPS;
     float currentTime;
     float updateTime;
     float deltaTime;
@@ -58,7 +58,7 @@ public:
     vec2 getWindowResolution();
     float getTime();
     float getDeltaTime();
-    float getCurrentFps();
+    float getCurrentFPS();
     void terminate();
     ~Engine();
     static void engineReceiveKeyboardInteractions(GLFWwindow* window, int key, int code, int action, int modifiers);

@@ -42,6 +42,8 @@ ParticleShader::ParticleShader() {
 
 
 
+
+
 void ParticleShader::engineRenderShader(Geometry* geometry) {
     
     

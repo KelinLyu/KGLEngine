@@ -17,7 +17,19 @@ uniform vec3 baseWorldPosition;
 void main() {
     
     UV = vertexUV;
-    gl_Position = projectionTransform * (viewTransform * vec4(baseWorldPosition, 1.0f) + vec4(vertexPosition.xy, 0, 0));
+    
+    
+    vec2 localPosition = vertexPosition;
+    
+    //localPosition.x = cos(time) * vertexPosition.x - sin(time) * vertexPosition.y;
+    //localPosition.y = sin(time) * vertexPosition.x + cos(time) * vertexPosition.y;
+    
+    
+    
+    //localPosition *= sin(time) * 0.5f + 0.5f;
+    
+    
+    gl_Position = projectionTransform * (viewTransform * vec4(baseWorldPosition, 1.0f) + vec4(localPosition, 0.0f, 0.0f));
     
     
     
