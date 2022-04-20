@@ -21,6 +21,7 @@ protected:
     vector<Animator*> animators;
     int geometryInstancingIndex;
     map<Geometry*, vector<unsigned int>> frozenNodeGeometryInstancingIndices;
+    bool hasUnfreezableGeometries;
 public:
     string name;
     unsigned int tags;
@@ -39,11 +40,12 @@ public:
     void loadModelFile(string file);
     void loadAnimator(string name, string file);
     Node* generateBoneNode(string boneName);
-    Node* copy();
-    Node* clone();
+    virtual Node* copy();
+    virtual Node* clone();
     void freeze();
     Animator* getAnimator(string name);
     void updateTransform();
+    Node* getChildNode(string name);
     mat4 getWorldTransform();
     vec3 getWorldPosition();
     vec3 getWorldEulerAngles();
@@ -119,6 +121,7 @@ private:
 public:
     float renderingOrder;
     bool useLocalSpace;
+    
     bool isAdditive;
     bool youngestFirst;
     float spreadingAngle;
@@ -140,6 +143,9 @@ public:
     Texture* texture;
     vec4 color;
     ParticleNode(unsigned int birthrate, float duration, float durationVariation);
+    
+    void setMaxAmount(unsigned int amount);
+    
     void setEmissionSphere(float innerRadius, float outerRadius);
     void setEmissionBox(vec3 size);
     void setColorAnimation(vec4 color, float progress);
@@ -149,6 +155,8 @@ public:
     void play();
     void stop();
     void reset();
+    Node* copy() override;
+    Node* clone() override;
     ~ParticleNode();
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
 };

@@ -2,6 +2,8 @@
 #include "Node.hpp"
 ParticleNode::ParticleNode(unsigned int birthrate, float duration, float durationVariation) {
     this->engineInitializeNode();
+    this->hasUnfreezableGeometries = true;
+    this->isPlaying = true;
     this->productionAmount = (unsigned int)glm::max(1.0f, (float)birthrate / 60.0f);
     this->productionTime = 0.0f;
     this->productionTimeInterval = 1.0f / (float)birthrate;
@@ -77,6 +79,14 @@ void ParticleNode::stop() {
 }
 void ParticleNode::reset() {
     this->renderer->engineResetAllParticleData();
+}
+Node* ParticleNode::copy() {
+    Node* node = new Node();
+    return(node);
+}
+Node* ParticleNode::clone() {
+    Node* node = new Node();
+    return(node);
 }
 ParticleNode::~ParticleNode() {
     delete(this->renderer);

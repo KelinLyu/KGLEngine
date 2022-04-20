@@ -211,6 +211,7 @@ void Node::engineInitializeNode() {
     this->orientationTargetNode = NULL;
     this->worldTransform = mat4(-1.0f);
     this->geometryInstancingIndex = -1;
+    this->hasUnfreezableGeometries = false;
 }
 void Node::engineProcessNode(aiNode *node, const aiScene *scene) {
     for(unsigned int i = 0; i < node->mNumMeshes; i += 1) {
@@ -281,21 +282,23 @@ void Node::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     this->worldTransform = parentWorldTransform * (translateMatrix * rotateMatrix * scaleMatrix);
 }
 void Node::engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries, map<Geometry*, vector<unsigned int>>* indices) {
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        if(find(allGeometries->begin(), allGeometries->end(), this->geometries[i]) == allGeometries->end()) {
-            allGeometries->push_back(this->geometries[i]);
-        }
-        if(this->geometries[i]->engineGetGeometryInstanceCount() == 0) {
-            this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
-        }
-        if(this->geometryInstancingIndex != -1) {
-            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, true);
-            if(indices->find(this->geometries[i]) == indices->end()) {
-                vector<unsigned int> array;
-                array.push_back(this->geometryInstancingIndex);
-                (*indices)[this->geometries[i]] = array;
-            }else{
-                (*indices)[this->geometries[i]].push_back(this->geometryInstancingIndex);
+    if(!this->hasUnfreezableGeometries) {
+        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+            if(find(allGeometries->begin(), allGeometries->end(), this->geometries[i]) == allGeometries->end()) {
+                allGeometries->push_back(this->geometries[i]);
+            }
+            if(this->geometries[i]->engineGetGeometryInstanceCount() == 0) {
+                this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
+            }
+            if(this->geometryInstancingIndex != -1) {
+                this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, true);
+                if(indices->find(this->geometries[i]) == indices->end()) {
+                    vector<unsigned int> array;
+                    array.push_back(this->geometryInstancingIndex);
+                    (*indices)[this->geometries[i]] = array;
+                }else{
+                    (*indices)[this->geometries[i]].push_back(this->geometryInstancingIndex);
+                }
             }
         }
     }
