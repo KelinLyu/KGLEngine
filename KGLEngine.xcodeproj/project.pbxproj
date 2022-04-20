@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C20560DD280FDB7B0020BBB1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C20560DC280FDB7B0020BBB1 /* main.cpp */; };
 		C231B3222804AAAF0030CD85 /* PBRShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C231B3212804AAAF0030CD85 /* PBRShader.cpp */; };
 		C26888AD280CC23D004E500B /* ParticleNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888AC280CC23D004E500B /* ParticleNode.cpp */; };
 		C26888AF280CD578004E500B /* ParticleRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888AE280CD578004E500B /* ParticleRenderer.cpp */; };
@@ -53,6 +54,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C20560DC280FDB7B0020BBB1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C231B31B280351120030CD85 /* glm_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glm_helper.h; sourceTree = "<group>"; };
 		C231B3212804AAAF0030CD85 /* PBRShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PBRShader.cpp; sourceTree = "<group>"; };
 		C26888AC280CC23D004E500B /* ParticleNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleNode.cpp; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 			children = (
 				C294F8F127FCFA37002B6550 /* Resources */,
 				C2AD2E6F27FF0EE700A493D6 /* KGLEngine */,
+				C20560DC280FDB7B0020BBB1 /* main.cpp */,
 			);
 			path = KGLEngine;
 			sourceTree = "<group>";
@@ -337,6 +340,7 @@
 			files = (
 				C26888AD280CC23D004E500B /* ParticleNode.cpp in Sources */,
 				C2F7796B2807C309001A214D /* SpriteNode.cpp in Sources */,
+				C20560DD280FDB7B0020BBB1 /* main.cpp in Sources */,
 				C2AD2E8927FF0EE700A493D6 /* Bone.cpp in Sources */,
 				C27440202800A7E0009DDD9F /* UnitCube.cpp in Sources */,
 				C2895261280923CF007BE8CD /* TextRenderer.cpp in Sources */,
