@@ -4,6 +4,7 @@
 #include "../Engine.hpp"
 class Texture;
 class Geometry;
+class ParticleNode;
 class Shader {
 protected:
     static int currentProgramID;
@@ -17,6 +18,8 @@ protected:
     bool isUIShader;
     bool isParticleShader;
 public:
+    bool writeToDepthBuffer;
+    bool clearDepthBuffer;
     Shader();
     Shader(string shaderFile);
     Shader(string vertexShaderCode, string fragmentShaderCode);
@@ -121,26 +124,30 @@ public:
     ~SpriteShader();
     void engineRenderShader(Geometry* geometry) override;
 };
-
-
-
-
-
-
-
-
-
-
 class ParticleShader final: public Shader {
 private:
+    ParticleNode* particleNode;
+    int currentUseLocalSpace;
+    int currentIsAdditive;
+    Texture* currentTexture;
+    vec4 currentColor;
+    bool colorAnimationVectorsChanged;
+    vector<vec4> colorKeys;
+    vector<float> progressKeys;
+    bool spriteSheetAnimationChanged;
+    bool hasSpriteSheetAnimation;
+    unsigned int spriteSheetAnimationRows;
+    unsigned int spriteSheetAnimationColumns;
+    unsigned int spriteSheetAnimationInitialFrameRange;
+    float spriteSheetAnimationFPS;
+    float spriteSheetAnimationFPSVariation;
 public:
-    ParticleShader();
-    
-    
-    ~ParticleShader() = default;
-    
-    
-    
+    ParticleShader(ParticleNode* particleNode);
+    ~ParticleShader();
+    void engineSetParticleShaderColorAnimation(vector<vec4> colorKeys, vector<float> progressKeys);
+    void engineSetSpriteSheetAnimation(unsigned int rows, unsigned int columns,
+                                       unsigned int initialFrameRange,
+                                       unsigned int FPS, unsigned int FPSVariation);
     void engineRenderShader(Geometry* geometry) override;
 };
 #endif

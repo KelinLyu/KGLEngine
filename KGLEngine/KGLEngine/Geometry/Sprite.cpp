@@ -2,6 +2,7 @@
 #include "Geometry.hpp"
 Sprite::Sprite() {
     this->engineInitializeGeometry();
+    this->cullMode = 2;
     float vertices[] = {
         0.0f, 1.0f, 0.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f,
@@ -20,13 +21,4 @@ Sprite::Sprite() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     this->indiceCount = 6;
-}
-void Sprite::engineRenderGeometry() {
-    if(this->clearDepthBuffer) {
-        glClear(GL_DEPTH_BUFFER_BIT);
-    }
-    glDisable(GL_CULL_FACE);
-    this->shader->engineRenderShader(this);
-    this->updated = false;
-    this->prepared = false;
 }

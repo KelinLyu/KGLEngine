@@ -104,7 +104,6 @@ Geometry* Geometry::copy(vector<Animator*>* animators) {
     geometry->isHidden = this->isHidden;
     geometry->renderingOrder = this->renderingOrder;
     geometry->lightMask = this->lightMask;
-    geometry->clearDepthBuffer = this->clearDepthBuffer;
     glGenVertexArrays(1, &geometry->vertexArrays);
     glGenBuffers(1, &geometry->vertexBuffers);
     glGenBuffers(1, &geometry->elementBuffers);
@@ -174,7 +173,6 @@ void Geometry::engineInitializeGeometry() {
     this->isHidden = false;
     this->renderingOrder = 0.0f;
     this->lightMask = -1;
-    this->clearDepthBuffer = false;
     this->instanceCount = 0;
     this->requiresInstanceUpdate = false;
 }
@@ -187,8 +185,11 @@ unsigned int Geometry::engineGetGeometryVertexArrays() {
 unsigned int Geometry::engineGetGeometryIndiceCount() {
     return(this->indiceCount);
 }
-bool Geometry::engineCheckIfGeometryHasBones() {
+bool Geometry::engineCheckWhetherGeometryHasBones() {
     return(this->boneCount > 0);
+}
+bool Geometry::engineCheckWhetherGeometryHasAnimations() {
+    return(this->animations.size() > 0);
 }
 map<string, BoneInfo>* Geometry::engineGetGeometryBonesInfoMap() {
     return(&this->bonesInfoMap);
@@ -238,7 +239,7 @@ void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, ma
     }
 }
 mat4 Geometry::engineGetGeometryBoneTransform(string name) {
-    if(this->engineCheckIfGeometryHasBones()) {
+    if(this->engineCheckWhetherGeometryHasBones()) {
         if(this->bonesInfoMap.find(name) != this->bonesInfoMap.end()) {
             int index = this->bonesInfoMap[name].id;
             mat4 transform = this->boneTransforms[index];
@@ -257,7 +258,7 @@ void Geometry::engineUpdateGeometryAnimations() {
     if(this->updated) {
         return;
     }
-    if(this->engineCheckIfGeometryHasBones()) {
+    if(this->engineCheckWhetherGeometryHasBones()) {
         if(this->animations.size() > 0) {
             this->engineCalculateGeometryBoneTransforms(this->animations[0]->engineGetRootAnimationBoneNode(), mat4(1.0f), true);
         }
@@ -331,9 +332,6 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     Engine::main->preparedGeometries.push_back(this);
 }
 void Geometry::engineRenderGeometry() {
-    if(this->clearDepthBuffer) {
-        glClear(GL_DEPTH_BUFFER_BIT);
-    }
     if(this->cullMode == 0) {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
@@ -346,7 +344,6 @@ void Geometry::engineRenderGeometry() {
     if(this->instanceCount > 0 && this->requiresInstanceUpdate) {
         glBindBuffer(GL_ARRAY_BUFFER, this->modelTransformBuffers);
         glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->modelTransforms[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, this->normalTransformBuffers);
         glBufferData(GL_ARRAY_BUFFER, this->instanceCount * sizeof(mat4), &this->normalTransforms[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);

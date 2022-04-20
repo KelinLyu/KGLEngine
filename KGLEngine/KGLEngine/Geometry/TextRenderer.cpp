@@ -2,6 +2,7 @@
 #include "Geometry.hpp"
 TextRenderer::TextRenderer() {
     this->engineInitializeGeometry();
+    this->cullMode = 2;
     float vertices[] = {
         0.0f, 1.0f, 0.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f,
@@ -52,10 +53,6 @@ TextRenderer::~TextRenderer() {
     this->transforms.clear();
 }
 void TextRenderer::engineRenderGeometry() {
-    if(this->clearDepthBuffer) {
-        glClear(GL_DEPTH_BUFFER_BIT);
-    }
-    glDisable(GL_CULL_FACE);
     for(unsigned int i = 0; i < this->transforms.size(); i += 1) {
         this->modelTransform = this->mainTransform * this->transforms[i];
         this->shader->setTexture("textureMap", this->textures[i]);

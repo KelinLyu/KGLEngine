@@ -21,6 +21,15 @@ struct GeometryVertex {
     int boneIDs[MAX_BONE_INFLUENCE];
     float weights[MAX_BONE_INFLUENCE];
 };
+struct ParticleData {
+    vec2 birthTimeAndDuration;
+    vec3 initialPosition;
+    vec3 initialSpeed;
+    vec4 accelerationData;
+    vec2 rotationData;
+    vec2 scaleData;
+    vec2 spriteSheetAnimationData;
+};
 class Geometry {
 protected:
     bool updated;
@@ -47,7 +56,6 @@ public:
     bool isHidden;
     float renderingOrder;
     unsigned int lightMask;
-    bool clearDepthBuffer;
     Geometry() = default;
     Geometry(aiMesh* mesh);
     Geometry* copy(vector<Animator*>* animators);
@@ -60,7 +68,8 @@ public:
     mat4 engineGetGeometryModelTransform();
     unsigned int engineGetGeometryVertexArrays();
     unsigned int engineGetGeometryIndiceCount();
-    bool engineCheckIfGeometryHasBones();
+    bool engineCheckWhetherGeometryHasBones();
+    bool engineCheckWhetherGeometryHasAnimations();
     map<string, BoneInfo>* engineGetGeometryBonesInfoMap();
     vector<mat4>* engineGetGeometryBoneTransforms();
     void engineCalculateGeometryBoneTransforms(AnimationBoneNode* node, mat4 parentTransform, bool first);
@@ -71,25 +80,25 @@ public:
     virtual void engineRenderGeometry();
     unsigned int engineGeometryAddInstance();
     void engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform, bool freeze);
-    unsigned int engineGetGeometryInstanceCount();
+    virtual unsigned int engineGetGeometryInstanceCount();
 };
 class UnitCube final: public Geometry {
 public:
     UnitCube();
 };
-
-
-
-
 class ParticleRenderer final: public Geometry {
+private:
+    unsigned int particleAmount;
+    unsigned int dataBuffers;
+    vector<ParticleData> dataVector;
 public:
-    ParticleRenderer();
+    ParticleRenderer(unsigned int amount);
+    ~ParticleRenderer();
+    void engineResetAllParticleData();
+    void engineRenderGeometry() override;
+    ParticleData* engineGetParticleData(bool front);
+    unsigned int engineGetGeometryInstanceCount() override;
 };
-
-
-
-
-
 class Skybox final: public Geometry {
 private:
     Texture* texture;
@@ -105,7 +114,6 @@ class Sprite final: public Geometry {
 public:
     Sprite();
     ~Sprite() = default;
-    void engineRenderGeometry() override;
 };
 class TextRenderer final: public Geometry {
 private:

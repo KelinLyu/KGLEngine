@@ -64,6 +64,7 @@ void Shader::activateShader() {
 void Shader::setUIShader() {
     this->isUIShader = true;
     this->blendMode = 2;
+    this->writeToDepthBuffer = false;
 }
 void Shader::setOpaque() {
     this->blendMode = 0;
@@ -133,11 +134,13 @@ Shader::~Shader() {
 }
 void Shader::engineInitializeShader(string vertexShaderCode, string fragmentShaderCode) {
     this->blendMode = 0;
+    this->vertexShaderSourceCode = vertexShaderCode;
+    this->fragmentShaderSourceCode = fragmentShaderCode;
     this->currentModelTransform = mat4(-1.0f);
     this->isUIShader = false;
     this->isParticleShader = false;
-    this->vertexShaderSourceCode = vertexShaderCode;
-    this->fragmentShaderSourceCode = fragmentShaderCode;
+    this->writeToDepthBuffer = true;
+    this->clearDepthBuffer = false;
     const char* vertexShaderString = vertexShaderCode.c_str();
     const char* fragmentShaderString = fragmentShaderCode.c_str();
     int result = 0;
@@ -202,6 +205,10 @@ bool Shader::engineCheckCompileErrors(unsigned int shader, string type) {
     return(result);
 }
 void Shader::engineRenderShader(Geometry* geometry) {
+    if(this->clearDepthBuffer) {
+        glDepthMask(GL_TRUE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
     if(this->blendMode == 0) {
         glDisable(GL_BLEND);
     }else if(this->blendMode == 1) {
@@ -210,6 +217,11 @@ void Shader::engineRenderShader(Geometry* geometry) {
     }else if(this->blendMode == 2) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    if(this->writeToDepthBuffer) {
+        glDepthMask(GL_TRUE);
+    }else{
+        glDepthMask(GL_FALSE);
     }
     this->activateShader();
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
@@ -221,26 +233,11 @@ void Shader::engineRenderShader(Geometry* geometry) {
     }else if(this->isParticleShader) {
         glDepthFunc(GL_LESS);
         this->setFloat("time", Engine::main->getTime());
-        
-        
-        
-        
         mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
         mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
-        
-        
-        
-        
-        
-        
         this->setMat4("projectionTransform", projectionTransform);
         this->setMat4("viewTransform", viewTransform);
         this->setMat4("modelViewTransform", viewTransform * modelTransform);
-        
-        
-        
-        
-        
     }else{
         glDepthFunc(GL_LESS);
         mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
@@ -255,7 +252,7 @@ void Shader::engineRenderShader(Geometry* geometry) {
             this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));
         }
         this->setMat4("node.modelViewProjectionTransform", viewProjectionTransform * modelTransform);
-        if(geometry->engineCheckIfGeometryHasBones()) {
+        if(geometry->engineCheckWhetherGeometryHasBones() && geometry->engineCheckWhetherGeometryHasAnimations()) {
             this->setBool("hasBones", true);
             vector<mat4>* boneTransforms = geometry->engineGetGeometryBoneTransforms();
             for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {

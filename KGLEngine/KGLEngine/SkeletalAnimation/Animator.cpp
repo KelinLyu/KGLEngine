@@ -24,7 +24,7 @@ Animator::Animator(string name, string file, Node* node) {
     this->duration = animation->mDuration;
     this->baseSpeed = animation->mTicksPerSecond;
     for(unsigned int i = 0; i < node->geometries.size(); i += 1) {
-        if(node->geometries[i]->engineCheckIfGeometryHasBones()) {
+        if(node->geometries[i]->engineCheckWhetherGeometryHasBones()) {
             Animation* animation = new Animation(scene, this, node->geometries[i]);
             this->animations.push_back(animation);
         }

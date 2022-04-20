@@ -1,7 +1,8 @@
 // Developed by Kelin Lyu.
 #include "Geometry.hpp"
-ParticleRenderer::ParticleRenderer() {
+ParticleRenderer::ParticleRenderer(unsigned int amount) {
     this->engineInitializeGeometry();
+    this->particleAmount = amount;
     struct ParticleVertex {
         vec3 position;
         vec2 uv;
@@ -30,9 +31,6 @@ ParticleRenderer::ParticleRenderer() {
     indices.push_back(0);
     indices.push_back(2);
     indices.push_back(3);
-    
-    
-    
     this->indiceCount = (unsigned int)indices.size();
     glGenVertexArrays(1, &this->vertexArrays);
     glGenBuffers(1, &this->vertexBuffers);
@@ -46,15 +44,73 @@ ParticleRenderer::ParticleRenderer() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (void*)offsetof(ParticleVertex, uv));
+    for(unsigned int i = 0; i < this->particleAmount; i += 1) {
+        ParticleData data;
+        data.birthTimeAndDuration = vec2(0.0f);
+        data.initialPosition = vec3(0.0f);
+        data.initialSpeed = vec3(0.0f);
+        data.accelerationData = vec4(0.0f);
+        data.rotationData = vec2(0.0f);
+        data.scaleData = vec2(0.0f);
+        data.spriteSheetAnimationData = vec2(0.0f);
+        this->dataVector.push_back(data);
+    }
+    glGenBuffers(1, &this->dataBuffers);
+    glBindBuffer(GL_ARRAY_BUFFER, this->dataBuffers);
+    glBufferData(GL_ARRAY_BUFFER, this->particleAmount * sizeof(ParticleData), &this->dataVector[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (void*)0);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (void*)offsetof(ParticleData, initialPosition));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (void*)offsetof(ParticleData, initialSpeed));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (void*)offsetof(ParticleData, accelerationData));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (void*)offsetof(ParticleData, rotationData));
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(7, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (void*)offsetof(ParticleData, scaleData));
+    glEnableVertexAttribArray(8);
+    glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (void*)offsetof(ParticleData, spriteSheetAnimationData));
+    glVertexAttribDivisor(2, 1);
+    glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+    glVertexAttribDivisor(6, 1);
+    glVertexAttribDivisor(7, 1);
+    glVertexAttribDivisor(8, 1);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+}
+ParticleRenderer::~ParticleRenderer() {
+    glDeleteBuffers(1, &this->dataBuffers);
+    this->dataVector.clear();
+}
+void ParticleRenderer::engineResetAllParticleData() {
+    for(unsigned int i = 0; i < this->particleAmount; i += 1) {
+        this->dataVector[i].birthTimeAndDuration = vec2(0.0f);
+    }
+}
+void ParticleRenderer::engineRenderGeometry() {
+    glBindBuffer(GL_ARRAY_BUFFER, this->dataBuffers);
+    glBufferData(GL_ARRAY_BUFFER, this->particleAmount * sizeof(ParticleData), &this->dataVector[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    this->shader->engineRenderShader(this);
+    this->updated = false;
+    this->prepared = false;
+}
+ParticleData* ParticleRenderer::engineGetParticleData(bool front) {
+    if(front) {
+        ParticleData data = this->dataVector[0];
+        this->dataVector.erase(this->dataVector.begin());
+        this->dataVector.push_back(data);
+        return(&this->dataVector[(unsigned int)this->dataVector.size() - 1]);
+    }
+    ParticleData data = this->dataVector[(unsigned int)this->dataVector.size() - 1];
+    this->dataVector.erase(this->dataVector.end() - 1);
+    this->dataVector.insert(this->dataVector.begin(), data);
+    return(&this->dataVector[0]);
+}
+unsigned int ParticleRenderer::engineGetGeometryInstanceCount() {
+    return(this->particleAmount);
 }

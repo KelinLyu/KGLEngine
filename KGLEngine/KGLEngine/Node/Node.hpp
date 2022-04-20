@@ -97,107 +97,61 @@ public:
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
     void engineConfigurateShader(Shader* shader, int index);
 };
-
-
-
-
-
-
-
 class ParticleNode final: public Node {
 private:
-    
+    bool isPlaying;
     ParticleRenderer* renderer;
-    
     ParticleShader* shader;
-    
-    float productionTime;
     unsigned int productionAmount;
-    
-    // - isHidden
-    int particleBirthrate; // - birth time
-    float particleDuration; // - death time
+    float productionTime;
+    float productionTimeInterval;
+    float particleDuration;
     float particleDurationVariation;
-    
-    bool hasSpriteSheetAnimation;
-    unsigned int spriteSheetAnimationRows;
-    unsigned int spriteSheetAnimationColumns;
-    unsigned int spriteSheetAnimationInitialFrameRange; // - initial frame
+    unsigned int emissionShape;
+    float innerSphereRadius;
+    float outerSphereRadius;
+    vec3 boxSize;
+    vector<vec4> colorKeys;
+    vector<float> progressKeys;
+    unsigned int spriteSheetAnimationInitialFrameRange;
     unsigned int spriteSheetAnimationFPS;
-    unsigned int spriteSheetAnimationFPSVariation; // - FPS
-    unsigned int spriteSheetAnimationBehavior;
-    
-    vector<float> colorizationTimestamps;
-    vector<vec3> colorizationColors;
-    
+    unsigned int spriteSheetAnimationFPSVariation;
 public:
-    
     float renderingOrder;
-    bool isLocal;
+    bool useLocalSpace;
     bool isAdditive;
-    
-    float birthrateFactor;
-    float speedFactor;
-    
-    float volumeRadius; // - initial location, float
-    float spreadingAngle; // - start direction, float
-    
-    float initialSpeed; // - speed
+    bool youngestFirst;
+    float spreadingAngle;
+    float initialSpeed;
     float initialSpeedVariation;
-    float speedAcceleration; // - speed acceleration, float
+    float speedAcceleration;
     float speedAccelerationVariation;
-    
-    float initialRotation; // - initial rotation, float
+    vec3 acceleration;
+    vec3 accelerationVariation;
+    float initialRotation;
     float initialRotationVariation;
-    float rotatingSpeed; // - rotating speed, float
+    float rotatingSpeed;
     float rotatingSpeedVariation;
-    
-    float initialScale; // - initial scale, float
+    bool randomizeRotatingDirection;
+    float initialScale;
     float initialScaleVariation;
-    float scalingSpeed; // - scaling speed, float
+    float scalingSpeed;
     float scalingSpeedVariation;
-    
-    vec3 worldAcceleration; // - world acceleration, vec3
-    vec3 worldAccelerationVariation;
-    
     Texture* texture;
-    
-    ParticleNode(int birthrate, float duration, float durationVariation);
-    
-    void initializeSpriteSheetAnimation(unsigned int rows, unsigned int columns,
-                                        unsigned int initialFrameRange,
-                                        unsigned int FPS, unsigned int FPSVariation);
-    void setSpriteSheetAnimationClamp();
-    void setSpriteSheetAnimationRepeat();
-    
-    void setColor(vec3 color, float progress);
-    
+    vec4 color;
+    ParticleNode(unsigned int birthrate, float duration, float durationVariation);
+    void setEmissionSphere(float innerRadius, float outerRadius);
+    void setEmissionBox(vec3 size);
+    void setColorAnimation(vec4 color, float progress);
+    void setSpriteSheetAnimation(unsigned int rows, unsigned int columns,
+                                 unsigned int initialFrameRange,
+                                 unsigned int FPS, unsigned int FPSVariation);
+    void play();
+    void stop();
+    void reset();
     ~ParticleNode();
-    
     void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
-    
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class UINode: public Node {
 private:
     mat4 renderingTransform;
