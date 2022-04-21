@@ -23,7 +23,7 @@ public:
     bool wasKeyReleased(int key);
     float getKeyDuration(int key, float currentTime);
     string getLastPressedCharacter();
-    vec2 getMousePosition();
+    vec2 getMouseScreenPosition();
     vec2 getMouseTranslation();
     float getScrollWheelAcceleration();
     ~Input();

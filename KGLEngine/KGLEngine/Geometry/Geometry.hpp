@@ -12,6 +12,7 @@ class Animation;
 class Animator;
 class Font;
 class Node;
+class LightNode;
 struct GeometryVertex {
     vec3 position;
     vec3 normal;
@@ -41,7 +42,7 @@ protected:
     unsigned int elementBuffers;
     unsigned int indiceCount;
     vector<Animation*> animations;
-    int boneCount;
+    unsigned int boneCount;
     map<string, BoneInfo> bonesInfoMap;
     vector<mat4> boneTransforms;
     mat4 modelTransform;
@@ -52,10 +53,13 @@ protected:
     vector<mat4> modelTransforms;
     vector<mat4> normalTransforms;
     bool requiresInstanceUpdate;
+    bool hasBoundingSphereInformation;
+    vec3 boundingSpherePosition;
+    float boundingSphereRadius;
 public:
     bool isHidden;
     float renderingOrder;
-    unsigned int lightMask;
+    unsigned int lightingBitMask;
     Geometry() = default;
     Geometry(aiMesh* mesh);
     Geometry* copy(vector<Animator*>* animators);
@@ -70,6 +74,7 @@ public:
     unsigned int engineGetGeometryIndiceCount();
     bool engineCheckWhetherGeometryHasBones();
     bool engineCheckWhetherGeometryHasAnimations();
+    unsigned int* engineGetGeometryBoneCount();
     map<string, BoneInfo>* engineGetGeometryBonesInfoMap();
     vector<mat4>* engineGetGeometryBoneTransforms();
     void engineCalculateGeometryBoneTransforms(AnimationBoneNode* node, mat4 parentTransform, bool first);
@@ -81,6 +86,7 @@ public:
     unsigned int engineGeometryAddInstance();
     void engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform, bool freeze);
     virtual unsigned int engineGetGeometryInstanceCount();
+    bool engineCheckWhetherGeometryIsAffectedByLightNode(LightNode* lightNode);
 };
 class UnitCube final: public Geometry {
 public:

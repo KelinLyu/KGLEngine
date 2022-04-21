@@ -1,6 +1,9 @@
 // Developed by Kelin Lyu.
 #include "Shader.hpp"
 int Shader::currentProgramID = -1;
+int Shader::currentBlendMode = -1;
+int Shader::currentWriteToDepthBuffer = -1;
+int Shader::currentDepthFunction = -1;
 Shader::Shader() {
     string vertexShaderCode = R""""(
 #version 330 core
@@ -209,29 +212,41 @@ void Shader::engineRenderShader(Geometry* geometry) {
         glDepthMask(GL_TRUE);
         glClear(GL_DEPTH_BUFFER_BIT);
     }
-    if(this->blendMode == 0) {
-        glDisable(GL_BLEND);
-    }else if(this->blendMode == 1) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    }else if(this->blendMode == 2) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if(Shader::currentBlendMode != this->blendMode) {
+        Shader::currentBlendMode = this->blendMode;
+        if(this->blendMode == 0) {
+            glDisable(GL_BLEND);
+        }else if(this->blendMode == 1) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        }else if(this->blendMode == 2) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
     }
-    if(this->writeToDepthBuffer) {
-        glDepthMask(GL_TRUE);
-    }else{
-        glDepthMask(GL_FALSE);
+    if(Shader::currentWriteToDepthBuffer != this->writeToDepthBuffer) {
+        Shader::currentWriteToDepthBuffer = this->writeToDepthBuffer;
+        if(this->writeToDepthBuffer) {
+            glDepthMask(GL_TRUE);
+        }else{
+            glDepthMask(GL_FALSE);
+        }
     }
     this->activateShader();
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
     if(this->isUIShader) {
-        glDepthFunc(GL_ALWAYS);
+        if(Shader::currentDepthFunction != 1) {
+            Shader::currentDepthFunction = 1;
+            glDepthFunc(GL_ALWAYS);
+        }
         mat4 projectionTransform = Engine::main->mainCameraNode->getOrthogonalProjectionTransform();
         this->setMat4("projectionTransform", projectionTransform);
         this->setMat4("modelProjectionTransform", projectionTransform * modelTransform);
     }else if(this->isParticleShader) {
-        glDepthFunc(GL_LESS);
+        if(Shader::currentDepthFunction != 0) {
+            Shader::currentDepthFunction = 0;
+            glDepthFunc(GL_LESS);
+        }
         this->setFloat("time", Engine::main->getTime());
         mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
         mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
@@ -239,7 +254,10 @@ void Shader::engineRenderShader(Geometry* geometry) {
         this->setMat4("viewTransform", viewTransform);
         this->setMat4("modelViewTransform", viewTransform * modelTransform);
     }else{
-        glDepthFunc(GL_LESS);
+        if(Shader::currentDepthFunction != 0) {
+            Shader::currentDepthFunction = 0;
+            glDepthFunc(GL_LESS);
+        }
         mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
         mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
         mat4 viewProjectionTransform = projectionTransform * viewTransform;
@@ -261,12 +279,14 @@ void Shader::engineRenderShader(Geometry* geometry) {
         }else{
             this->setBool("hasBones", false);
         }
+        unsigned int i = 0;
         unsigned int count = 0;
-        while(count < LIGHTS_LIMIT && count < Engine::main->preparedLightNodes.size()) {
-            if((geometry->lightMask & Engine::main->preparedLightNodes[count]->lightMask) > 0) {
-                Engine::main->preparedLightNodes[count]->engineConfigurateShader(this, count);
+        while(count < LIGHTS_LIMIT && i < Engine::main->preparedLightNodes.size()) {
+            if(geometry->engineCheckWhetherGeometryIsAffectedByLightNode(Engine::main->preparedLightNodes[i])) {
+                Engine::main->preparedLightNodes[i]->engineConfigurateShader(this, count);
+                count += 1;
             }
-            count += 1;
+            i += 1;
         }
         this->setInt("lightCount", count);
     }

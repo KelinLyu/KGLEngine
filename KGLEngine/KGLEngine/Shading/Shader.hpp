@@ -8,6 +8,9 @@ class ParticleNode;
 class Shader {
 protected:
     static int currentProgramID;
+    static int currentBlendMode;
+    static int currentWriteToDepthBuffer;
+    static int currentDepthFunction;
     unsigned int programID;
     unsigned int blendMode;
     string vertexShaderSourceCode;

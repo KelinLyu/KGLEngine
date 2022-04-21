@@ -38,9 +38,10 @@ void Node::loadModelFile(string file) {
     }
     this->engineProcessNode(scene->mRootNode, scene);
 }
-void Node::loadAnimator(string name, string file) {
+Animator* Node::loadAnimator(string name, string file) {
     Animator* animator = new Animator(name, file, this);
     this->animators.push_back(animator);
+    return(animator);
 }
 Node* Node::generateBoneNode(string boneName) {
     Node* boneNode = new Node();
@@ -51,11 +52,12 @@ Node* Node::generateBoneNode(string boneName) {
 Node* Node::copy() {
     Node* node = new Node();
     node->name = this->name;
-    node->tags = this->tags;
     node->isDisabled = this->isDisabled;
+    node->renderingBitMask = this->renderingBitMask;
     node->position = this->position;
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;
+    node->orientationTargetNode = this->orientationTargetNode;
     for(unsigned int i = 0; i < this->animators.size(); i += 1) {
         node->animators.push_back(this->animators[i]->engineCopyAnimator());
     }
@@ -63,15 +65,27 @@ Node* Node::copy() {
         node->geometries.push_back(this->geometries[i]->copy(&node->animators));
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
-        node->addChildNode(this->childNodes[i]->copy());
+        Node* newNode = this->childNodes[i]->copy();
+        node->addChildNode(newNode);
+        map<string, Node*>::iterator iterator;
+        for(iterator = this->boneNodes.begin(); iterator != this->boneNodes.end(); iterator++) {
+            if(iterator->second == this->childNodes[i]) {
+                node->boneNodes[iterator->first] = newNode;
+                break;
+            }
+        }
     }
     return(node);
 }
 Node* Node::clone() {
     Node* node = new Node();
+    node->name = this->name;
+    node->isDisabled = this->isDisabled;
+    node->renderingBitMask = this->renderingBitMask;
     node->position = this->position;
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;
+    node->orientationTargetNode = this->orientationTargetNode;
     for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
         if(this->geometries[i]->engineGetGeometryInstanceCount() == 0) {
             this->geometryInstancingIndex = this->geometries[i]->engineGeometryAddInstance();
@@ -80,7 +94,15 @@ Node* Node::clone() {
         node->geometries.push_back(this->geometries[i]);
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
-        node->addChildNode(this->childNodes[i]->clone());
+        Node* newNode = this->childNodes[i]->clone();
+        node->addChildNode(newNode);
+        map<string, Node*>::iterator iterator;
+        for(iterator = this->boneNodes.begin(); iterator != this->boneNodes.end(); iterator++) {
+            if(iterator->second == this->childNodes[i]) {
+                node->boneNodes[iterator->first] = newNode;
+                break;
+            }
+        }
     }
     return(node);
 }
@@ -90,11 +112,25 @@ void Node::freeze() {
 }
 Animator* Node::getAnimator(string name) {
     for(unsigned int i = 0; i < this->animators.size(); i += 1) {
-        if(this->animators[i]->engineAnimationGetAnimatorName() == name) {
+        if(this->animators[i]->engineGetAnimatorName() == name) {
             return(this->animators[i]);
         }
     }
     return(NULL);
+}
+void Node::playAnimators(unsigned int mask, float fadeIn, float fadeOut) {
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        if((this->animators[i]->animatorBitMask & mask) > 0) {
+            this->animators[i]->play(fadeIn, fadeOut);
+        }
+    }
+}
+void Node::stopAnimators(unsigned int mask, float fadeOut) {
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        if((this->animators[i]->animatorBitMask & mask) > 0) {
+            this->animators[i]->stop(fadeOut);
+        }
+    }
 }
 void Node::updateTransform() {
     if(this->parent != NULL) {
@@ -103,6 +139,18 @@ void Node::updateTransform() {
             this->childNodes[i]->updateTransform();
         }
     }
+}
+Node* Node::getChildNode(string name) {
+    if(this->name == name) {
+        return(this);
+    }
+    for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
+        Node* childNode = this->childNodes[i]->getChildNode(name);
+        if(childNode != NULL) {
+            return(childNode);
+        }
+    }
+    return(NULL);
 }
 mat4 Node::getWorldTransform() {
     if(this->worldTransform == mat4(-1.0f)) {
@@ -163,10 +211,28 @@ vec3 Node::getPositionOnScreen() {
         vec3 result;
         result.x = projection.x * 0.5f / projection.w + 0.5f;
         result.y = 0.5f - projection.y * 0.5f / projection.w;
-        result.z = projection.z / projection.w;
+        result.z = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
         return(result);
     }
     return(vec3(0.0f));
+}
+CameraNode* Node::convertToCameraNode() {
+    return(this->currentCameraNode);
+}
+LightNode* Node::convertToLightNode() {
+    return(this->currentLightNode);
+}
+ParticleNode* Node::convertToParticleNode() {
+    return(this->currentParticleNode);
+}
+UINode* Node::convertToUINode() {
+    return(this->currentUINode);
+}
+SpriteNode* Node::convertToSpriteNode() {
+    return(this->currentSpriteNode);
+}
+TextNode* Node::convertToTextNode() {
+    return(this->currentTextNode);
 }
 Node::~Node() {
     this->removeFromParentNode();
@@ -202,9 +268,9 @@ Node::~Node() {
 }
 void Node::engineInitializeNode() {
     this->name = "";
-    this->tags = 0;
     this->parent = NULL;
     this->isDisabled = false;
+    this->renderingBitMask = -1;
     this->position = vec3(0.0f);
     this->eulerAngles = vec3(0.0f);
     this->scale = vec3(1.0f);
@@ -212,6 +278,11 @@ void Node::engineInitializeNode() {
     this->worldTransform = mat4(-1.0f);
     this->geometryInstancingIndex = -1;
     this->hasUnfreezableGeometries = false;
+    this->currentCameraNode = NULL;
+    this->currentLightNode = NULL;
+    this->currentUINode = NULL;
+    this->currentSpriteNode = NULL;
+    this->currentTextNode = NULL;
 }
 void Node::engineProcessNode(aiNode *node, const aiScene *scene) {
     for(unsigned int i = 0; i < node->mNumMeshes; i += 1) {
@@ -263,10 +334,12 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
         matrix = glm::inverse(matrix);
         this->worldTransform = glm::scale(matrix, this->scale);
     }
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
-        if(this->geometryInstancingIndex >= 0) {
-            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, false);
+    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
+        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+            this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
+            if(this->geometryInstancingIndex >= 0) {
+                this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, false);
+            }
         }
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {

@@ -66,7 +66,7 @@ string Input::getLastPressedCharacter() {
     this->lastCharacter = "";
     return(result);
 }
-vec2 Input::getMousePosition() {
+vec2 Input::getMouseScreenPosition() {
     return(this->mousePosition / Engine::main->getWindowResolution());
 }
 vec2 Input::getMouseTranslation() {

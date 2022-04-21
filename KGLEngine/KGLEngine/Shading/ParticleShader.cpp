@@ -159,7 +159,7 @@ void ParticleShader::engineSetSpriteSheetAnimation(unsigned int rows, unsigned i
 void ParticleShader::engineRenderShader(Geometry* geometry) {
     if(this->currentUseLocalSpace != this->particleNode->useLocalSpace) {
         this->currentUseLocalSpace = this->particleNode->useLocalSpace;
-        this->setBool("useLocalTransform", this->particleNode->useLocalSpace);
+        this->setBool("useLocalSpace", this->particleNode->useLocalSpace);
     }
     if(this->currentIsAdditive != this->particleNode->isAdditive) {
         this->currentIsAdditive = this->particleNode->isAdditive;

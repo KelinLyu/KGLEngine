@@ -1,6 +1,6 @@
 // Developed by Kelin Lyu.
 #version 330 core
-const int LIGHTS_LIMIT = 10;
+const int LIGHTS_LIMIT = 50;
 in fragment_data {
     vec3 position;
     vec3 normal;
@@ -27,6 +27,7 @@ struct light_data {
     vec3 direction;
     float attenuationExponent;
     float range;
+    float penetrationRange;
     float innerAngle;
     float outerAngle;
 };
@@ -154,7 +155,13 @@ void main() {
             float attenuationProgress = max((lights[i].range - lightDistance) / lights[i].range, 0.0f);
             float attenuation = pow(attenuationProgress, lights[i].attenuationExponent);
             lightVector = normalize(lightVector);
-            lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
+            if(lights[i].penetrationRange > 0.0f) {
+                float penetrationProgress = max((lights[i].penetrationRange - lightDistance) / lights[i].penetrationRange, 0.0f);
+                float penetration = pow(penetrationProgress, lights[i].attenuationExponent);
+                lightFactor = (penetration + (1.0f - penetration) * max(dot(normal, lightVector), 0.0f)) * attenuation;
+            }else{
+                lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
+            }
         }else if(lights[i].type == 3) {
             lightVector = lights[i].position - fragment.position;
             float lightDistance = length(lightVector);
@@ -166,7 +173,13 @@ void main() {
             float intensity = (theta - lights[i].outerAngle) / epsilon;
             intensity *= clamp(intensity, 0.0f, 1.0f);
             attenuation *= intensity * intensity;
-            lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
+            if(lights[i].penetrationRange > 0.0f) {
+                float penetrationProgress = max((lights[i].penetrationRange - lightDistance) / lights[i].penetrationRange, 0.0f);
+                float penetration = pow(penetrationProgress, lights[i].attenuationExponent);
+                lightFactor = (penetration + (1.0f - penetration) * max(dot(normal, lightVector), 0.0f)) * attenuation;
+            }else{
+                lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
+            }
         }
         if(lightFactor <= 0.0f) {
             continue;

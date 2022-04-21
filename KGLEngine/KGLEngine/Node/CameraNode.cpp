@@ -2,9 +2,41 @@
 #include "Node.hpp"
 CameraNode::CameraNode(float field, float near, float far) {
     this->engineInitializeNode();
+    this->currentCameraNode = this;
     this->field = glm::radians(field);
     this->near = near;
     this->far = far;
+}
+Node* CameraNode::copy() {
+    CameraNode* node = new CameraNode(this->field, this->near, this->far);
+    node->name = this->name;
+    node->isDisabled = this->isDisabled;
+    node->renderingBitMask = this->renderingBitMask;
+    node->position = this->position;
+    node->eulerAngles = this->eulerAngles;
+    node->scale = this->scale;
+    node->orientationTargetNode = this->orientationTargetNode;
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        node->animators.push_back(this->animators[i]->engineCopyAnimator());
+    }
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        node->geometries.push_back(this->geometries[i]->copy(&node->animators));
+    }
+    for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
+        Node* newNode = this->childNodes[i]->copy();
+        node->addChildNode(newNode);
+        map<string, Node*>::iterator iterator;
+        for(iterator = this->boneNodes.begin(); iterator != this->boneNodes.end(); iterator++) {
+            if(iterator->second == this->childNodes[i]) {
+                node->boneNodes[iterator->first] = newNode;
+                break;
+            }
+        }
+    }
+    return(node);
+}
+Node* CameraNode::clone() {
+    return(this->copy());
 }
 mat4 CameraNode::getOrthogonalProjectionTransform() {
     vec2 resolution = Engine::main->getScreenResolution();

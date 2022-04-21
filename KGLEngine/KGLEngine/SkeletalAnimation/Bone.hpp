@@ -3,7 +3,7 @@
 #define Bone_hpp
 #include "../Engine.hpp"
 struct BoneInfo final {
-    int id;
+    unsigned int id;
     mat4 offset;
 };
 struct BoneKeyFramePosition final {

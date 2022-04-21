@@ -4,6 +4,7 @@ Animation::Animation(const aiScene* scene, Animator* animator, Geometry* geometr
     this->animator = animator;
     geometry->engineAddAnimationToGeometry(this);
     aiAnimation* animation = scene->mAnimations[0];
+    unsigned int* boneCount = geometry->engineGetGeometryBoneCount();
     map<string, BoneInfo>* bonesInfoMap = geometry->engineGetGeometryBonesInfoMap();
     this->rootAnimationBoneNode = new AnimationBoneNode();
     this->engineAnimationProcessNode(this->rootAnimationBoneNode, scene->mRootNode, bonesInfoMap);
@@ -11,9 +12,11 @@ Animation::Animation(const aiScene* scene, Animator* animator, Geometry* geometr
     for(unsigned int i = 0; i < size; i += 1) {
         aiNodeAnim* channel = animation->mChannels[i];
         string boneName = channel->mNodeName.data;
-        if((*bonesInfoMap).find(boneName) != (*bonesInfoMap).end()) {
-            this->bones[boneName] = new Bone(channel->mNodeName.data, channel);
+        if((*bonesInfoMap).find(boneName) == (*bonesInfoMap).end()) {
+            (*bonesInfoMap)[boneName].id = (*boneCount);
+            (*boneCount) = (*boneCount) + 1;
         }
+        this->bones[boneName] = new Bone(channel->mNodeName.data, channel);
     }
 }
 Animation::~Animation() {
@@ -22,11 +25,7 @@ Animation::~Animation() {
 }
 void Animation::engineAnimationProcessNode(AnimationBoneNode* targetNode, aiNode* node, map<string, BoneInfo>* bonesInfoMap) {
     string name = node->mName.data;
-    if((*bonesInfoMap).find(name) != (*bonesInfoMap).end()) {
-        targetNode->name = name;
-    }else{
-        targetNode->name = "";
-    }
+    targetNode->name = name;
     targetNode->transform = assimp_helper::getMat4(node->mTransformation);
     for(unsigned int i = 0; i < node->mNumChildren; i += 1) {
         AnimationBoneNode* newNode = new AnimationBoneNode();

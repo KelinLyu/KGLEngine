@@ -18,8 +18,10 @@ private:
     float stateChangeBlendFactor;
     vector<Animation*> animations;
 public:
+    unsigned int animatorBitMask;
     bool repeats;
     bool clamps;
+    float timeOffset;
     float speed;
     float blendFactor;
     Animator() = default;
@@ -29,12 +31,14 @@ public:
     void stop(float fadeOut);
     bool isPlaying();
     float getTime();
+    float getDuration();
     float getCurrentBlendFactor();
     ~Animator();
-    string engineAnimationGetAnimatorName();
-    float engineAnimationGetAnimatorCurrentBlendFactor();
-    float engineAnimationGetAnimatorFadeInFactor(float progress);
-    float engineAnimationGetAnimatorFadeOutFactor(float progress);
+    string engineGetAnimatorName();
+    float engineGetAnimatorTime();
+    float engineGetAnimatorCurrentBlendFactor();
+    float engineGetAnimatorFadeInFactor(float progress);
+    float engineGetAnimatorFadeOutFactor(float progress);
     void engineUpdateAnimator();
     Animator* engineCopyAnimator();
 };

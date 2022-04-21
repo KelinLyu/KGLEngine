@@ -2,9 +2,53 @@
 #include "Node.hpp"
 UINode::UINode() {
     this->engineInitializeUINode();
+    this->currentUINode = this;
+}
+Node* UINode::copy() {
+    UINode* node = new UINode();
+    node->screenPosition = this->screenPosition;
+    node->position = this->position;
+    node->rotation = this->rotation;
+    node->scale = this->scale;
+    node->size = this->size;
+    node->alpha = this->alpha;
+    node->renderingOrder = this->renderingOrder;
+    node->name = this->name;
+    node->isDisabled = this->isDisabled;
+    node->renderingBitMask = this->renderingBitMask;
+    node->Node::position = this->Node::position;
+    node->Node::eulerAngles = this->Node::eulerAngles;
+    node->Node::scale = this->Node::scale;
+    node->orientationTargetNode = this->orientationTargetNode;
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        node->geometries.push_back(this->geometries[i]->copy(&node->animators));
+    }
+    for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
+        node->addChildNode(this->childNodes[i]->copy());
+    }
+    return(node);
+}
+Node* UINode::clone() {
+    return(this->copy());
 }
 void UINode::loadSprite(Sprite* sprite) {
     this->geometries.push_back(sprite);
+}
+vec2 UINode::convertScreenPositionToLocal(vec2 screenPosition) {
+    vec2 resolution = Engine::main->getScreenResolution();
+    float minLength = glm::min(resolution.x, resolution.y);
+    mat4 transform = glm::translate(glm::mat4(1.0f), vec3(screenPosition * resolution, 0.0f));
+    vec3 location = glm_helper::getPosition(glm::inverse(this->getWorldTransform()) * transform);
+    return(vec2(location.x / minLength, location.y / minLength));
+}
+bool UINode::checkSizeIncludesScreenPosition(vec2 screenPosition) {
+    vec2 localPosition = this->convertScreenPositionToLocal(screenPosition);
+    if(-this->size.x * 0.5f < localPosition.x && localPosition.x < this->size.x * 0.5f) {
+        if(-this->size.y * 0.5f < localPosition.y && localPosition.y < this->size.y * 0.5f) {
+            return(true);
+        }
+    }
+    return(false);
 }
 void UINode::engineInitializeUINode() {
     this->engineInitializeNode();
@@ -22,9 +66,11 @@ void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data)
         return;
     }
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        this->geometries[i]->renderingOrder = data.y + this->renderingOrder;
-        this->geometries[i]->enginePrepareGeometryForRendering(this->renderingTransform);
+    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
+        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+            this->geometries[i]->renderingOrder = data.y + this->renderingOrder;
+            this->geometries[i]->enginePrepareGeometryForRendering(this->renderingTransform);
+        }
     }
     vec2 newData = vec2(data.x * this->alpha, data.y + this->renderingOrder);
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
@@ -49,3 +95,4 @@ void UINode::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     transform = glm::scale(transform, vec3(uiSize, 1.0f));
     this->renderingTransform = parentWorldTransform * transform;
 }
+

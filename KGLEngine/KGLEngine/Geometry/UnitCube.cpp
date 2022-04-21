@@ -232,4 +232,7 @@ UnitCube::UnitCube() {
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(GeometryVertex), (void*)offsetof(GeometryVertex, weights));
     glBindVertexArray(0);
+    this->hasBoundingSphereInformation = true;
+    this->boundingSpherePosition = vec3(0.0f);
+    this->boundingSphereRadius = 1.0f;
 }
