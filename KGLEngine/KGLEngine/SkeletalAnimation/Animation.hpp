@@ -7,7 +7,9 @@ class Geometry;
 class Animator;
 struct AnimationBoneNode final {
     string name;
-    mat4 transform;
+    vec3 position;
+    quat rotation;
+    vec3 scale;
     vector<AnimationBoneNode*> children;
 };
 class Animation final {

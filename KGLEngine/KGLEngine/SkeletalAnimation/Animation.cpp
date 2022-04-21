@@ -26,7 +26,10 @@ Animation::~Animation() {
 void Animation::engineAnimationProcessNode(AnimationBoneNode* targetNode, aiNode* node, map<string, BoneInfo>* bonesInfoMap) {
     string name = node->mName.data;
     targetNode->name = name;
-    targetNode->transform = assimp_helper::getMat4(node->mTransformation);
+    mat4 transform = assimp_helper::getMat4(node->mTransformation);
+    targetNode->position = glm_helper::getPosition(transform);
+    targetNode->rotation = glm::quat_cast(transform);
+    targetNode->scale = glm_helper::getScale(transform);
     for(unsigned int i = 0; i < node->mNumChildren; i += 1) {
         AnimationBoneNode* newNode = new AnimationBoneNode();
         this->engineAnimationProcessNode(newNode, node->mChildren[i], bonesInfoMap);

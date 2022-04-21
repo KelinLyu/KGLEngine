@@ -2,7 +2,9 @@
 #include "Bone.hpp"
 Bone::Bone(string name, aiNodeAnim* channel) {
     this->name = name;
-    this->transform = mat4(1.0f);
+    this->position = vec3(0.0f);
+    this->rotation = quat(0.0f, 0.0f, 0.0f, 0.0f);
+    this->scale = vec3(0.0f);
     this->currentKeyPositionIndex = 0;
     this->currentKeyRotationIndex = 0;
     this->currentKeyScaleIndex = 0;
@@ -39,13 +41,18 @@ Bone::~Bone() {
 string Bone::engineGetName() const {
     return(this->name);
 }
-mat4 Bone::engineGetTransform() {
-    return(this->transform);
+vec3 Bone::engineGetBonePosition() {
+    return(this->position);
+}
+quat Bone::engineGetBoneRotation() {
+    return(this->rotation);
+}
+vec3 Bone::engineGetBoneScale() {
+    return(this->scale);
 }
 void Bone::engineUpdateBoneAnimation(float animationTime) {
-    mat4 translationTransform = mat4(1.0f);
     if(this->keyPositions.size() == 1) {
-        translationTransform = glm::translate(mat4(1.0f), this->keyPositions[0].position);
+        this->position = this->keyPositions[0].position;
     }else{
         int index = this->currentKeyPositionIndex;
         if(animationTime < this->keyPositions[index].timestamp) {
@@ -60,12 +67,10 @@ void Bone::engineUpdateBoneAnimation(float animationTime) {
         }
         float base = this->keyPositions[index + 1].timestamp - this->keyPositions[index].timestamp;
         float factor = (animationTime - this->keyPositions[index].timestamp) / base;
-        vec3 position = mix(this->keyPositions[index].position, this->keyPositions[index + 1].position, factor);
-        translationTransform = glm::translate(mat4(1.0f), position);
+        this->position = glm::mix(this->keyPositions[index].position, this->keyPositions[index + 1].position, factor);
     }
-    mat4 rotationTransform = mat4(1.0f);
     if(this->keyRotations.size() == 1) {
-        rotationTransform = glm::toMat4(normalize(this->keyRotations[0].orientation));
+        this->rotation = glm::normalize(this->keyRotations[0].orientation);
     }else{
         int index = this->currentKeyRotationIndex;
         if(animationTime < this->keyRotations[index].timestamp) {
@@ -80,12 +85,11 @@ void Bone::engineUpdateBoneAnimation(float animationTime) {
         }
         float base = this->keyRotations[index + 1].timestamp - this->keyRotations[index].timestamp;
         float factor = (animationTime - this->keyRotations[index].timestamp) / base;
-        quat rotation = slerp(keyRotations[index].orientation, keyRotations[index + 1].orientation, factor);
-        rotationTransform = toMat4(normalize(rotation));
+        quat rotation = glm::slerp(keyRotations[index].orientation, keyRotations[index + 1].orientation, factor);
+        this->rotation = glm::normalize(rotation);
     }
-    mat4 scaleTransform = mat4(1.0f);
     if(this->keyScales.size() == 1) {
-        scaleTransform = glm::scale(mat4(1.0f), this->keyScales[0].scale);
+        this->scale = this->keyScales[0].scale;
     }else{
         int index = this->currentKeyScaleIndex;
         if(animationTime < this->keyScales[index].timestamp) {
@@ -100,8 +104,6 @@ void Bone::engineUpdateBoneAnimation(float animationTime) {
         }
         float base = this->keyScales[index + 1].timestamp - this->keyScales[index].timestamp;
         float factor = (animationTime - this->keyScales[index].timestamp) / base;
-        vec3 scale = mix(this->keyScales[index].scale, this->keyScales[index + 1].scale, factor);
-        scaleTransform = glm::scale(mat4(1.0f), scale);
+        this->scale = glm::mix(this->keyScales[index].scale, this->keyScales[index + 1].scale, factor);
     }
-    this->transform = translationTransform * rotationTransform * scaleTransform;
 }

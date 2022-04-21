@@ -77,7 +77,7 @@ public:
     unsigned int* engineGetGeometryBoneCount();
     map<string, BoneInfo>* engineGetGeometryBonesInfoMap();
     vector<mat4>* engineGetGeometryBoneTransforms();
-    void engineCalculateGeometryBoneTransforms(AnimationBoneNode* node, mat4 parentTransform, bool first);
+    void engineCalculateGeometryBoneTransforms(AnimationBoneNode* node, mat4 parentTransform);
     mat4 engineGetGeometryBoneTransform(string name);
     void engineAddAnimationToGeometry(Animation* animation);
     void engineUpdateGeometryAnimations();

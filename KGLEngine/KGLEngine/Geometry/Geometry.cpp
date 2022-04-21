@@ -237,9 +237,11 @@ map<string, BoneInfo>* Geometry::engineGetGeometryBonesInfoMap() {
 vector<mat4>* Geometry::engineGetGeometryBoneTransforms() {
     return(&this->boneTransforms);
 }
-void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, mat4 parentTransform, bool first) {
+void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, mat4 parentTransform) {
     string nodeName = node->name;
-    mat4 finalTransform = node->transform;
+    vec3 position = node->position;
+    quat rotation = node->rotation;
+    vec3 scale = node->scale;
     for(unsigned int i = 0; i < this->animations.size(); i += 1) {
         if(this->animations[i]->engineAnimationGetAnimator() == NULL) {
             continue;
@@ -248,26 +250,17 @@ void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, ma
         if(blendFactor == 0.0f) {
             continue;
         }
-        mat4 transform = mat4(0.0f);
         Bone* bone = this->animations[i]->engineAnimationGetBone(nodeName);
         if(bone == NULL || this->animations[i]->engineAnimationGetAnimator() == NULL) {
-            if(first) {
-                transform = node->transform;
-            }
+            continue;
         }else{
             bone->engineUpdateBoneAnimation(this->animations[i]->engineAnimationGetAnimator()->engineGetAnimatorTime());
-            transform = bone->engineGetTransform();
+            position = glm::mix(position, bone->engineGetBonePosition(), blendFactor);
+            rotation = glm::slerp(rotation, bone->engineGetBoneRotation(), blendFactor);
+            scale = glm::mix(scale, bone->engineGetBoneScale(), blendFactor);
         }
-        if(transform == mat4(0.0f)) {
-            continue;
-        }
-        quat rotation = quat_cast(finalTransform);
-        quat newRotation = quat_cast(transform);
-        quat blendedRotation = slerp(rotation, newRotation, blendFactor);
-        mat4 matrix = mat4_cast(blendedRotation);
-        matrix[3] = finalTransform[3] * (1.0f - blendFactor) + transform[3] * blendFactor;
-        finalTransform = matrix;
     }
+    mat4 finalTransform = glm::translate(mat4(1.0f), position) * glm::mat4_cast(rotation) * glm::scale(mat4(1.0f), scale);
     mat4 globalTransform = parentTransform * finalTransform;
     if(this->bonesInfoMap.find(nodeName) != this->bonesInfoMap.end()) {
         int index = this->bonesInfoMap[nodeName].id;
@@ -275,7 +268,7 @@ void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, ma
         this->boneTransforms[index] = globalTransform * offset;
     }
     for(unsigned int i = 0; i < node->children.size(); i += 1) {
-        this->engineCalculateGeometryBoneTransforms(node->children[i], globalTransform, false);
+        this->engineCalculateGeometryBoneTransforms(node->children[i], globalTransform);
     }
 }
 mat4 Geometry::engineGetGeometryBoneTransform(string name) {
@@ -303,7 +296,7 @@ void Geometry::engineUpdateGeometryAnimations() {
     }
     if(this->engineCheckWhetherGeometryHasBones()) {
         if(this->animations.size() > 0) {
-            this->engineCalculateGeometryBoneTransforms(this->animations[0]->engineGetRootAnimationBoneNode(), mat4(1.0f), true);
+            this->engineCalculateGeometryBoneTransforms(this->animations[0]->engineGetRootAnimationBoneNode(), mat4(1.0f));
         }
     }
     this->updated = true;
