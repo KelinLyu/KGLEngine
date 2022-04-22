@@ -4,6 +4,7 @@
 #include "../Engine.hpp"
 #define LIGHTS_LIMIT 50
 struct FontCharacter;
+struct AnimationBoneNode;
 class SpriteShader;
 class ParticleShader;
 class Geometry;
@@ -32,6 +33,8 @@ protected:
     UINode* currentUINode;
     SpriteNode* currentSpriteNode;
     TextNode* currentTextNode;
+    vector<string> boneNames;
+    vector<mat4> boneTransforms;
 public:
     string name;
     Node* parent;
@@ -81,6 +84,7 @@ public:
     void engineInitializeNode();
     void engineProcessNode(aiNode* node, const aiScene* scene);
     void engineUpdateNodeAnimators(mat4 parentWorldTransform);
+    void engineNodeCalculateBoneTransforms(AnimationBoneNode *node, mat4 parentTransform);
     virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data);
     virtual void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
     void engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries, map<Geometry*, vector<unsigned int>>* indices);

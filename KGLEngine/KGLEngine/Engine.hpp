@@ -10,7 +10,6 @@
 #include "Shading/Shader.hpp"
 #include "Geometry/Geometry.hpp"
 #include "SkeletalAnimation/Bone.hpp"
-#include "SkeletalAnimation/Animation.hpp"
 #include "SkeletalAnimation/Animator.hpp"
 #include "Node/Node.hpp"
 class Input;

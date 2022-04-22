@@ -270,7 +270,7 @@ void Shader::engineRenderShader(Geometry* geometry) {
             this->setMat4("node.normalTransform", transpose(inverse(modelTransform)));
         }
         this->setMat4("node.modelViewProjectionTransform", viewProjectionTransform * modelTransform);
-        if(geometry->engineCheckWhetherGeometryHasBones() && geometry->engineCheckWhetherGeometryHasAnimations()) {
+        if(geometry->engineCheckWhetherGeometryHasBones() && geometry->engineCheckWhetherGeometryHasUpdatedSkeletalAnimations()) {
             this->setBool("hasBones", true);
             vector<mat4>* boneTransforms = geometry->engineGetGeometryBoneTransforms();
             for(unsigned int i = 0; i < BONES_LIMIT; i += 1) {

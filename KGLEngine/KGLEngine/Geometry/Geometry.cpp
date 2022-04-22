@@ -63,15 +63,21 @@ Geometry::Geometry(aiMesh* mesh) {
         for(unsigned int i = 0; i < mesh->mNumBones; i += 1) {
             int boneID = -1;
             string boneName = mesh->mBones[i]->mName.C_Str();
-            if(this->bonesInfoMap.find(boneName) == this->bonesInfoMap.end()) {
+            bool found = false;
+            for(unsigned int j = 0; j < this->boneNames.size(); j += 1) {
+                if(boneName == this->boneNames[j]) {
+                    boneID = this->boneInfos[j].id;
+                }
+            }
+            if(!found) {
                 BoneInfo newBoneInfo;
                 newBoneInfo.id = this->boneCount;
                 newBoneInfo.offset = assimp_helper::getMat4(mesh->mBones[i]->mOffsetMatrix);
-                this->bonesInfoMap[boneName] = newBoneInfo;
+                newBoneInfo.index = -1;
+                this->boneNames.push_back(boneName);
+                this->boneInfos.push_back(newBoneInfo);
                 boneID = this->boneCount;
                 this->boneCount = this->boneCount + 1;
-            }else{
-                boneID = this->bonesInfoMap[boneName].id;
             }
             aiVertexWeight* weights = mesh->mBones[i]->mWeights;
             int numWeights = mesh->mBones[i]->mNumWeights;
@@ -125,12 +131,9 @@ Geometry* Geometry::copy(vector<Animator*>* animators) {
     geometry->engineInitializeGeometry();
     geometry->cullMode = this->cullMode;
     geometry->indiceCount = this->indiceCount;
-    for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        Animation* animation = this->animations[i]->engineCopyAnimation((*animators)[i]);
-        geometry->animations.push_back(animation);
-    }
     geometry->boneCount = this->boneCount;
-    geometry->bonesInfoMap = this->bonesInfoMap;
+    geometry->boneNames = this->boneNames;
+    geometry->boneInfos = this->boneInfos;
     geometry->boneTransforms = this->boneTransforms;
     geometry->isHidden = this->isHidden;
     geometry->renderingOrder = this->renderingOrder;
@@ -191,10 +194,6 @@ Geometry::~Geometry() {
     glDeleteBuffers(1, &this->normalTransformBuffers);
     this->modelTransforms.clear();
     this->normalTransforms.clear();
-    for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        delete(this->animations[i]);
-    }
-    this->animations.clear();
     this->shader = NULL;
 }
 void Geometry::engineInitializeGeometry() {
@@ -203,6 +202,7 @@ void Geometry::engineInitializeGeometry() {
     this->cullMode = 0;
     this->shader = NULL;
     this->boneCount = 0;
+    this->skeletalAnimationUpdated = false;
     this->modelTransform = mat4(0.0f);
     this->isHidden = false;
     this->renderingOrder = 0.0f;
@@ -225,69 +225,34 @@ unsigned int Geometry::engineGetGeometryIndiceCount() {
 bool Geometry::engineCheckWhetherGeometryHasBones() {
     return(this->boneCount > 0);
 }
-bool Geometry::engineCheckWhetherGeometryHasAnimations() {
-    return(this->animations.size() > 0);
-}
-unsigned int* Geometry::engineGetGeometryBoneCount() {
-    return(&this->boneCount);
-}
-map<string, BoneInfo>* Geometry::engineGetGeometryBonesInfoMap() {
-    return(&this->bonesInfoMap);
-}
 vector<mat4>* Geometry::engineGetGeometryBoneTransforms() {
     return(&this->boneTransforms);
 }
-void Geometry::engineCalculateGeometryBoneTransforms(AnimationBoneNode *node, mat4 parentTransform) {
-    string nodeName = node->name;
-    vec3 position = node->position;
-    quat rotation = node->rotation;
-    vec3 scale = node->scale;
-    for(unsigned int i = 0; i < this->animations.size(); i += 1) {
-        if(this->animations[i]->engineAnimationGetAnimator() == NULL) {
-            continue;
-        }
-        float blendFactor = this->animations[i]->engineAnimationGetAnimator()->engineGetAnimatorCurrentBlendFactor();
-        if(blendFactor == 0.0f) {
-            continue;
-        }
-        Bone* bone = this->animations[i]->engineAnimationGetBone(nodeName);
-        if(bone == NULL || this->animations[i]->engineAnimationGetAnimator() == NULL) {
-            continue;
-        }else{
-            bone->engineUpdateBoneAnimation(this->animations[i]->engineAnimationGetAnimator()->engineGetAnimatorTime());
-            position = glm::mix(position, bone->engineGetBonePosition(), blendFactor);
-            rotation = glm::slerp(rotation, bone->engineGetBoneRotation(), blendFactor);
-            scale = glm::mix(scale, bone->engineGetBoneScale(), blendFactor);
-        }
-    }
-    mat4 finalTransform = glm::translate(mat4(1.0f), position) * glm::mat4_cast(rotation) * glm::scale(mat4(1.0f), scale);
-    mat4 globalTransform = parentTransform * finalTransform;
-    if(this->bonesInfoMap.find(nodeName) != this->bonesInfoMap.end()) {
-        int index = this->bonesInfoMap[nodeName].id;
-        mat4 offset = this->bonesInfoMap[nodeName].offset;
-        this->boneTransforms[index] = globalTransform * offset;
-    }
-    for(unsigned int i = 0; i < node->children.size(); i += 1) {
-        this->engineCalculateGeometryBoneTransforms(node->children[i], globalTransform);
-    }
-}
 mat4 Geometry::engineGetGeometryBoneTransform(string name) {
     if(this->engineCheckWhetherGeometryHasBones()) {
-        if(this->bonesInfoMap.find(name) != this->bonesInfoMap.end()) {
-            int index = this->bonesInfoMap[name].id;
-            mat4 transform = this->boneTransforms[index];
-            if(transform != mat4(0.0f)) {
-                mat4 offset = this->bonesInfoMap[name].offset;
-                return(transform * inverse(offset));
+        for(unsigned int i = 0; i < this->boneNames.size(); i += 1) {
+            if(name == this->boneNames[i]) {
+                int index = this->boneInfos[i].id;
+                mat4 transform = this->boneTransforms[index];
+                if(transform != mat4(0.0f)) {
+                    mat4 offset = this->boneInfos[i].offset;
+                    return(transform * glm::inverse(offset));
+                }
             }
         }
     }
     return(mat4(0.0f));
 }
-void Geometry::engineAddAnimationToGeometry(Animation* animation) {
-    this->animations.push_back(animation);
+void Geometry::engineUpdateGeometryBoneIndices(vector<string>* boneNames) {
+    for(unsigned int i = 0; i < (*boneNames).size(); i += 1) {
+        for(unsigned int j = 0; j < this->boneNames.size(); j += 1) {
+            if((*boneNames)[i] == this->boneNames[j]) {
+                this->boneInfos[j].index = i;
+            }
+        }
+    }
 }
-void Geometry::engineUpdateGeometryAnimations() {
+void Geometry::engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms) {
     if(this->updated) {
         return;
     }
@@ -295,11 +260,20 @@ void Geometry::engineUpdateGeometryAnimations() {
         return;
     }
     if(this->engineCheckWhetherGeometryHasBones()) {
-        if(this->animations.size() > 0) {
-            this->engineCalculateGeometryBoneTransforms(this->animations[0]->engineGetRootAnimationBoneNode(), mat4(1.0f));
+        for(unsigned int i = 0; i < this->boneInfos.size(); i += 1) {
+            int index = this->boneInfos[i].index;
+            if(index > -1) {
+                int id = this->boneInfos[i].id;
+                mat4 offset = this->boneInfos[i].offset;
+                this->boneTransforms[id] = boneTransforms[index] * offset;
+            }
         }
+        this->skeletalAnimationUpdated = true;
     }
     this->updated = true;
+}
+bool Geometry::engineCheckWhetherGeometryHasUpdatedSkeletalAnimations() {
+    return(this->skeletalAnimationUpdated);
 }
 void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     if(this->prepared) {

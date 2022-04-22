@@ -28,7 +28,6 @@
 		C2AD2E8E27FF0EE700A493D6 /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7627FF0EE700A493D6 /* Node.cpp */; };
 		C2AD2E8F27FF0EE700A493D6 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7727FF0EE700A493D6 /* Texture.cpp */; };
 		C2AD2E9027FF0EE700A493D6 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7927FF0EE700A493D6 /* Shader.cpp */; };
-		C2AD2E9127FF0EE700A493D6 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7A27FF0EE700A493D6 /* Animation.cpp */; };
 		C2AD2E9227FF0EE700A493D6 /* Animator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2AD2E7D27FF0EE700A493D6 /* Animator.cpp */; };
 		C2F7794E280666BE001A214D /* Skybox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7794D280666BE001A214D /* Skybox.cpp */; };
 		C2F7795828072F4E001A214D /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2F7795728072F4E001A214D /* Sprite.cpp */; };
@@ -75,12 +74,10 @@
 		C2AD2E7227FF0EE700A493D6 /* Input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
 		C2AD2E7327FF0EE700A493D6 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
 		C2AD2E7427FF0EE700A493D6 /* Engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
-		C2AD2E7527FF0EE700A493D6 /* Animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Animation.hpp; sourceTree = "<group>"; };
 		C2AD2E7627FF0EE700A493D6 /* Node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Node.cpp; sourceTree = "<group>"; };
 		C2AD2E7727FF0EE700A493D6 /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
 		C2AD2E7827FF0EE700A493D6 /* Animator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Animator.hpp; sourceTree = "<group>"; };
 		C2AD2E7927FF0EE700A493D6 /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shader.cpp; sourceTree = "<group>"; };
-		C2AD2E7A27FF0EE700A493D6 /* Animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Animation.cpp; sourceTree = "<group>"; };
 		C2AD2E7B27FF0EE700A493D6 /* Node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Node.hpp; sourceTree = "<group>"; };
 		C2AD2E7C27FF0EE700A493D6 /* Texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Texture.hpp; sourceTree = "<group>"; };
 		C2AD2E7D27FF0EE700A493D6 /* Animator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Animator.cpp; sourceTree = "<group>"; };
@@ -128,8 +125,6 @@
 			children = (
 				C2AD2E7F27FF0EE700A493D6 /* Bone.hpp */,
 				C2AD2E7027FF0EE700A493D6 /* Bone.cpp */,
-				C2AD2E7527FF0EE700A493D6 /* Animation.hpp */,
-				C2AD2E7A27FF0EE700A493D6 /* Animation.cpp */,
 				C2AD2E7827FF0EE700A493D6 /* Animator.hpp */,
 				C2AD2E7D27FF0EE700A493D6 /* Animator.cpp */,
 			);
@@ -357,7 +352,6 @@
 				C2F779662807B4A0001A214D /* FontLibrary.cpp in Sources */,
 				C2AD2E8E27FF0EE700A493D6 /* Node.cpp in Sources */,
 				C274401A2800A74E009DDD9F /* CameraNode.cpp in Sources */,
-				C2AD2E9127FF0EE700A493D6 /* Animation.cpp in Sources */,
 				C2AD2E9227FF0EE700A493D6 /* Animator.cpp in Sources */,
 				C231B3222804AAAF0030CD85 /* PBRShader.cpp in Sources */,
 				C2AD2E8F27FF0EE700A493D6 /* Texture.cpp in Sources */,

@@ -5,6 +5,7 @@
 struct BoneInfo final {
     unsigned int id;
     mat4 offset;
+    int index;
 };
 struct BoneKeyFramePosition final {
     vec3 position;

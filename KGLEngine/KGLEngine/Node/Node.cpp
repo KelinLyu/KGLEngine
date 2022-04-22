@@ -39,8 +39,14 @@ void Node::loadModelFile(string file) {
     this->engineProcessNode(scene->mRootNode, scene);
 }
 Animator* Node::loadAnimator(string name, string file) {
-    Animator* animator = new Animator(name, file, this);
+    Animator* animator = new Animator(name, file, &this->boneNames, &this->boneTransforms);
     this->animators.push_back(animator);
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        this->animators[i]->engineUpdateAnimatorBoneIndices(&this->boneNames);
+    }
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        this->geometries[i]->engineUpdateGeometryBoneIndices(&this->boneNames);
+    }
     return(animator);
 }
 Node* Node::generateBoneNode(string boneName) {
@@ -58,6 +64,8 @@ Node* Node::copy() {
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;
     node->orientationTargetNode = this->orientationTargetNode;
+    node->boneNames = this->boneNames;
+    node->boneTransforms = this->boneTransforms;
     for(unsigned int i = 0; i < this->animators.size(); i += 1) {
         node->animators.push_back(this->animators[i]->engineCopyAnimator());
     }
@@ -294,18 +302,19 @@ void Node::engineProcessNode(aiNode *node, const aiScene *scene) {
     }
 }
 void Node::engineUpdateNodeAnimators(mat4 parentWorldTransform) {
+    if(this->isDisabled) {
+        return;
+    }
     if(this->animators.size() > 0) {
         for(unsigned int i = 0; i < this->animators.size(); i += 1) {
             this->animators[i]->engineUpdateAnimator();
         }
-    }
-    if(this->isDisabled) {
-        return;
+        this->engineNodeCalculateBoneTransforms(this->animators[0]->engineAnimatorGetRootAnimationBoneNode(), mat4(1.0f));
+        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+            this->geometries[i]->engineUpdateGeometrySkeletalAnimations(this->boneTransforms);
+        }
     }
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
-    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-        this->geometries[i]->engineUpdateGeometryAnimations();
-    }
     map<string, Node*>::iterator iterator;
     for(iterator = this->boneNodes.begin(); iterator != this->boneNodes.end(); iterator++) {
         mat4 transform = mat4(0.0f);
@@ -321,6 +330,36 @@ void Node::engineUpdateNodeAnimators(mat4 parentWorldTransform) {
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
         this->childNodes[i]->engineUpdateNodeAnimators(this->worldTransform);
+    }
+}
+void Node::engineNodeCalculateBoneTransforms(AnimationBoneNode *node, mat4 parentTransform) {
+    string nodeName = node->name;
+    vec3 position = node->position;
+    quat rotation = node->rotation;
+    vec3 scale = node->scale;
+    int index = node->index;
+    for(unsigned int i = 0; i < this->animators.size(); i += 1) {
+        float blendFactor = this->animators[i]->engineGetAnimatorCurrentBlendFactor();
+        if(blendFactor == 0.0f) {
+            continue;
+        }
+        Bone* bone = this->animators[i]->engineAnimatorGetBone(nodeName);
+        if(bone == NULL) {
+            continue;
+        }else{
+            bone->engineUpdateBoneAnimation(this->animators[i]->engineGetAnimatorTime());
+            position = glm::mix(position, bone->engineGetBonePosition(), blendFactor);
+            rotation = glm::slerp(rotation, bone->engineGetBoneRotation(), blendFactor);
+            scale = glm::mix(scale, bone->engineGetBoneScale(), blendFactor);
+        }
+    }
+    mat4 finalTransform = glm::translate(mat4(1.0f), position) * glm::mat4_cast(rotation) * glm::scale(mat4(1.0f), scale);
+    mat4 globalTransform = parentTransform * finalTransform;
+    if(index != -1) {
+        this->boneTransforms[index] = globalTransform;
+    }
+    for(unsigned int i = 0; i < node->children.size(); i += 1) {
+        this->engineNodeCalculateBoneTransforms(node->children[i], globalTransform);
     }
 }
 void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {

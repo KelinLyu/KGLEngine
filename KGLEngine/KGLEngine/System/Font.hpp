@@ -12,10 +12,10 @@ public:
 };
 class Font final {
 private:
-    map<char, FontCharacter*> characters;
+    vector<FontCharacter*> characters;
 public:
     Font(FT_Face font);
     ~Font();
-    FontCharacter* engineGetFontCharacter(char character);
+    FontCharacter* engineGetFontCharacter(unsigned char character);
 };
 #endif

@@ -10,7 +10,7 @@ Font::Font(FT_Face font) {
             character->size = vec2(0.0f);
             character->bearing = vec2(0.0f);
             character->advance = 0.0f;
-            this->characters.insert(pair<char, FontCharacter*>(c, character));
+            this->characters.push_back(character);
         }else{
             Texture* glyphTexture = new Texture(font->glyph->bitmap.width,
                                                 font->glyph->bitmap.rows,
@@ -26,23 +26,21 @@ Font::Font(FT_Face font) {
             character->size = size;
             character->bearing = bearing;
             character->advance = (advance >> 6);
-            this->characters.insert(pair<char, FontCharacter*>(c, character));
+            this->characters.push_back(character);
         }
     }
-    map<char, FontCharacter*>::iterator iterator;
-    for(iterator = this->characters.begin(); iterator != this->characters.end(); iterator++) {
-        iterator->second->size = iterator->second->size / maxHeight;
-        iterator->second->bearing = iterator->second->bearing / maxHeight;
-        iterator->second->advance = iterator->second->advance / maxHeight;
+    for(unsigned int i = 0; i < this->characters.size(); i += 1) {
+        this->characters[i]->size = this->characters[i]->size / maxHeight;
+        this->characters[i]->bearing = this->characters[i]->bearing / maxHeight;
+        this->characters[i]->advance = this->characters[i]->advance / maxHeight;
     }
 }
 Font::~Font() {
-    map<char, FontCharacter*>::iterator iterator;
-    for(iterator = this->characters.begin(); iterator != this->characters.end(); iterator++) {
-        delete(iterator->second->texture);
+    for(unsigned int i = 0; i < this->characters.size(); i += 1) {
+        delete(this->characters[i]);
     }
     this->characters.clear();
 }
-FontCharacter* Font::engineGetFontCharacter(char character) {
+FontCharacter* Font::engineGetFontCharacter(unsigned char character) {
     return(this->characters[character]);
 }

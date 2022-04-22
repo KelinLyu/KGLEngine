@@ -5,10 +5,8 @@
 #define MAX_BONE_INFLUENCE 4
 #define BONES_LIMIT 120
 struct BoneInfo;
-struct AnimationBoneNode;
 class Texture;
 class Shader;
-class Animation;
 class Animator;
 class Font;
 class Node;
@@ -41,10 +39,11 @@ protected:
     unsigned int vertexBuffers;
     unsigned int elementBuffers;
     unsigned int indiceCount;
-    vector<Animation*> animations;
     unsigned int boneCount;
-    map<string, BoneInfo> bonesInfoMap;
+    vector<string> boneNames;
+    vector<BoneInfo> boneInfos;
     vector<mat4> boneTransforms;
+    bool skeletalAnimationUpdated;
     mat4 modelTransform;
     unsigned int modelTransformBuffers;
     unsigned int normalTransformBuffers;
@@ -73,14 +72,11 @@ public:
     unsigned int engineGetGeometryVertexArrays();
     unsigned int engineGetGeometryIndiceCount();
     bool engineCheckWhetherGeometryHasBones();
-    bool engineCheckWhetherGeometryHasAnimations();
-    unsigned int* engineGetGeometryBoneCount();
-    map<string, BoneInfo>* engineGetGeometryBonesInfoMap();
     vector<mat4>* engineGetGeometryBoneTransforms();
-    void engineCalculateGeometryBoneTransforms(AnimationBoneNode* node, mat4 parentTransform);
     mat4 engineGetGeometryBoneTransform(string name);
-    void engineAddAnimationToGeometry(Animation* animation);
-    void engineUpdateGeometryAnimations();
+    void engineUpdateGeometryBoneIndices(vector<string>* boneNames);
+    void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
+    bool engineCheckWhetherGeometryHasUpdatedSkeletalAnimations();
     void enginePrepareGeometryForRendering(mat4 worldTransform);
     virtual void engineRenderGeometry();
     unsigned int engineGeometryAddInstance();
