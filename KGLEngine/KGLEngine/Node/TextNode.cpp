@@ -70,12 +70,15 @@ TextNode::~TextNode() {
     this->textRenderer = NULL;
     this->font = NULL;
 }
-void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+void TextNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
     if(this->isDisabled) {
         return;
     }
     vec2 newData = vec2(data.x * this->alpha, data.y + this->renderingOrder);
-    this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data);
+    this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data, shadowMap);
+    if(shadowMap) {
+        return;
+    }
     if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
         if(this->currentAlpha != newData.x) {
             this->currentAlpha = newData.x;

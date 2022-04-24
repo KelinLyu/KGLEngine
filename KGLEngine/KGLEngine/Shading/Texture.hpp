@@ -5,6 +5,7 @@
 class Texture final {
 public:
     unsigned int data;
+    Texture() = default;
     Texture(string file);
     Texture(string file, float maxAnisotropy, bool generateMipmaps);
     Texture(string right, string left,

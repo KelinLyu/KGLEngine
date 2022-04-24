@@ -53,12 +53,13 @@ protected:
     vector<mat4> normalTransforms;
     bool requiresInstanceUpdate;
     bool hasBoundingSphereInformation;
-    vec3 boundingSpherePosition;
-    float boundingSphereRadius;
 public:
     bool isHidden;
     float renderingOrder;
     unsigned int lightingBitMask;
+    vec3 boundingSpherePosition;
+    float boundingSphereRadius;
+    unsigned int affectedLightCount;
     Geometry() = default;
     Geometry(aiMesh* mesh);
     Geometry* copy(vector<Animator*>* animators);
@@ -78,7 +79,7 @@ public:
     void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
     bool engineCheckWhetherGeometryHasUpdatedSkeletalAnimations();
     void enginePrepareGeometryForRendering(mat4 worldTransform);
-    virtual void engineRenderGeometry();
+    virtual void engineRenderGeometry(bool shadowMap);
     unsigned int engineGeometryAddInstance();
     void engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform, bool freeze);
     virtual unsigned int engineGetGeometryInstanceCount();
@@ -97,7 +98,7 @@ public:
     ParticleRenderer(unsigned int amount);
     ~ParticleRenderer();
     void engineResetAllParticleData();
-    void engineRenderGeometry() override;
+    void engineRenderGeometry(bool shadowMap) override;
     ParticleData* engineGetParticleData(bool front);
     unsigned int engineGetGeometryInstanceCount() override;
 };
@@ -110,7 +111,7 @@ public:
            string front, string back,
            float maxAnisotropy);
     ~Skybox();
-    void engineRenderGeometry() override;
+    void engineRenderGeometry(bool shadowMap) override;
 };
 class Sprite final: public Geometry {
 public:
@@ -125,7 +126,7 @@ private:
 public:
     TextRenderer();
     ~TextRenderer();
-    void engineRenderGeometry() override;
+    void engineRenderGeometry(bool shadowMap) override;
     void engineSetTextRendererAlpha(float alpha);
     void engineSetTextRendererColor(vec4 color);
     void engineSetTextRendererTexturesAndTransforms(vector<Texture*> textures, vector<mat4> transforms);

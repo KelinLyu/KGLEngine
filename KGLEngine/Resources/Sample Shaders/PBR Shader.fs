@@ -7,6 +7,7 @@ in fragment_data {
     vec2 UV;
     mat3 TBN;
     mat3 inverseTBN;
+    vec4 lightSpacePosition;
 } fragment;
 out vec4 color;
 struct frame_data {
@@ -72,7 +73,16 @@ uniform vec3 defaultEmissionColor;
 uniform bool useEmissionMap;
 uniform sampler2D emissionMap;
 uniform float emissionIntensity;
+uniform bool renderingShadow;
+uniform bool useShadowMap;
+uniform sampler2D shadowMap;
+uniform mat4 lightSpaceMatrix;
+uniform float shadowBias;
+uniform int shadowSamples;
 void main() {
+    if(renderingShadow) {
+        return;
+    }
     vec2 UV = fragment.UV;
     if(useHeightMap) {
         vec3 cameraVector = frame.cameraPosition - fragment.position;
@@ -122,7 +132,7 @@ void main() {
         }
         metallic *= metallicIntensity;
     }
-    metallic = max(0.0f, min(metallic, 1.0f));
+    metallic = clamp(metallic, 0.0f, 1.0f);
     metallic = 0.2f + 0.6f * metallic;
     float roughness = defaultRoughness;
     if(useRoughnessMap) {
@@ -132,7 +142,7 @@ void main() {
         }
         roughness *= roughnessIntensity;
     }
-    roughness = max(0.0f, min(roughness, 1.0f));
+    roughness = clamp(roughness, 0.0f, 1.0f);
     roughness = 0.2f + 0.6f * roughness;
     vec3 viewVector = normalize(frame.cameraPosition - fragment.position);
     vec3 lightingColor = vec3(0.0f);
@@ -149,6 +159,37 @@ void main() {
         if(lights[i].type == 1) {
             lightVector = -lights[i].direction;
             lightFactor = max(dot(normal, lightVector), 0.0f);
+            if(useShadowMap) {
+                vec3 shadowMapUV = fragment.lightSpacePosition.xyz / fragment.lightSpacePosition.w;
+                shadowMapUV = shadowMapUV * 0.5f + 0.5f;
+                float shadowFactor = clamp(length(shadowMapUV.xy - vec2(0.5f)), 0.0f, 0.5f);
+                shadowFactor = 1.0f - shadowFactor * 2.0f;
+                float bias = max(shadowBias * (1.0f - dot(normal, lightVector)), shadowBias * 0.1f);
+                float currentDepth = shadowMapUV.z - bias;
+                float intensity = 0.0f;
+                if(shadowSamples > 0) {
+                    vec2 shadowUV;
+                    vec2 displacement = 1.0f / textureSize(shadowMap, 0);
+                    float count = 0.0f;
+                    for(int x = -shadowSamples; x <= shadowSamples; x += 1) {
+                        for(int y = -shadowSamples; y <= shadowSamples; y += 1) {
+                            shadowUV = shadowMapUV.xy + vec2(x, y) * displacement;
+                            float depth = texture(shadowMap, shadowUV).r;
+                            if(currentDepth > depth) {
+                                intensity += 1.0f;
+                            }
+                            count += 1.0f;
+                        }
+                    }
+                    intensity = (intensity / count) * shadowFactor;
+                }else{
+                    float depth = texture(shadowMap, shadowMapUV.xy).r;
+                    if(currentDepth > depth) {
+                        intensity = shadowFactor;
+                    }
+                }
+                lightFactor *= 1.0f - intensity;
+            }
         }else if(lights[i].type == 2) {
             lightVector = lights[i].position - fragment.position;
             float lightDistance = length(lightVector);

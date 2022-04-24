@@ -259,7 +259,7 @@ void Geometry::engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransform
     if(this->isHidden) {
         return;
     }
-    if(this->engineCheckWhetherGeometryHasBones()) {
+    if(this->boneCount > 0) {
         for(unsigned int i = 0; i < this->boneInfos.size(); i += 1) {
             int index = this->boneInfos[i].index;
             if(index > -1) {
@@ -341,7 +341,7 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     }
     Engine::main->preparedGeometries.push_back(this);
 }
-void Geometry::engineRenderGeometry() {
+void Geometry::engineRenderGeometry(bool shadowMap) {
     if(this->cullMode == 0) {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
@@ -359,7 +359,7 @@ void Geometry::engineRenderGeometry() {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         this->requiresInstanceUpdate = false;
     }
-    this->shader->engineRenderShader(this);
+    this->shader->engineRenderShader(this, shadowMap);
     this->updated = false;
     this->prepared = false;
 }

@@ -174,7 +174,7 @@ vec3 Node::getWorldPosition() {
     return(glm_helper::getPosition(this->worldTransform));
 }
 vec3 Node::getWorldEulerAngles() {
-    return(glm_helper::getEularAngles(this->worldTransform));
+    return(glm_helper::getEulerAngles(this->worldTransform));
 }
 vec3 Node::getWorldScale() {
     return(glm_helper::getScale(this->worldTransform));
@@ -220,6 +220,9 @@ vec3 Node::getPositionOnScreen() {
         result.x = projection.x * 0.5f / projection.w + 0.5f;
         result.y = 0.5f - projection.y * 0.5f / projection.w;
         result.z = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
+        if(projection.w < 0.0f) {
+            result.z = -result.z;
+        }
         return(result);
     }
     return(vec3(0.0f));
@@ -325,7 +328,7 @@ void Node::engineUpdateNodeAnimators(mat4 parentWorldTransform) {
             }
         }
         iterator->second->position = glm_helper::getPosition(transform);
-        iterator->second->eulerAngles = glm_helper::getEularAngles(transform);
+        iterator->second->eulerAngles = glm_helper::getEulerAngles(transform);
         iterator->second->updateTransform();
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
@@ -362,7 +365,7 @@ void Node::engineNodeCalculateBoneTransforms(AnimationBoneNode *node, mat4 paren
         this->engineNodeCalculateBoneTransforms(node->children[i], globalTransform);
     }
 }
-void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
     if(this->isDisabled) {
         return;
     }
@@ -382,7 +385,7 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
         }
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
-        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, data);
+        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, data, shadowMap);
     }
 }
 void Node::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {

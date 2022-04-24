@@ -91,11 +91,11 @@ void ParticleRenderer::engineResetAllParticleData() {
         this->dataVector[i].birthTimeAndDuration = vec2(0.0f);
     }
 }
-void ParticleRenderer::engineRenderGeometry() {
+void ParticleRenderer::engineRenderGeometry(bool shadowMap) {
     glBindBuffer(GL_ARRAY_BUFFER, this->dataBuffers);
     glBufferData(GL_ARRAY_BUFFER, this->particleAmount * sizeof(ParticleData), &this->dataVector[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    this->shader->engineRenderShader(this);
+    this->shader->engineRenderShader(this, shadowMap);
     this->updated = false;
     this->prepared = false;
 }

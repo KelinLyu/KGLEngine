@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C20560DD280FDB7B0020BBB1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C20560DC280FDB7B0020BBB1 /* main.cpp */; };
 		C231B3222804AAAF0030CD85 /* PBRShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C231B3212804AAAF0030CD85 /* PBRShader.cpp */; };
+		C233F4C3281374D400750C34 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C233F4C1281374D400750C34 /* Animation.cpp */; };
 		C26888AD280CC23D004E500B /* ParticleNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888AC280CC23D004E500B /* ParticleNode.cpp */; };
 		C26888AF280CD578004E500B /* ParticleRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888AE280CD578004E500B /* ParticleRenderer.cpp */; };
 		C26888B1280CDF58004E500B /* ParticleShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888B0280CDF58004E500B /* ParticleShader.cpp */; };
@@ -56,6 +57,8 @@
 		C20560DC280FDB7B0020BBB1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C231B31B280351120030CD85 /* glm_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glm_helper.h; sourceTree = "<group>"; };
 		C231B3212804AAAF0030CD85 /* PBRShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PBRShader.cpp; sourceTree = "<group>"; };
+		C233F4C1281374D400750C34 /* Animation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Animation.cpp; sourceTree = "<group>"; };
+		C233F4C2281374D400750C34 /* Animation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Animation.hpp; sourceTree = "<group>"; };
 		C26888AC280CC23D004E500B /* ParticleNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleNode.cpp; sourceTree = "<group>"; };
 		C26888AE280CD578004E500B /* ParticleRenderer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleRenderer.cpp; sourceTree = "<group>"; };
 		C26888B0280CDF58004E500B /* ParticleShader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleShader.cpp; sourceTree = "<group>"; };
@@ -251,6 +254,8 @@
 				C2F779642807B4A0001A214D /* FontLibrary.cpp */,
 				C2F779682807B4AD001A214D /* Font.hpp */,
 				C2F779672807B4AD001A214D /* Font.cpp */,
+				C233F4C2281374D400750C34 /* Animation.hpp */,
+				C233F4C1281374D400750C34 /* Animation.cpp */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -344,6 +349,7 @@
 				C274401D2800A789009DDD9F /* LightNode.cpp in Sources */,
 				C2F779692807B4AD001A214D /* Font.cpp in Sources */,
 				C2AD2E9027FF0EE700A493D6 /* Shader.cpp in Sources */,
+				C233F4C3281374D400750C34 /* Animation.cpp in Sources */,
 				C2AD2E8C27FF0EE700A493D6 /* Image.cpp in Sources */,
 				C2F7795828072F4E001A214D /* Sprite.cpp in Sources */,
 				C2F7795E28075612001A214D /* SpriteShader.cpp in Sources */,

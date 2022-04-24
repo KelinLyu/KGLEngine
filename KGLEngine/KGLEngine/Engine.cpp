@@ -118,6 +118,14 @@ bool Engine::shouldUpdate() {
     if(this->deltaTime >= this->FPS) {
         this->input->engineUpdateInput();
         this->rootNode->engineUpdateNodeAnimators(mat4(1.0f));
+        map<string, Animation*>::iterator iterator;
+        for(iterator = this->animations.begin(); iterator != this->animations.end();) {
+            if(iterator->second->engineShouldRemoveAnimation()) {
+                this->animations.erase(iterator++);
+            }else{
+                ++iterator;
+            }
+        }
         this->updateTime = this->currentTime;
         result = true;
     }
@@ -126,25 +134,56 @@ bool Engine::shouldUpdate() {
 void Engine::addNode(Node* node) {
     this->rootNode->addChildNode(node);
 }
+void Engine::playAnimation(Animation* animation) {
+    animation->engineActivateAnimation();
+    this->animations[animation->engineGetAnimationName()] = animation;
+}
+void Engine::stopAnimation(string name) {
+    Animation* animation = new Animation(name, 0.0f);
+    animation->engineActivateAnimation();
+    this->animations[name] = animation;
+}
 void Engine::render() {
+    int width, height;
+    glfwGetFramebufferSize(this->window, &width, &height);
+    glViewport(0, 0, width, height);
     glDepthMask(GL_TRUE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     if(this->mainCameraNode != NULL) {
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
-        this->rootNode->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f));
+        this->rootNode->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f), false);
         if(this->skybox != NULL) {
-            this->skybox->engineRenderGeometry();
+            this->skybox->engineRenderGeometry(false);
         }
         for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
-            this->preparedGeometries[i]->engineRenderGeometry();
+            this->preparedGeometries[i]->engineRenderGeometry(false);
         }
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
     }
     glfwSwapInterval(1);
     glfwSwapBuffers(this->window);
+}
+void Engine::renderDirectionalLightShadowMap(LightNode* directionalLightNode) {
+    CameraNode* currentCameraNode = this->mainCameraNode;
+    this->mainCameraNode = directionalLightNode->directionalLightCameraNode;
+    glViewport(0, 0, directionalLightNode->shadowMapSize, directionalLightNode->shadowMapSize);
+    glBindFramebuffer(GL_FRAMEBUFFER, directionalLightNode->shadowBuffer);
+    glDepthMask(GL_TRUE);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    if(this->mainCameraNode != NULL) {
+        this->preparedGeometries.clear();
+        this->preparedLightNodes.clear();
+        this->rootNode->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f), true);
+        for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
+            this->preparedGeometries[i]->engineRenderGeometry(true);
+        }
+        this->preparedGeometries.clear();
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    this->mainCameraNode = currentCameraNode;
 }
 vec2 Engine::getScreenResolution() {
     return(this->screenResolution);

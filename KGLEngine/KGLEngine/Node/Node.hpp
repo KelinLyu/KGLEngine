@@ -85,18 +85,22 @@ public:
     void engineProcessNode(aiNode* node, const aiScene* scene);
     void engineUpdateNodeAnimators(mat4 parentWorldTransform);
     void engineNodeCalculateBoneTransforms(AnimationBoneNode *node, mat4 parentTransform);
-    virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data);
+    virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap);
     virtual void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
     void engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries, map<Geometry*, vector<unsigned int>>* indices);
 };
 class CameraNode final: public Node{
 public:
+    float width;
+    float height;
     float field;
     float near;
     float far;
     CameraNode(float field, float near, float far);
+    CameraNode(float width, float height, float near, float far);
     Node* copy() override;
     Node* clone() override;
+    mat4 getDirectionalLightSpaceMatrix();
     mat4 getOrthogonalProjectionTransform();
     mat4 getProjectionTransform();
     mat4 getViewTransform();
@@ -114,7 +118,14 @@ public:
     float penetrationRange;
     float innerAngle;
     float outerAngle;
+    bool hasDirectionalLightShadow;
+    CameraNode* directionalLightCameraNode;
     unsigned int lightingBitMask;
+    unsigned int shadowMapSize;
+    unsigned int shadowBuffer;
+    Texture* shadowMap;
+    float shadowBias;
+    int shadowSamples;
     LightNode(vec3 color);
     Node* copy() override;
     Node* clone() override;
@@ -122,8 +133,9 @@ public:
     void setDirectionalLight();
     void setPointLight(float attenuationExponent, float range);
     void setSpotLight(float attenuationExponent, float range, float innerAngle, float outerAngle);
+    void activateDirectionalLightShadow(unsigned int mapSize, float projectionSize, float near, float far, float xOffset, float bias, int samples);
     ~LightNode() = default;
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
     unsigned int engineGetLightType();
     void engineConfigurateShader(Shader* shader, int index);
 };
@@ -190,7 +202,7 @@ public:
     void stop();
     void reset();
     ~ParticleNode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
 };
 class UINode: public Node {
 private:
@@ -211,7 +223,7 @@ public:
     bool checkSizeIncludesScreenPosition(vec2 screenPosition);
     ~UINode() = default;
     void engineInitializeUINode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
 class SpriteNode: public UINode {
@@ -232,7 +244,7 @@ public:
     void setSemitransparent();
     void setAdditive();
     ~SpriteNode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
 class TextNode final: public UINode {
@@ -260,7 +272,7 @@ public:
     void setCenterVerticalAlignment();
     void setBottomVerticalAlignment();
     ~TextNode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
 #endif

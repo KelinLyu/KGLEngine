@@ -17,6 +17,8 @@
 #include <limits.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <utility>
+#include <functional>
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <glm/glm.hpp>

@@ -65,11 +65,14 @@ SpriteNode::~SpriteNode() {
     this->multiplyTexture = NULL;
     this->emissionTexture = NULL;
 }
-void SpriteNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+void SpriteNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
     if(this->isDisabled) {
         return;
     }
-    this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data);
+    this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data, shadowMap);
+    if(shadowMap) {
+        return;
+    }
     this->spriteShader->alpha = this->alpha * data.x;
     this->spriteShader->defaultColor = this->color;
     this->spriteShader->textureMap = this->texture;

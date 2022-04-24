@@ -207,7 +207,7 @@ bool Shader::engineCheckCompileErrors(unsigned int shader, string type) {
     }
     return(result);
 }
-void Shader::engineRenderShader(Geometry* geometry) {
+void Shader::engineRenderShader(Geometry* geometry, bool shadowMap) {
     if(this->clearDepthBuffer) {
         glDepthMask(GL_TRUE);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -234,6 +234,10 @@ void Shader::engineRenderShader(Geometry* geometry) {
     }
     this->activateShader();
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
+    this->setBool("renderingShadow", shadowMap);
+    if(shadowMap) {
+        this->setMat4("lightSpaceMatrix", Engine::main->mainCameraNode->getDirectionalLightSpaceMatrix());
+    }
     if(this->isUIShader) {
         if(Shader::currentDepthFunction != 1) {
             Shader::currentDepthFunction = 1;
@@ -279,6 +283,7 @@ void Shader::engineRenderShader(Geometry* geometry) {
         }else{
             this->setBool("hasBones", false);
         }
+        this->setBool("useShadowMap", false);
         unsigned int i = 0;
         unsigned int count = 0;
         while(count < LIGHTS_LIMIT && i < Engine::main->preparedLightNodes.size()) {
@@ -289,6 +294,7 @@ void Shader::engineRenderShader(Geometry* geometry) {
             i += 1;
         }
         this->setInt("lightCount", count);
+        geometry->affectedLightCount = count;
     }
     for(unsigned int i = 0; i < this->textures.size(); i += 1) {
         glActiveTexture(GL_TEXTURE0 + i);

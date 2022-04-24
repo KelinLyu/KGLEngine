@@ -13,6 +13,7 @@ LightNode::LightNode(vec3 color) {
     this->innerAngle = 0.0f;
     this->outerAngle = 0.0f;
     this->lightingBitMask = -1;
+    this->hasDirectionalLightShadow = false;
 }
 Node* LightNode::copy() {
     LightNode* node = new LightNode(this->colorFactor);
@@ -71,11 +72,39 @@ void LightNode::setSpotLight(float attenuationExponent, float range, float inner
     this->innerAngle = innerAngle;
     this->outerAngle = outerAngle;
 }
-void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+void LightNode::activateDirectionalLightShadow(unsigned int mapSize, float projectionSize, float near, float far, float xOffset, float bias, int samples) {
+    this->hasDirectionalLightShadow = true;
+    this->shadowMapSize = mapSize;
+    glGenFramebuffers(1, &this->shadowBuffer);
+    unsigned int map;
+    glGenTextures(1, &map);
+    glBindTexture(GL_TEXTURE_2D, map);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, mapSize, mapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->shadowBuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, map, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    this->shadowMap = new Texture();
+    this->shadowMap->data = map;
+    this->directionalLightCameraNode = new CameraNode(projectionSize, projectionSize, near, far);
+    this->directionalLightCameraNode->position.x = xOffset;
+    this->addChildNode(this->directionalLightCameraNode);
+    this->shadowBias = bias;
+    this->shadowSamples = samples;
+}
+void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
     if(this->isDisabled) {
         return;
     }
-    this->Node::enginePrepareNodeForRendering(parentWorldTransform, data);
+    this->Node::enginePrepareNodeForRendering(parentWorldTransform, data, shadowMap);
+    if(shadowMap) {
+        return;
+    }
     if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
         this->cameraNodeDistance = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
         for(unsigned int i = 0; i < Engine::main->preparedLightNodes.size(); i += 1) {
@@ -111,5 +140,12 @@ void LightNode::engineConfigurateShader(Shader* shader, int index) {
         shader->setFloat("lights[" + to_string(index) + "].penetrationRange", this->penetrationRange);
         shader->setFloat("lights[" + to_string(index) + "].innerAngle", glm::cos(glm::radians(this->innerAngle)));
         shader->setFloat("lights[" + to_string(index) + "].outerAngle", glm::cos(glm::radians(this->outerAngle)));
+    }
+    if(this->hasDirectionalLightShadow) {
+        shader->setBool("useShadowMap", true);
+        shader->setTexture("shadowMap", this->shadowMap);
+        shader->setMat4("lightSpaceMatrix", this->directionalLightCameraNode->getDirectionalLightSpaceMatrix());
+        shader->setFloat("shadowBias", this->shadowBias);
+        shader->setInt("shadowSamples", this->shadowSamples);
     }
 }

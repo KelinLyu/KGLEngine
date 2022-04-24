@@ -169,11 +169,14 @@ ParticleNode::~ParticleNode() {
     this->colorKeys.clear();
     this->progressKeys.clear();
 }
-void ParticleNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data) {
+void ParticleNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
     if(this->isDisabled) {
         return;
     }
-    this->Node::enginePrepareNodeForRendering(parentWorldTransform, data);
+    this->Node::enginePrepareNodeForRendering(parentWorldTransform, data, shadowMap);
+    if(shadowMap) {
+        return;
+    }
     if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
         float currentTime = Engine::main->getTime();
         if(currentTime > this->productionTime) {

@@ -3,7 +3,18 @@
 CameraNode::CameraNode(float field, float near, float far) {
     this->engineInitializeNode();
     this->currentCameraNode = this;
+    this->width = 0.0f;
+    this->height = 0.0f;
     this->field = glm::radians(field);
+    this->near = near;
+    this->far = far;
+}
+CameraNode::CameraNode(float width, float height, float near, float far) {
+    this->engineInitializeNode();
+    this->currentCameraNode = this;
+    this->width = width;
+    this->height = height;
+    this->field = 0.0f;
     this->near = near;
     this->far = far;
 }
@@ -37,6 +48,12 @@ Node* CameraNode::copy() {
 }
 Node* CameraNode::clone() {
     return(this->copy());
+}
+mat4 CameraNode::getDirectionalLightSpaceMatrix() {
+    mat4 lightProjection = glm::ortho(-this->width * 0.5f, this->width * 0.5f,
+                                      -this->height * 0.5f, this->height * 0.5f,
+                                      this->near, this->far);
+    return(lightProjection * this->getViewTransform());
 }
 mat4 CameraNode::getOrthogonalProjectionTransform() {
     vec2 resolution = Engine::main->getScreenResolution();

@@ -17,6 +17,7 @@ out fragment_data {
     vec2 UV;
     mat3 TBN;
     mat3 inverseTBN;
+    vec4 lightSpacePosition;
 } fragment;
 struct frame_data {
     mat4 viewProjectionTransform;
@@ -33,6 +34,8 @@ uniform node_data node;
 uniform bool hasBones;
 uniform mat4 boneTransforms[BONES_LIMIT];
 uniform bool enableInstancing;
+uniform bool renderingShadow;
+uniform mat4 lightSpaceMatrix;
 void main() {
     mat4 modelTransform = node.modelTransform;
     mat4 normalTransform = node.normalTransform;
@@ -41,6 +44,20 @@ void main() {
         modelTransform = instancingModelTransform;
         normalTransform = instancingNormalTransform;
         modelViewProjectionTransform = frame.viewProjectionTransform * modelTransform;
+    }
+    if(renderingShadow) {
+        if(hasBones) {
+            mat4 boneTransform = mat4(0.0f);
+            for(int i = 0; i < MAX_BONE_INFLUENCE; i += 1) {
+                boneTransform += boneTransforms[boneIDs[i]] * weights[i];
+            }
+            vec4 localPosition = boneTransform * vec4(vertexPosition, 1.0f);
+            gl_Position = lightSpaceMatrix * modelTransform * localPosition;
+        }else{
+            vec4 localPosition = vec4(vertexPosition, 1.0f);
+            gl_Position = lightSpaceMatrix * modelTransform * localPosition;
+        }
+        return;
     }
     if(hasBones) {
         mat4 boneTransform = mat4(0.0f);
@@ -68,4 +85,5 @@ void main() {
     }
     fragment.inverseTBN = inverse(fragment.TBN);
     fragment.UV = vertexUV;
+    fragment.lightSpacePosition = lightSpaceMatrix * vec4(fragment.position, 1.0f);
 }
