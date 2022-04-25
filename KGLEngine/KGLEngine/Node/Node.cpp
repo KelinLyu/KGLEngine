@@ -327,6 +327,14 @@ void Node::engineUpdateNodeAnimators(mat4 parentWorldTransform) {
                 break;
             }
         }
+        if(transform == mat4(0.0f)) {
+            for(unsigned int i = 0; i < this->boneNames.size(); i += 1) {
+                if(this->boneNames[i] == iterator->first) {
+                    transform = this->boneTransforms[i];
+                    break;
+                }
+            }
+        }
         iterator->second->position = glm_helper::getPosition(transform);
         iterator->second->eulerAngles = glm_helper::getEulerAngles(transform);
         iterator->second->updateTransform();

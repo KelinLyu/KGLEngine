@@ -1,7 +1,9 @@
 // Developed by Kelin Lyu.
 #version 330 core
-const int MAX_BONE_INFLUENCE = 4;
+const int LIGHTS_LIMIT = 30;
+const int SHADOWS_LIMIT = 6;
 const int BONES_LIMIT = 120;
+const int MAX_BONE_INFLUENCE = 4;
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
 layout (location = 2) in vec2 vertexUV;
@@ -17,7 +19,7 @@ out fragment_data {
     vec2 UV;
     mat3 TBN;
     mat3 inverseTBN;
-    vec4 lightSpacePosition;
+    vec4 lightSpacePositions[SHADOWS_LIMIT];
 } fragment;
 struct frame_data {
     float time;
@@ -30,12 +32,36 @@ struct node_data {
     mat4 normalTransform;
     mat4 modelViewProjectionTransform;
 };
+struct light_data {
+    int type;
+    vec3 colorFactor;
+    vec3 highlightFactor;
+    vec3 position;
+    vec3 direction;
+    float attenuationExponent;
+    float range;
+    float penetrationRange;
+    float innerAngle;
+    float outerAngle;
+    int shadowIndex;
+};
+struct shadow_data {
+    int type;
+    sampler2D shadowMap;
+    mat4 lightSpaceMatrix;
+    float bias;
+    int samples;
+};
 uniform frame_data frame;
 uniform node_data node;
+uniform light_data lights[LIGHTS_LIMIT];
+uniform int lightCount;
+uniform shadow_data shadows[SHADOWS_LIMIT];
+uniform int shadowCount;
 uniform bool hasBones;
 uniform mat4 boneTransforms[BONES_LIMIT];
 uniform bool enableInstancing;
-uniform bool renderingShadow;
+uniform int renderingMode;
 uniform mat4 lightSpaceMatrix;
 void main() {
     mat4 modelTransform = node.modelTransform;
@@ -46,7 +72,7 @@ void main() {
         normalTransform = instancingNormalTransform;
         modelViewProjectionTransform = frame.viewProjectionTransform * modelTransform;
     }
-    if(renderingShadow) {
+    if(renderingMode == 1) {
         if(hasBones) {
             mat4 boneTransform = mat4(0.0f);
             for(int i = 0; i < MAX_BONE_INFLUENCE; i += 1) {
@@ -86,5 +112,9 @@ void main() {
     }
     fragment.inverseTBN = inverse(fragment.TBN);
     fragment.UV = vertexUV;
-    fragment.lightSpacePosition = lightSpaceMatrix * vec4(fragment.position, 1.0f);
+    for(int i = 0; i < shadowCount; i += 1) {
+        if(shadows[i].type == 0) {
+            fragment.lightSpacePositions[i] = shadows[i].lightSpaceMatrix * vec4(fragment.position, 1.0f);
+        }
+    }
 }

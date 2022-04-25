@@ -280,6 +280,7 @@ void main() {
     float roughness4 = roughness * roughness * roughness * roughness;
     float roughness4OverPi = roughness4 / 3.1416f;
     float roughness4MinusOne = roughness4 - 1.0f;
+    float shadowAmount = 0.0f;
     for(int i = 0; i < lightCount; i += 1) {
         if(lights[i].type == 0) {
             lightingColor += diffuseColor.rgb * lights[i].colorFactor;
@@ -321,6 +322,7 @@ void main() {
                     }
                 }
                 lightFactor *= 1.0f - intensity;
+                shadowAmount += intensity;
             }
         }else if(lights[i].type == 2) {
             lightVector = lights[i].position - fragment.position;
@@ -334,14 +336,6 @@ void main() {
                 lightFactor = (penetration + (1.0f - penetration) * max(dot(normal, lightVector), 0.0f)) * attenuation;
             }else{
                 lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
-            }
-            if(lights[i].shadowIndex > -1) {
-
-
-
-
-
-
             }
         }else if(lights[i].type == 3) {
             lightVector = lights[i].position - fragment.position;
@@ -361,14 +355,6 @@ void main() {
             }else{
                 lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
             }
-            if(lights[i].shadowIndex > -1) {
-
-
-
-
-
-
-            }
         }
         if(lightFactor <= 0.0f) {
             continue;
@@ -385,12 +371,13 @@ void main() {
         lightingColor += F * diffuseColor.rgb * lightFactor * lights[i].colorFactor;
         lightingColor += NDF * diffuseColor.rgb * lightFactor * lights[i].highlightFactor;
     }
+    shadowAmount = clamp(1.0 - shadowAmount, 0.0f, 0.5f);
     vec3 F0 = mix(vec3(0.1f), diffuseColor.rgb, metallic);
     float cosTheta = max(dot(normal, viewVector), 0.0f);
     float factor = clamp(1.0f - cosTheta, 0.0f, 1.0f);
     vec3 F = F0 + (max(vec3(1.0f - roughness), F0) - F0) * factor;
     vec3 kD = (1.0f - F) * (1.0f - metallic);
-    color = vec4(kD * diffuseColor.rgb + lightingColor, diffuseColor.a * opacity);
+    color = vec4(kD * diffuseColor.rgb + lightingColor * shadowAmount, diffuseColor.a * opacity);
     if(useReflectionMap) {
         vec3 reflectionVector = reflect(-viewVector, normal);
         vec2 uv = vec2(atan(reflectionVector.z, reflectionVector.x), -asin(reflectionVector.y));
