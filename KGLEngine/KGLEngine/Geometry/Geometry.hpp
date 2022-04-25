@@ -79,7 +79,7 @@ public:
     void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
     bool engineCheckWhetherGeometryHasUpdatedSkeletalAnimations();
     void enginePrepareGeometryForRendering(mat4 worldTransform);
-    virtual void engineRenderGeometry(bool shadowMap);
+    virtual void engineRenderGeometry(unsigned int renderingMode);
     unsigned int engineGeometryAddInstance();
     void engineUpdateGeometryInstanceTransform(unsigned int index, mat4 modelTransform, bool freeze);
     virtual unsigned int engineGetGeometryInstanceCount();
@@ -98,7 +98,7 @@ public:
     ParticleRenderer(unsigned int amount);
     ~ParticleRenderer();
     void engineResetAllParticleData();
-    void engineRenderGeometry(bool shadowMap) override;
+    void engineRenderGeometry(unsigned int renderingMode) override;
     ParticleData* engineGetParticleData(bool front);
     unsigned int engineGetGeometryInstanceCount() override;
 };
@@ -111,7 +111,7 @@ public:
            string front, string back,
            float maxAnisotropy);
     ~Skybox();
-    void engineRenderGeometry(bool shadowMap) override;
+    void engineRenderGeometry(unsigned int renderingMode) override;
 };
 class Sprite final: public Geometry {
 public:
@@ -126,7 +126,7 @@ private:
 public:
     TextRenderer();
     ~TextRenderer();
-    void engineRenderGeometry(bool shadowMap) override;
+    void engineRenderGeometry(unsigned int renderingMode) override;
     void engineSetTextRendererAlpha(float alpha);
     void engineSetTextRendererColor(vec4 color);
     void engineSetTextRendererTexturesAndTransforms(vector<Texture*> textures, vector<mat4> transforms);

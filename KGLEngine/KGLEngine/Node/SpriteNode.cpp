@@ -65,12 +65,12 @@ SpriteNode::~SpriteNode() {
     this->multiplyTexture = NULL;
     this->emissionTexture = NULL;
 }
-void SpriteNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
+void SpriteNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) {
     if(this->isDisabled) {
         return;
     }
-    this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data, shadowMap);
-    if(shadowMap) {
+    this->UINode::enginePrepareNodeForRendering(parentWorldTransform, data, renderingMode);
+    if(renderingMode > 0) {
         return;
     }
     this->spriteShader->alpha = this->alpha * data.x;

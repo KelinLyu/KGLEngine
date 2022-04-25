@@ -61,12 +61,12 @@ void UINode::engineInitializeUINode() {
     this->renderingOrder = 0.0f;
     this->renderingTransform = mat4(0.0f);
 }
-void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
+void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) {
     if(this->isDisabled) {
         return;
     }
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
-    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0 && !shadowMap) {
+    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0 && renderingMode == 0) {
         for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
             this->geometries[i]->renderingOrder = data.y + this->renderingOrder;
             this->geometries[i]->enginePrepareGeometryForRendering(this->renderingTransform);
@@ -74,7 +74,7 @@ void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data,
     }
     vec2 newData = vec2(data.x * this->alpha, data.y + this->renderingOrder);
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
-        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, newData, shadowMap);
+        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, newData, renderingMode);
     }
 }
 void UINode::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {

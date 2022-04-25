@@ -42,6 +42,7 @@ public:
     Skybox* skybox;
     vector<Geometry*> preparedGeometries;
     vector<LightNode*> preparedLightNodes;
+    vector<LightNode*> preparedLightNodeShadows;
     Engine(const char* windowTitle,
            float resolutionScaleFactor,
            bool fullscreenMode,

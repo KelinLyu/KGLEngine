@@ -153,24 +153,26 @@ void Engine::render() {
     if(this->mainCameraNode != NULL) {
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
+        this->preparedLightNodeShadows.clear();
         this->rootNode->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f), false);
         if(this->skybox != NULL) {
-            this->skybox->engineRenderGeometry(false);
+            this->skybox->engineRenderGeometry(0);
         }
         for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
-            this->preparedGeometries[i]->engineRenderGeometry(false);
+            this->preparedGeometries[i]->engineRenderGeometry(0);
         }
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
+        this->preparedLightNodeShadows.clear();
     }
     glfwSwapInterval(1);
     glfwSwapBuffers(this->window);
 }
 void Engine::renderDirectionalLightShadowMap(LightNode* directionalLightNode) {
     CameraNode* currentCameraNode = this->mainCameraNode;
-    this->mainCameraNode = directionalLightNode->directionalLightCameraNode;
-    glViewport(0, 0, directionalLightNode->shadowMapSize, directionalLightNode->shadowMapSize);
-    glBindFramebuffer(GL_FRAMEBUFFER, directionalLightNode->shadowBuffer);
+    this->mainCameraNode = directionalLightNode->engineGetDirectionalLightCameraNode();
+    glViewport(0, 0, directionalLightNode->engineLightNodeGetShadowMapSize(), directionalLightNode->engineLightNodeGetShadowMapSize());
+    glBindFramebuffer(GL_FRAMEBUFFER, directionalLightNode->engineLightNodeGetShadowBuffer());
     glDepthMask(GL_TRUE);
     glClear(GL_DEPTH_BUFFER_BIT);
     if(this->mainCameraNode != NULL) {
@@ -178,7 +180,7 @@ void Engine::renderDirectionalLightShadowMap(LightNode* directionalLightNode) {
         this->preparedLightNodes.clear();
         this->rootNode->enginePrepareNodeForRendering(mat4(1.0f), vec2(1.0f, 0.0f), true);
         for(unsigned int i = 0; i < this->preparedGeometries.size(); i += 1) {
-            this->preparedGeometries[i]->engineRenderGeometry(true);
+            this->preparedGeometries[i]->engineRenderGeometry(1);
         }
         this->preparedGeometries.clear();
     }

@@ -341,7 +341,7 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
     }
     Engine::main->preparedGeometries.push_back(this);
 }
-void Geometry::engineRenderGeometry(bool shadowMap) {
+void Geometry::engineRenderGeometry(unsigned int renderingMode) {
     if(this->cullMode == 0) {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
@@ -359,7 +359,7 @@ void Geometry::engineRenderGeometry(bool shadowMap) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         this->requiresInstanceUpdate = false;
     }
-    this->shader->engineRenderShader(this, shadowMap);
+    this->shader->engineRenderShader(this, renderingMode);
     this->updated = false;
     this->prepared = false;
 }

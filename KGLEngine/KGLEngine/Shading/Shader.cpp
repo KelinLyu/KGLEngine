@@ -207,7 +207,7 @@ bool Shader::engineCheckCompileErrors(unsigned int shader, string type) {
     }
     return(result);
 }
-void Shader::engineRenderShader(Geometry* geometry, bool shadowMap) {
+void Shader::engineRenderShader(Geometry* geometry, unsigned int renderingMode) {
     if(this->clearDepthBuffer) {
         glDepthMask(GL_TRUE);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -234,8 +234,8 @@ void Shader::engineRenderShader(Geometry* geometry, bool shadowMap) {
     }
     this->activateShader();
     mat4 modelTransform = geometry->engineGetGeometryModelTransform();
-    this->setBool("renderingShadow", shadowMap);
-    if(shadowMap) {
+    this->setBool("renderingMode", renderingMode);
+    if(renderingMode == 1) {
         this->setMat4("lightSpaceMatrix", Engine::main->mainCameraNode->getDirectionalLightSpaceMatrix());
     }
     if(this->isUIShader) {
@@ -265,6 +265,7 @@ void Shader::engineRenderShader(Geometry* geometry, bool shadowMap) {
         mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
         mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
         mat4 viewProjectionTransform = projectionTransform * viewTransform;
+        this->setFloat("frame.time", Engine::main->getTime());
         this->setMat4("frame.viewProjectionTransform", viewProjectionTransform);
         this->setVec3("frame.cameraPosition", Engine::main->mainCameraNode->getWorldPosition());
         this->setVec3("frame.cameraDirection", Engine::main->mainCameraNode->getFrontVectorInWorld());
@@ -288,13 +289,17 @@ void Shader::engineRenderShader(Geometry* geometry, bool shadowMap) {
         unsigned int count = 0;
         while(count < LIGHTS_LIMIT && i < Engine::main->preparedLightNodes.size()) {
             if(geometry->engineCheckWhetherGeometryIsAffectedByLightNode(Engine::main->preparedLightNodes[i])) {
-                Engine::main->preparedLightNodes[i]->engineConfigurateShader(this, count);
+                Engine::main->preparedLightNodes[i]->engineConfigurateLightForShader(this, count);
                 count += 1;
             }
             i += 1;
         }
         this->setInt("lightCount", count);
         geometry->affectedLightCount = count;
+        for(unsigned int i = 0; i < Engine::main->preparedLightNodeShadows.size(); i += 1) {
+            Engine::main->preparedLightNodeShadows[i]->engineConfigurateShadowForShader(this, i);
+        }
+        this->setInt("shadowCount", (unsigned int)Engine::main->preparedLightNodeShadows.size());
     }
     for(unsigned int i = 0; i < this->textures.size(); i += 1) {
         glActiveTexture(GL_TEXTURE0 + i);

@@ -1,6 +1,6 @@
 // Developed by Kelin Lyu.
 #version 330 core
-const int LIGHTS_LIMIT = 50;
+const int LIGHTS_LIMIT = 30;
 in fragment_data {
     vec3 position;
     vec3 normal;
@@ -11,6 +11,7 @@ in fragment_data {
 } fragment;
 out vec4 color;
 struct frame_data {
+    float time;
     mat4 viewProjectionTransform;
     vec3 cameraPosition;
     vec3 cameraDirection;

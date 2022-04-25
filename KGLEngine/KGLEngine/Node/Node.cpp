@@ -365,7 +365,7 @@ void Node::engineNodeCalculateBoneTransforms(AnimationBoneNode *node, mat4 paren
         this->engineNodeCalculateBoneTransforms(node->children[i], globalTransform);
     }
 }
-void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
+void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) {
     if(this->isDisabled) {
         return;
     }
@@ -385,7 +385,7 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, b
         }
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
-        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, data, shadowMap);
+        this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, data, renderingMode);
     }
 }
 void Node::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {

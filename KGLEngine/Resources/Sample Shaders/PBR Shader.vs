@@ -20,6 +20,7 @@ out fragment_data {
     vec4 lightSpacePosition;
 } fragment;
 struct frame_data {
+    float time;
     mat4 viewProjectionTransform;
     vec3 cameraPosition;
     vec3 cameraDirection;

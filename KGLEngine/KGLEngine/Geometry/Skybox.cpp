@@ -83,7 +83,7 @@ Skybox::~Skybox() {
     delete(this->texture);
     delete(this->shader);
 }
-void Skybox::engineRenderGeometry(bool shadowMap) {
+void Skybox::engineRenderGeometry(unsigned int renderingMode) {
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);

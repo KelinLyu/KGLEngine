@@ -81,7 +81,7 @@ SpriteShader::~SpriteShader() {
     this->emissionTextureMap = NULL;
     delete(this);
 }
-void SpriteShader::engineRenderShader(Geometry *geometry, bool shadowMap) {
+void SpriteShader::engineRenderShader(Geometry *geometry, unsigned int renderingMode) {
     if(this->currentAlpha != this->alpha) {
         this->currentAlpha = this->alpha;
         this->setFloat("alpha", this->alpha);
@@ -133,5 +133,5 @@ void SpriteShader::engineRenderShader(Geometry *geometry, bool shadowMap) {
         this->currentEmissionIntensity = this->emissionIntensity;
         this->setFloat("emissionIntensity", this->emissionIntensity);
     }
-    this->Shader::engineRenderShader(geometry, shadowMap);
+    this->Shader::engineRenderShader(geometry, renderingMode);
 }

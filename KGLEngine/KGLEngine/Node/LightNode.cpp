@@ -97,40 +97,69 @@ void LightNode::activateDirectionalLightShadow(unsigned int mapSize, float proje
     this->shadowBias = bias;
     this->shadowSamples = samples;
 }
-void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) {
+void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) {
     if(this->isDisabled) {
         return;
     }
-    this->Node::enginePrepareNodeForRendering(parentWorldTransform, data, shadowMap);
-    if(shadowMap) {
+    this->Node::enginePrepareNodeForRendering(parentWorldTransform, data, renderingMode);
+    if(renderingMode > 0) {
         return;
     }
     if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
-        this->cameraNodeDistance = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
+        if(this->lightType < 2) {
+            this->cameraNodeDistance = 0;
+        }else{
+            this->cameraNodeDistance = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
+        }
         for(unsigned int i = 0; i < Engine::main->preparedLightNodes.size(); i += 1) {
             if(Engine::main->preparedLightNodes[i]->cameraNodeDistance > this->cameraNodeDistance) {
                 Engine::main->preparedLightNodes.insert(Engine::main->preparedLightNodes.begin() + i, this);
+                this->enginePrepareLightShadowForRendering();
                 return;
             }
         }
         Engine::main->preparedLightNodes.push_back(this);
+        this->enginePrepareLightShadowForRendering();
+    }
+}
+void LightNode::enginePrepareLightShadowForRendering() {
+    if(Engine::main->preparedLightNodeShadows.size() >= SHADOWS_LIMIT) {
+        this->shadowIndex = -1;
+        return;
+    }
+    if(this->lightType == 1 && this->hasDirectionalLightShadow) {
+        this->shadowIndex = (unsigned int)Engine::main->preparedLightNodeShadows.size();
+        Engine::main->preparedLightNodeShadows.push_back(this);
+    }else{
+        this->shadowIndex = -1;
     }
 }
 unsigned int LightNode::engineGetLightType() {
     return(this->lightType);
 }
-void LightNode::engineConfigurateShader(Shader* shader, int index) {
+CameraNode* LightNode::engineGetDirectionalLightCameraNode() {
+    return(this->directionalLightCameraNode);
+}
+unsigned int LightNode::engineLightNodeGetShadowMapSize() {
+    return(this->shadowMapSize);
+}
+unsigned int LightNode::engineLightNodeGetShadowBuffer() {
+    return(this->shadowBuffer);
+}
+void LightNode::engineConfigurateLightForShader(Shader* shader, int index) {
     shader->setInt("lights[" + to_string(index) + "].type", this->lightType);
     shader->setVec3("lights[" + to_string(index) + "].colorFactor", this->colorFactor);
     if(this->lightType == 1) {
         shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->colorFactor * this->highlightIntensity);
         shader->setVec3("lights[" + to_string(index) + "].direction", this->getFrontVectorInWorld());
+        shader->setInt("lights[" + to_string(index) + "].shadowIndex", this->shadowIndex);
     }else if(this->lightType == 2) {
         shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->colorFactor * this->highlightIntensity);
         shader->setVec3("lights[" + to_string(index) + "].position", this->getWorldPosition());
         shader->setFloat("lights[" + to_string(index) + "].attenuationExponent", this->attenuationExponent);
         shader->setFloat("lights[" + to_string(index) + "].range", this->range);
         shader->setFloat("lights[" + to_string(index) + "].penetrationRange", this->penetrationRange);
+        shader->setInt("lights[" + to_string(index) + "].shadowIndex", this->shadowIndex);
     }else if(this->lightType == 3) {
         shader->setVec3("lights[" + to_string(index) + "].highlightFactor", this->colorFactor * this->highlightIntensity);
         shader->setVec3("lights[" + to_string(index) + "].position", this->getWorldPosition());
@@ -140,12 +169,15 @@ void LightNode::engineConfigurateShader(Shader* shader, int index) {
         shader->setFloat("lights[" + to_string(index) + "].penetrationRange", this->penetrationRange);
         shader->setFloat("lights[" + to_string(index) + "].innerAngle", glm::cos(glm::radians(this->innerAngle)));
         shader->setFloat("lights[" + to_string(index) + "].outerAngle", glm::cos(glm::radians(this->outerAngle)));
+        shader->setInt("lights[" + to_string(index) + "].shadowIndex", this->shadowIndex);
     }
-    if(this->hasDirectionalLightShadow) {
-        shader->setBool("useShadowMap", true);
-        shader->setTexture("shadowMap", this->shadowMap);
-        shader->setMat4("lightSpaceMatrix", this->directionalLightCameraNode->getDirectionalLightSpaceMatrix());
-        shader->setFloat("shadowBias", this->shadowBias);
-        shader->setInt("shadowSamples", this->shadowSamples);
+}
+void LightNode::engineConfigurateShadowForShader(Shader* shader, int index) {
+    if(this->lightType == 1) {
+        shader->setInt("shadows[" + to_string(index) + "].type", 0);
     }
+    shader->setTexture("shadows[" + to_string(index) + "].shadowMap", this->shadowMap);
+    shader->setMat4("shadows[" + to_string(index) + "].lightSpaceMatrix", this->directionalLightCameraNode->getDirectionalLightSpaceMatrix());
+    shader->setFloat("shadows[" + to_string(index) + "].bias", this->shadowBias);
+    shader->setInt("shadows[" + to_string(index) + "].samples", this->shadowSamples);
 }

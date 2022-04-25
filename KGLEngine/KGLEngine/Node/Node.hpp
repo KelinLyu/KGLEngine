@@ -2,7 +2,8 @@
 #ifndef Node_hpp
 #define Node_hpp
 #include "../Engine.hpp"
-#define LIGHTS_LIMIT 50
+#define LIGHTS_LIMIT 30
+#define SHADOWS_LIMIT 6
 struct FontCharacter;
 struct AnimationBoneNode;
 class SpriteShader;
@@ -85,7 +86,7 @@ public:
     void engineProcessNode(aiNode* node, const aiScene* scene);
     void engineUpdateNodeAnimators(mat4 parentWorldTransform);
     void engineNodeCalculateBoneTransforms(AnimationBoneNode *node, mat4 parentTransform);
-    virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap);
+    virtual void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode);
     virtual void engineCalculateNodeWorldTransform(mat4 parentWorldTransform);
     void engineRecursivelyFreezeChildNodes(vector<Geometry*>* allGeometries, map<Geometry*, vector<unsigned int>>* indices);
 };
@@ -110,6 +111,14 @@ class LightNode final: public Node {
 private:
     unsigned int lightType;
     float cameraNodeDistance;
+    bool hasDirectionalLightShadow;
+    CameraNode* directionalLightCameraNode;
+    unsigned int shadowMapSize;
+    unsigned int shadowBuffer;
+    Texture* shadowMap;
+    float shadowBias;
+    int shadowSamples;
+    int shadowIndex;
 public:
     vec3 colorFactor;
     float highlightIntensity;
@@ -118,14 +127,7 @@ public:
     float penetrationRange;
     float innerAngle;
     float outerAngle;
-    bool hasDirectionalLightShadow;
-    CameraNode* directionalLightCameraNode;
     unsigned int lightingBitMask;
-    unsigned int shadowMapSize;
-    unsigned int shadowBuffer;
-    Texture* shadowMap;
-    float shadowBias;
-    int shadowSamples;
     LightNode(vec3 color);
     Node* copy() override;
     Node* clone() override;
@@ -135,9 +137,15 @@ public:
     void setSpotLight(float attenuationExponent, float range, float innerAngle, float outerAngle);
     void activateDirectionalLightShadow(unsigned int mapSize, float projectionSize, float near, float far, float xOffset, float bias, int samples);
     ~LightNode() = default;
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) override;
+    void enginePrepareLightShadowForRendering();
     unsigned int engineGetLightType();
-    void engineConfigurateShader(Shader* shader, int index);
+    CameraNode* engineGetDirectionalLightCameraNode();
+    unsigned int engineLightNodeGetShadowMapSize();
+    unsigned int engineLightNodeGetShadowBuffer();
+    void engineConfigurateLightForShader(Shader* shader, int index);
+    void engineConfigurateShadowForShader(Shader* shader, int index);
+    
 };
 class ParticleNode final: public Node {
 private:
@@ -202,7 +210,7 @@ public:
     void stop();
     void reset();
     ~ParticleNode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) override;
 };
 class UINode: public Node {
 private:
@@ -223,7 +231,7 @@ public:
     bool checkSizeIncludesScreenPosition(vec2 screenPosition);
     ~UINode() = default;
     void engineInitializeUINode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
 class SpriteNode: public UINode {
@@ -244,7 +252,7 @@ public:
     void setSemitransparent();
     void setAdditive();
     ~SpriteNode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
 class TextNode final: public UINode {
@@ -272,7 +280,7 @@ public:
     void setCenterVerticalAlignment();
     void setBottomVerticalAlignment();
     ~TextNode();
-    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, bool shadowMap) override;
+    void enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, unsigned int renderingMode) override;
     void engineCalculateNodeWorldTransform(mat4 parentWorldTransform) override;
 };
 #endif

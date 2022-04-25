@@ -45,7 +45,7 @@ public:
     ~Shader();
     void engineInitializeShader(string vertexShaderCode, string fragmentShaderCode);
     bool engineCheckCompileErrors(unsigned int shader, string type);
-    virtual void engineRenderShader(Geometry* geometry, bool shadowMap);
+    virtual void engineRenderShader(Geometry* geometry, unsigned int renderingMode);
 };
 class PBRShader final: public Shader {
 private:
@@ -101,7 +101,7 @@ public:
     void setMultiplyMap(Texture* texture);
     void setEmissionMap(Texture* texture);
     ~PBRShader() = default;
-    void engineRenderShader(Geometry* geometry, bool shadowMap) override;
+    void engineRenderShader(Geometry* geometry, unsigned int renderingMode) override;
 };
 class SpriteShader final: public Shader {
 private:
@@ -126,7 +126,7 @@ public:
     float emissionIntensity;
     SpriteShader();
     ~SpriteShader();
-    void engineRenderShader(Geometry* geometry, bool shadowMap) override;
+    void engineRenderShader(Geometry* geometry, unsigned int renderingMode) override;
 };
 class ParticleShader final: public Shader {
 private:
@@ -152,6 +152,6 @@ public:
     void engineSetSpriteSheetAnimation(unsigned int rows, unsigned int columns,
                                        unsigned int initialFrameRange,
                                        unsigned int FPS, unsigned int FPSVariation);
-    void engineRenderShader(Geometry* geometry, bool shadowMap) override;
+    void engineRenderShader(Geometry* geometry, unsigned int renderingMode) override;
 };
 #endif

@@ -52,11 +52,11 @@ TextRenderer::~TextRenderer() {
     this->textures.clear();
     this->transforms.clear();
 }
-void TextRenderer::engineRenderGeometry(bool shadowMap) {
+void TextRenderer::engineRenderGeometry(unsigned int renderingMode) {
     for(unsigned int i = 0; i < this->transforms.size(); i += 1) {
         this->modelTransform = this->mainTransform * this->transforms[i];
         this->shader->setTexture("textureMap", this->textures[i]);
-        this->shader->engineRenderShader(this, shadowMap);
+        this->shader->engineRenderShader(this, renderingMode);
     }
     this->updated = false;
     this->prepared = false;

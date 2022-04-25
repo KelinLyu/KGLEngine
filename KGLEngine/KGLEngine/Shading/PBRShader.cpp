@@ -3,8 +3,10 @@
 PBRShader::PBRShader(float metallic, float roughness) {
     string vertexShaderCode = R""""(
 #version 330 core
-const int MAX_BONE_INFLUENCE = 4;
+const int LIGHTS_LIMIT = 30;
+const int SHADOWS_LIMIT = 6;
 const int BONES_LIMIT = 120;
+const int MAX_BONE_INFLUENCE = 4;
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
 layout (location = 2) in vec2 vertexUV;
@@ -20,9 +22,10 @@ out fragment_data {
     vec2 UV;
     mat3 TBN;
     mat3 inverseTBN;
-    vec4 lightSpacePosition;
+    vec4 lightSpacePositions[SHADOWS_LIMIT];
 } fragment;
 struct frame_data {
+    float time;
     mat4 viewProjectionTransform;
     vec3 cameraPosition;
     vec3 cameraDirection;
@@ -32,12 +35,36 @@ struct node_data {
     mat4 normalTransform;
     mat4 modelViewProjectionTransform;
 };
+struct light_data {
+    int type;
+    vec3 colorFactor;
+    vec3 highlightFactor;
+    vec3 position;
+    vec3 direction;
+    float attenuationExponent;
+    float range;
+    float penetrationRange;
+    float innerAngle;
+    float outerAngle;
+    int shadowIndex;
+};
+struct shadow_data {
+    int type;
+    sampler2D shadowMap;
+    mat4 lightSpaceMatrix;
+    float bias;
+    int samples;
+};
 uniform frame_data frame;
 uniform node_data node;
+uniform light_data lights[LIGHTS_LIMIT];
+uniform int lightCount;
+uniform shadow_data shadows[SHADOWS_LIMIT];
+uniform int shadowCount;
 uniform bool hasBones;
 uniform mat4 boneTransforms[BONES_LIMIT];
 uniform bool enableInstancing;
-uniform bool renderingShadow;
+uniform int renderingMode;
 uniform mat4 lightSpaceMatrix;
 void main() {
     mat4 modelTransform = node.modelTransform;
@@ -48,10 +75,7 @@ void main() {
         normalTransform = instancingNormalTransform;
         modelViewProjectionTransform = frame.viewProjectionTransform * modelTransform;
     }
-    if(renderingShadow) {
-
-
-
+    if(renderingMode == 1) {
         if(hasBones) {
             mat4 boneTransform = mat4(0.0f);
             for(int i = 0; i < MAX_BONE_INFLUENCE; i += 1) {
@@ -91,22 +115,28 @@ void main() {
     }
     fragment.inverseTBN = inverse(fragment.TBN);
     fragment.UV = vertexUV;
-    fragment.lightSpacePosition = lightSpaceMatrix * vec4(fragment.position, 1.0f);
+    for(int i = 0; i < shadowCount; i += 1) {
+        if(shadows[i].type == 0) {
+            fragment.lightSpacePositions[i] = shadows[i].lightSpaceMatrix * vec4(fragment.position, 1.0f);
+        }
+    }
 }
 )"""";
     string fragmentShaderCode = R""""(
 #version 330 core
-const int LIGHTS_LIMIT = 50;
+const int LIGHTS_LIMIT = 30;
+const int SHADOWS_LIMIT = 6;
 in fragment_data {
     vec3 position;
     vec3 normal;
     vec2 UV;
     mat3 TBN;
     mat3 inverseTBN;
-    vec4 lightSpacePosition;
+    vec4 lightSpacePositions[SHADOWS_LIMIT];
 } fragment;
 out vec4 color;
 struct frame_data {
+    float time;
     mat4 viewProjectionTransform;
     vec3 cameraPosition;
     vec3 cameraDirection;
@@ -127,11 +157,21 @@ struct light_data {
     float penetrationRange;
     float innerAngle;
     float outerAngle;
+    int shadowIndex;
+};
+struct shadow_data {
+    int type;
+    sampler2D shadowMap;
+    mat4 lightSpaceMatrix;
+    float bias;
+    int samples;
 };
 uniform frame_data frame;
 uniform node_data node;
 uniform light_data lights[LIGHTS_LIMIT];
 uniform int lightCount;
+uniform shadow_data shadows[SHADOWS_LIMIT];
+uniform int shadowCount;
 uniform float opacity;
 uniform vec4 defaultDiffuseColor;
 uniform bool useDiffuseMap;
@@ -169,14 +209,9 @@ uniform vec3 defaultEmissionColor;
 uniform bool useEmissionMap;
 uniform sampler2D emissionMap;
 uniform float emissionIntensity;
-uniform bool renderingShadow;
-uniform bool useShadowMap;
-uniform sampler2D shadowMap;
-uniform mat4 lightSpaceMatrix;
-uniform float shadowBias;
-uniform int shadowSamples;
+uniform int renderingMode;
 void main() {
-    if(renderingShadow) {
+    if(renderingMode == 1) {
         return;
     }
     vec2 UV = fragment.UV;
@@ -255,22 +290,23 @@ void main() {
         if(lights[i].type == 1) {
             lightVector = -lights[i].direction;
             lightFactor = max(dot(normal, lightVector), 0.0f);
-            if(useShadowMap) {
-                vec3 shadowMapUV = fragment.lightSpacePosition.xyz / fragment.lightSpacePosition.w;
+            if(lights[i].shadowIndex > -1) {
+                int index = lights[i].shadowIndex;
+                vec3 shadowMapUV = fragment.lightSpacePositions[index].xyz / fragment.lightSpacePositions[index].w;
                 shadowMapUV = shadowMapUV * 0.5f + 0.5f;
                 float shadowFactor = clamp(length(shadowMapUV.xy - vec2(0.5f)), 0.0f, 0.5f);
                 shadowFactor = 1.0f - shadowFactor * 2.0f;
-                float bias = max(shadowBias * (1.0f - dot(normal, lightVector)), shadowBias * 0.1f);
+                float bias = max(shadows[index].bias * (1.0f - dot(normal, lightVector)), shadows[index].bias * 0.1f);
                 float currentDepth = shadowMapUV.z - bias;
                 float intensity = 0.0f;
-                if(shadowSamples > 0) {
+                if(shadows[index].samples > 0) {
                     vec2 shadowUV;
-                    vec2 displacement = 1.0f / textureSize(shadowMap, 0);
+                    vec2 displacement = 1.0f / textureSize(shadows[index].shadowMap, 0);
                     float count = 0.0f;
-                    for(int x = -shadowSamples; x <= shadowSamples; x += 1) {
-                        for(int y = -shadowSamples; y <= shadowSamples; y += 1) {
+                    for(int x = -shadows[index].samples; x <= shadows[index].samples; x += 1) {
+                        for(int y = -shadows[index].samples; y <= shadows[index].samples; y += 1) {
                             shadowUV = shadowMapUV.xy + vec2(x, y) * displacement;
-                            float depth = texture(shadowMap, shadowUV).r;
+                            float depth = texture(shadows[index].shadowMap, shadowUV).r;
                             if(currentDepth > depth) {
                                 intensity += 1.0f;
                             }
@@ -279,7 +315,7 @@ void main() {
                     }
                     intensity = (intensity / count) * shadowFactor;
                 }else{
-                    float depth = texture(shadowMap, shadowMapUV.xy).r;
+                    float depth = texture(shadows[index].shadowMap, shadowMapUV.xy).r;
                     if(currentDepth > depth) {
                         intensity = shadowFactor;
                     }
@@ -299,6 +335,14 @@ void main() {
             }else{
                 lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
             }
+            if(lights[i].shadowIndex > -1) {
+
+
+
+
+
+
+            }
         }else if(lights[i].type == 3) {
             lightVector = lights[i].position - fragment.position;
             float lightDistance = length(lightVector);
@@ -316,6 +360,14 @@ void main() {
                 lightFactor = (penetration + (1.0f - penetration) * max(dot(normal, lightVector), 0.0f)) * attenuation;
             }else{
                 lightFactor = max(dot(normal, lightVector), 0.0f) * attenuation;
+            }
+            if(lights[i].shadowIndex > -1) {
+
+
+
+
+
+
             }
         }
         if(lightFactor <= 0.0f) {
@@ -571,7 +623,7 @@ void PBRShader::setEmissionMap(Texture* texture) {
     this->setBool("useEmissionMap", true);
     this->setTexture("emissionMap", texture);
 }
-void PBRShader::engineRenderShader(Geometry *geometry, bool shadowMap) {
+void PBRShader::engineRenderShader(Geometry *geometry, unsigned int renderingMode) {
     if(this->currentOpacity != this->opacity) {
         this->currentOpacity = this->opacity;
         this->setFloat("opacity", this->opacity);
@@ -648,5 +700,5 @@ void PBRShader::engineRenderShader(Geometry *geometry, bool shadowMap) {
         this->currentEmissionIntensity = this->emissionIntensity;
         this->setFloat("emissionIntensity", this->emissionIntensity);
     }
-    this->Shader::engineRenderShader(geometry, shadowMap);
+    this->Shader::engineRenderShader(geometry, renderingMode);
 }

@@ -20,6 +20,7 @@ out fragment_data {
     vec4 lightSpacePosition;
 } fragment;
 struct frame_data {
+    float time;
     mat4 viewProjectionTransform;
     vec3 cameraPosition;
     vec3 cameraDirection;
@@ -59,30 +60,24 @@ void main() {
         }
         return;
     }
-    if(hasBones) {
-        mat4 boneTransform = mat4(0.0f);
-        for(int i = 0; i < MAX_BONE_INFLUENCE; i += 1) {
-            boneTransform += boneTransforms[boneIDs[i]] * weights[i];
-        }
-        vec4 localPosition = boneTransform * vec4(vertexPosition, 1.0f);
-        gl_Position = modelViewProjectionTransform * localPosition;
-        fragment.position = vec3(modelTransform * localPosition);
-        vec4 localNormal = boneTransform * vec4(vertexNormal, 0.0f);
-        fragment.normal = normalize(vec3(normalTransform * localNormal));
-        vec3 T = normalize(vec3(modelTransform * boneTransform * vec4(vertexTangent, 0.0f)));
-        vec3 B = normalize(vec3(modelTransform * boneTransform * vec4(vertexBitangent, 0.0f)));
-        vec3 N = normalize(vec3(modelTransform * boneTransform * vec4(vertexNormal, 0.0f)));
-        fragment.TBN = mat3(T, B, N);
-    }else{
-        vec4 localPosition = vec4(vertexPosition, 1.0f);
-        gl_Position = modelViewProjectionTransform * localPosition;
-        fragment.position = vec3(modelTransform * vec4(vertexPosition, 1.0f));
-        fragment.normal = normalize(mat3(normalTransform) * vertexNormal);
-        vec3 T = normalize(vec3(modelTransform * vec4(vertexTangent, 0.0f)));
-        vec3 B = normalize(vec3(modelTransform * vec4(vertexBitangent, 0.0f)));
-        vec3 N = normalize(vec3(modelTransform * vec4(vertexNormal, 0.0f)));
-        fragment.TBN = mat3(T, B, N);
-    }
+    vec4 localPosition = vec4(vertexPosition, 1.0f);
+    vec3 worldPosition = vec3(modelTransform * vec4(vertexPosition, 1.0f));
+    float timeFactor = frame.time * (2.0f + fract(worldPosition.y));
+    worldPosition *= 20.0f;
+    vec3 swayFactor;
+    swayFactor.x = sin(worldPosition.x + timeFactor) * 0.02f;
+    swayFactor.y = sin(worldPosition.y + timeFactor) * 0.05f;
+    swayFactor.y += cos(worldPosition.x + timeFactor) * 0.05f;
+    swayFactor.y += cos(worldPosition.z + timeFactor) * 0.05f;
+    swayFactor.z = cos(worldPosition.z + timeFactor) * 0.02f;
+    localPosition.xyz += swayFactor;
+    gl_Position = modelViewProjectionTransform * localPosition;
+    fragment.position = vec3(modelTransform * vec4(vertexPosition, 1.0f));
+    fragment.normal = normalize(mat3(normalTransform) * vertexNormal);
+    vec3 T = normalize(vec3(modelTransform * vec4(vertexTangent, 0.0f)));
+    vec3 B = normalize(vec3(modelTransform * vec4(vertexBitangent, 0.0f)));
+    vec3 N = normalize(vec3(modelTransform * vec4(vertexNormal, 0.0f)));
+    fragment.TBN = mat3(T, B, N);
     fragment.inverseTBN = inverse(fragment.TBN);
     fragment.UV = vertexUV;
     fragment.lightSpacePosition = lightSpaceMatrix * vec4(fragment.position, 1.0f);
