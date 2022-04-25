@@ -416,6 +416,79 @@ void main() {
     this->emissionColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     this->emissionIntensity = 1.0f;
 }
+PBRShader::PBRShader(string shaderFile, float metallic, float roughness) {
+    string vertexShaderCode;
+    string fragmentShaderCode;
+    ifstream vertexShaderStream;
+    ifstream fragmentShaderStream;
+    vertexShaderStream.exceptions(ifstream::failbit | ifstream::badbit);
+    fragmentShaderStream.exceptions(ifstream::failbit | ifstream::badbit);
+    try {
+        string vertexShaderFile = Engine::main->workingDirectory + shaderFile + ".vs";
+        string fragmentShaderFile = Engine::main->workingDirectory + shaderFile + ".fs";
+        vertexShaderStream.open(vertexShaderFile.c_str());
+        fragmentShaderStream.open(fragmentShaderFile.c_str());
+        stringstream vertexShader, fragmentShader;
+        vertexShader << vertexShaderStream.rdbuf();
+        fragmentShader << fragmentShaderStream.rdbuf();
+        vertexShaderStream.close();
+        fragmentShaderStream.close();
+        vertexShaderCode = vertexShader.str();
+        fragmentShaderCode = fragmentShader.str();
+    }catch(ifstream::failure error) {
+        cout << "\nFailed to load the shaders files: "
+        << Engine::main->workingDirectory + shaderFile << "!\n" << endl;
+        exit(1);
+    }
+    this->engineInitializeShader(vertexShaderCode, fragmentShaderCode);
+    this->currentOpacity = -1.0f;
+    this->currentDiffuseColor = vec4(-1.0f);
+    this->currentDiffuseIntensity = -1.0f;
+    this->currentAlphaCutThreshold = -1.0f;
+    this->currentNormalIntensity = -1.0f;
+    this->currentHeightIntensity = -1.0f;
+    this->currentHeightLayerRange= vec2(-1.0f);
+    this->currentMetallic = -1.0f;
+    this->currentMetallicIntensity = -1.0f;
+    this->currentinvertMetallic = -1;
+    this->currentRoughness = -1.0f;
+    this->currentRoughnessIntensity = -1.0f;
+    this->currentinvertRoughness = -1;
+    this->currentReflectionIntensity = -1.0f;
+    this->currentAmbientOcclusionIntensity = -1.0f;
+    this->currentMultiplyColor = vec4(-1.0f);
+    this->currentMultiplyIntensity = -1.0f;
+    this->currentEmissionColor = vec4(-1.0f);
+    this->currentEmissionIntensity = -1.0f;
+    this->setBool("useDiffuseMap", false);
+    this->setBool("useNormalMap", false);
+    this->setBool("useHeightMap", false);
+    this->setBool("useMetallicMap", false);
+    this->setBool("useRoughnessMap", false);
+    this->setBool("useReflectionMap", false);
+    this->setBool("useAmbientOcclusionMap", false);
+    this->setBool("useMultiplyMap", false);
+    this->setBool("useEmissionMap", false);
+    this->opacity = 1.0f;
+    this->diffuseColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
+    this->diffuseIntensity = 1.0f;
+    this->alphaCutThreshold = 0.5f;
+    this->normalIntensity = 1.0f;
+    this->heightIntensity = 1.0f;
+    this->heightLayerRange = vec2(4.0f, 16.0f);
+    this->metallic = metallic;
+    this->metallicIntensity = 1.0f;
+    this->invertMetallic = false;
+    this->roughness = roughness;
+    this->roughnessIntensity = 1.0f;
+    this->invertRoughness = false;
+    this->reflectionIntensity = 1.0f;
+    this->ambientOcclusionIntensity = 1.0f;
+    this->multiplyColor = vec4(1.0f);
+    this->multiplyIntensity = 1.0f;
+    this->emissionColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    this->emissionIntensity = 1.0f;
+}
 PBRShader* PBRShader::copy() {
     PBRShader* shader = new PBRShader(0.5f, 0.5f);
     for(unsigned int i = 0; i < this->uniformTextureNames.size(); i += 1) {

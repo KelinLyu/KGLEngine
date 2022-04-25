@@ -8,7 +8,7 @@ public:
     }
     static inline glm::vec3 getEulerAngles(const glm::mat4 transform) {
         float x, y, z;
-        glm::extractEulerAngleXYZ(transform, x, y, z);
+        glm::extractEulerAngleYZX(transform, y, z, x);
         return(glm::vec3(glm::degrees(x), glm::degrees(y), glm::degrees(z)));
     }
     static inline glm::vec3 getScale(const glm::mat4 transform) {

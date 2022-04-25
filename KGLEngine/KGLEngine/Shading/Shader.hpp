@@ -89,6 +89,7 @@ public:
     vec3 emissionColor;
     float emissionIntensity;
     PBRShader(float metallic, float roughness);
+    PBRShader(string shaderFile, float metallic, float roughness);
     PBRShader* copy();
     void setDiffuseMap(Texture* texture);
     void setNormalMap(Texture* texture);

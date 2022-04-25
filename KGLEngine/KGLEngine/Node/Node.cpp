@@ -390,9 +390,9 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, b
 }
 void Node::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     mat4 translateMatrix = glm::translate(mat4(1.0f), this->position);
-    mat4 rotateMatrix = glm::eulerAngleXYZ(glm::radians(this->eulerAngles.x),
-                                           glm::radians(this->eulerAngles.y),
-                                           glm::radians(this->eulerAngles.z));
+    mat4 rotateMatrix = glm::eulerAngleYZX(glm::radians(this->eulerAngles.y),
+                                           glm::radians(this->eulerAngles.z),
+                                           glm::radians(this->eulerAngles.x));
     mat4 scaleMatrix = glm::scale(mat4(1.0f), vec3(this->scale));
     this->worldTransform = parentWorldTransform * (translateMatrix * rotateMatrix * scaleMatrix);
 }
