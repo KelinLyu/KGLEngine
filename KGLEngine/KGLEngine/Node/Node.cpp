@@ -207,23 +207,20 @@ vec3 Node::getDownVectorInWorld() {
 }
 vec3 Node::getPositionOnScreen() {
     if(Engine::main->mainCameraNode != NULL) {
-        vec4 worldPosition = vec4(this->getWorldPosition(), 1.0f);
         mat4 viewTransform = Engine::main->mainCameraNode->getViewTransform();
         mat4 projectionTransform = Engine::main->mainCameraNode->getProjectionTransform();
-        mat4 transform = projectionTransform * viewTransform * this->worldTransform;
-        vec4 projection;
-        projection.x = worldPosition.x * transform[0][0] + worldPosition.y * transform[1][0] + worldPosition.z * transform[2][0] + transform[3][0];
-        projection.y = worldPosition.x * transform[0][1] + worldPosition.y * transform[1][1] + worldPosition.z * transform[2][1] + transform[3][1];
-        projection.z = worldPosition.x * transform[0][2] + worldPosition.y * transform[1][2] + worldPosition.z * transform[2][2] + transform[3][2];
-        projection.w = worldPosition.x * transform[0][3] + worldPosition.y * transform[1][3] + worldPosition.z * transform[2][3] + transform[3][3];
-        vec3 result;
-        result.x = projection.x * 0.5f / projection.w + 0.5f;
-        result.y = 0.5f - projection.y * 0.5f / projection.w;
-        result.z = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
-        if(projection.w < 0.0f) {
-            result.z = -result.z;
+        vec2 resolution = Engine::main->getWindowResolution();
+        vec4 viewport = vec4(0.0f, 0.0f, resolution.x, resolution.y);
+        vec3 projection = glm::project(vec3(0.0f), viewTransform * this->worldTransform, projectionTransform, viewport);
+        projection.x = projection.x / resolution.x;
+        projection.y = 1.0f - projection.y / resolution.y;
+        float distance = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
+        if(0.0f < projection.z && projection.z < 1.0f) {
+            projection.z = distance;
+        }else{
+            projection.z = -distance;
         }
-        return(result);
+        return(projection);
     }
     return(vec3(0.0f));
 }
