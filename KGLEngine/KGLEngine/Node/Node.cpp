@@ -1,5 +1,6 @@
 // Developed by Kelin Lyu.
 #include "Node.hpp"
+unsigned int Node::UID = 0;
 Node::Node() {
     this->engineInitializeNode();
 }
@@ -33,7 +34,7 @@ void Node::loadModelFile(string file) {
     const aiScene* scene = importer.ReadFile(Engine::main->workingDirectory + file, flags);
     if(scene == NULL || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         cout << "\nFailed to load the 3D model file: "
-             << Engine::main->workingDirectory + file << "!\n" << endl;
+        << Engine::main->workingDirectory + file << "!\n" << endl;
         exit(0);
     }
     this->engineProcessNode(scene->mRootNode, scene);
@@ -49,6 +50,14 @@ Animator* Node::loadAnimator(string name, string file) {
     }
     return(animator);
 }
+void Node::loadAudioBuffer(string name, AudioBuffer* buffer, float minDistance, float attenuation) {
+    Sound sound;
+    sound.setBuffer(*buffer->engineGetAudioBuffer());
+    sound.setMinDistance(glm::max(1.0f, minDistance));
+    sound.setAttenuation(attenuation);
+    this->sounds[name] = sound;
+    this->volumes[name] = 1.0f;
+}
 Node* Node::generateBoneNode(string boneName) {
     Node* boneNode = new Node();
     this->boneNodes[boneName] = boneNode;
@@ -59,7 +68,6 @@ Node* Node::copy() {
     Node* node = new Node();
     node->name = this->name;
     node->isDisabled = this->isDisabled;
-    node->renderingBitMask = this->renderingBitMask;
     node->position = this->position;
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;
@@ -89,7 +97,6 @@ Node* Node::clone() {
     Node* node = new Node();
     node->name = this->name;
     node->isDisabled = this->isDisabled;
-    node->renderingBitMask = this->renderingBitMask;
     node->position = this->position;
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;
@@ -242,6 +249,27 @@ SpriteNode* Node::convertToSpriteNode() {
 TextNode* Node::convertToTextNode() {
     return(this->currentTextNode);
 }
+void Node::playAudio(string name) {
+    this->sounds[name].play();
+}
+void Node::pauseAudio(string name) {
+    this->sounds[name].pause();
+}
+void Node::stopAudio(string name) {
+    this->sounds[name].stop();
+}
+float Node::getAudioTime(string name) {
+    return(this->sounds[name].getPlayingOffset().asSeconds());
+}
+void Node::changeAudioVolume(string name, float volume, float duration) {
+    if(duration == 0.0f) {
+        this->volumes[name] = volume;
+    }else{
+        Animation* animation = new Animation(name + to_string(this->ID), duration);
+        animation->setFloatAnimation(&this->volumes[name], volume);
+        Engine::main->playAnimation(animation);
+    }
+}
 Node::~Node() {
     this->removeFromParentNode();
     this->childNodes.clear();
@@ -275,10 +303,11 @@ Node::~Node() {
     this->parent = NULL;
 }
 void Node::engineInitializeNode() {
+    Node::UID += 1;
+    this->ID = Node::UID;
     this->name = "";
     this->parent = NULL;
     this->isDisabled = false;
-    this->renderingBitMask = -1;
     this->position = vec3(0.0f);
     this->eulerAngles = vec3(0.0f);
     this->scale = vec3(1.0f);
@@ -381,13 +410,17 @@ void Node::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data, u
         matrix = glm::inverse(matrix);
         this->worldTransform = glm::scale(matrix, this->scale);
     }
-    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
-        for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
-            this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
-            if(this->geometryInstancingIndex >= 0) {
-                this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, false);
-            }
+    for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
+        this->geometries[i]->enginePrepareGeometryForRendering(this->worldTransform);
+        if(this->geometryInstancingIndex >= 0) {
+            this->geometries[i]->engineUpdateGeometryInstanceTransform(this->geometryInstancingIndex, this->worldTransform, false);
         }
+    }
+    map<string, Sound>::iterator iterator;
+    for(iterator = this->sounds.begin(); iterator != this->sounds.end(); iterator++) {
+        vec3 worldPosition = this->getWorldPosition();
+        iterator->second.setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
+        iterator->second.setVolume(100.0f * this->volumes[iterator->first]);
     }
     for(unsigned int i = 0; i < this->childNodes.size(); i += 1) {
         this->childNodes[i]->enginePrepareNodeForRendering(this->worldTransform, data, renderingMode);

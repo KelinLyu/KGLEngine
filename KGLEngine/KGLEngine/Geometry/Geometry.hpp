@@ -56,6 +56,7 @@ protected:
 public:
     bool isHidden;
     float renderingOrder;
+    unsigned int renderingBitMask;
     unsigned int lightingBitMask;
     vec3 boundingSpherePosition;
     float boundingSphereRadius;

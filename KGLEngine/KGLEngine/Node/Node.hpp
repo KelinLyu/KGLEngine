@@ -6,6 +6,7 @@
 #define SHADOWS_LIMIT 6
 struct FontCharacter;
 struct AnimationBoneNode;
+class AudioBuffer;
 class SpriteShader;
 class ParticleShader;
 class Geometry;
@@ -22,6 +23,8 @@ class TextNode;
 class Font;
 class Node {
 protected:
+    static unsigned int UID;
+    unsigned int ID;
     mat4 worldTransform;
     map<string, Node*> boneNodes;
     vector<Animator*> animators;
@@ -36,12 +39,13 @@ protected:
     TextNode* currentTextNode;
     vector<string> boneNames;
     vector<mat4> boneTransforms;
+    map<string, Sound> sounds;
+    map<string, float> volumes;
 public:
     string name;
     Node* parent;
     vector<Node*> childNodes;
     bool isDisabled;
-    unsigned int renderingBitMask;
     vec3 position;
     vec3 eulerAngles;
     vec3 scale;
@@ -53,6 +57,7 @@ public:
     void loadUnitCube();
     void loadModelFile(string file);
     Animator* loadAnimator(string name, string file);
+    void loadAudioBuffer(string name, AudioBuffer* buffer, float minDistance = 1.0f, float attenuation = 1.0f);
     Node* generateBoneNode(string boneName);
     virtual Node* copy();
     virtual Node* clone();
@@ -81,6 +86,11 @@ public:
     UINode* convertToUINode();
     SpriteNode* convertToSpriteNode();
     TextNode* convertToTextNode();
+    void playAudio(string name);
+    void pauseAudio(string name);
+    void stopAudio(string name);
+    float getAudioTime(string name);
+    void changeAudioVolume(string name, float volume, float duration);
     ~Node();
     void engineInitializeNode();
     void engineProcessNode(aiNode* node, const aiScene* scene);
@@ -97,6 +107,7 @@ public:
     float field;
     float near;
     float far;
+    unsigned int renderingBitMask;
     CameraNode(float field, float near, float far);
     CameraNode(float width, float height, float near, float far);
     Node* copy() override;
@@ -128,6 +139,7 @@ public:
     float innerAngle;
     float outerAngle;
     unsigned int lightingBitMask;
+    unsigned int shadowBitMask;
     LightNode(vec3 color);
     Node* copy() override;
     Node* clone() override;
@@ -145,7 +157,6 @@ public:
     unsigned int engineLightNodeGetShadowBuffer();
     void engineConfigurateLightForShader(Shader* shader, int index);
     void engineConfigurateShadowForShader(Shader* shader, int index);
-    
 };
 class ParticleNode final: public Node {
 private:

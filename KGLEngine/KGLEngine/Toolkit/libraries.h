@@ -36,6 +36,8 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <SFML/Audio.hpp>
+#include <SFML/System.hpp>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "assimp_helper.h"
@@ -43,4 +45,5 @@
 #include "keys.h"
 using namespace std;
 using namespace glm;
+using namespace sf;
 #endif

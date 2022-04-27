@@ -78,6 +78,9 @@ void main() {
     this->shader->setInt("skybox", 0);
 }
 Skybox::~Skybox() {
+    if(Engine::main->skybox == this) {
+        Engine::main->skybox = NULL;
+    }
     glDeleteVertexArrays(1, &this->vertexArrays);
     glDeleteBuffers(1, &this->vertexBuffers);
     delete(this->texture);

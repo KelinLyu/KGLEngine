@@ -13,6 +13,7 @@ LightNode::LightNode(vec3 color) {
     this->innerAngle = 0.0f;
     this->outerAngle = 0.0f;
     this->lightingBitMask = -1;
+    this->shadowBitMask = -1;
     this->hasDirectionalLightShadow = false;
 }
 Node* LightNode::copy() {
@@ -27,7 +28,6 @@ Node* LightNode::copy() {
     node->lightingBitMask = this->lightingBitMask;
     node->name = this->name;
     node->isDisabled = this->isDisabled;
-    node->renderingBitMask = this->renderingBitMask;
     node->position = this->position;
     node->eulerAngles = this->eulerAngles;
     node->scale = this->scale;
@@ -80,8 +80,8 @@ void LightNode::activateDirectionalLightShadow(unsigned int mapSize, float proje
     glGenTextures(1, &map);
     glBindTexture(GL_TEXTURE_2D, map);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, mapSize, mapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glBindFramebuffer(GL_FRAMEBUFFER, this->shadowBuffer);
@@ -105,22 +105,20 @@ void LightNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 da
     if(renderingMode > 0) {
         return;
     }
-    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0) {
-        if(this->lightType < 2) {
-            this->cameraNodeDistance = 0;
-        }else{
-            this->cameraNodeDistance = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
-        }
-        for(unsigned int i = 0; i < Engine::main->preparedLightNodes.size(); i += 1) {
-            if(Engine::main->preparedLightNodes[i]->cameraNodeDistance > this->cameraNodeDistance) {
-                Engine::main->preparedLightNodes.insert(Engine::main->preparedLightNodes.begin() + i, this);
-                this->enginePrepareLightShadowForRendering();
-                return;
-            }
-        }
-        Engine::main->preparedLightNodes.push_back(this);
-        this->enginePrepareLightShadowForRendering();
+    if(this->lightType < 2) {
+        this->cameraNodeDistance = 0;
+    }else{
+        this->cameraNodeDistance = glm::length(Engine::main->mainCameraNode->getWorldPosition() - this->getWorldPosition());
     }
+    for(unsigned int i = 0; i < Engine::main->preparedLightNodes.size(); i += 1) {
+        if(Engine::main->preparedLightNodes[i]->cameraNodeDistance > this->cameraNodeDistance) {
+            Engine::main->preparedLightNodes.insert(Engine::main->preparedLightNodes.begin() + i, this);
+            this->enginePrepareLightShadowForRendering();
+            return;
+        }
+    }
+    Engine::main->preparedLightNodes.push_back(this);
+    this->enginePrepareLightShadowForRendering();
 }
 void LightNode::enginePrepareLightShadowForRendering() {
     if(Engine::main->preparedLightNodeShadows.size() >= SHADOWS_LIMIT) {

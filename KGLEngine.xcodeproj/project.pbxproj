@@ -10,6 +10,9 @@
 		C20560DD280FDB7B0020BBB1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C20560DC280FDB7B0020BBB1 /* main.cpp */; };
 		C231B3222804AAAF0030CD85 /* PBRShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C231B3212804AAAF0030CD85 /* PBRShader.cpp */; };
 		C233F4C3281374D400750C34 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C233F4C1281374D400750C34 /* Animation.cpp */; };
+		C250DD422818DA5C008FBA73 /* libsfml-audio.2.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C250DD412818DA5C008FBA73 /* libsfml-audio.2.5.1.dylib */; };
+		C250DD442818F707008FBA73 /* libsfml-system.2.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C250DD432818F707008FBA73 /* libsfml-system.2.5.1.dylib */; };
+		C250DD472818F854008FBA73 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C250DD452818F854008FBA73 /* AudioBuffer.cpp */; };
 		C26888AD280CC23D004E500B /* ParticleNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888AC280CC23D004E500B /* ParticleNode.cpp */; };
 		C26888AF280CD578004E500B /* ParticleRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888AE280CD578004E500B /* ParticleRenderer.cpp */; };
 		C26888B1280CDF58004E500B /* ParticleShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C26888B0280CDF58004E500B /* ParticleShader.cpp */; };
@@ -59,6 +62,10 @@
 		C231B3212804AAAF0030CD85 /* PBRShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PBRShader.cpp; sourceTree = "<group>"; };
 		C233F4C1281374D400750C34 /* Animation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Animation.cpp; sourceTree = "<group>"; };
 		C233F4C2281374D400750C34 /* Animation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Animation.hpp; sourceTree = "<group>"; };
+		C250DD412818DA5C008FBA73 /* libsfml-audio.2.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libsfml-audio.2.5.1.dylib"; path = "../../../../opt/homebrew/Cellar/sfml/2.5.1_1/lib/libsfml-audio.2.5.1.dylib"; sourceTree = "<group>"; };
+		C250DD432818F707008FBA73 /* libsfml-system.2.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libsfml-system.2.5.1.dylib"; path = "../../../../opt/homebrew/Cellar/sfml/2.5.1_1/lib/libsfml-system.2.5.1.dylib"; sourceTree = "<group>"; };
+		C250DD452818F854008FBA73 /* AudioBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AudioBuffer.cpp; sourceTree = "<group>"; };
+		C250DD462818F854008FBA73 /* AudioBuffer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AudioBuffer.hpp; sourceTree = "<group>"; };
 		C26888AC280CC23D004E500B /* ParticleNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleNode.cpp; sourceTree = "<group>"; };
 		C26888AE280CD578004E500B /* ParticleRenderer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleRenderer.cpp; sourceTree = "<group>"; };
 		C26888B0280CDF58004E500B /* ParticleShader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleShader.cpp; sourceTree = "<group>"; };
@@ -117,6 +124,8 @@
 				C294F8F927FCFB27002B6550 /* libGLEW.2.2.0.dylib in Frameworks */,
 				C294F8FB27FCFB2E002B6550 /* libassimp.5.2.0.dylib in Frameworks */,
 				C2F7796028078726001A214D /* libfreetype.6.dylib in Frameworks */,
+				C250DD422818DA5C008FBA73 /* libsfml-audio.2.5.1.dylib in Frameworks */,
+				C250DD442818F707008FBA73 /* libsfml-system.2.5.1.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +218,8 @@
 		C294F8F327FCFB19002B6550 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C250DD432818F707008FBA73 /* libsfml-system.2.5.1.dylib */,
+				C250DD412818DA5C008FBA73 /* libsfml-audio.2.5.1.dylib */,
 				C2F7795F28078726001A214D /* libfreetype.6.dylib */,
 				C294F8FA27FCFB2E002B6550 /* libassimp.5.2.0.dylib */,
 				C294F8F827FCFB27002B6550 /* libGLEW.2.2.0.dylib */,
@@ -256,6 +267,8 @@
 				C2F779672807B4AD001A214D /* Font.cpp */,
 				C233F4C2281374D400750C34 /* Animation.hpp */,
 				C233F4C1281374D400750C34 /* Animation.cpp */,
+				C250DD462818F854008FBA73 /* AudioBuffer.hpp */,
+				C250DD452818F854008FBA73 /* AudioBuffer.cpp */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -362,6 +375,7 @@
 				C231B3222804AAAF0030CD85 /* PBRShader.cpp in Sources */,
 				C2AD2E8F27FF0EE700A493D6 /* Texture.cpp in Sources */,
 				C2AD2E8B27FF0EE700A493D6 /* Input.cpp in Sources */,
+				C250DD472818F854008FBA73 /* AudioBuffer.cpp in Sources */,
 				C2AD2E8A27FF0EE700A493D6 /* Geometry.cpp in Sources */,
 				C2F7796D2807D9EF001A214D /* TextNode.cpp in Sources */,
 				C2F7795A28072F5B001A214D /* UINode.cpp in Sources */,
@@ -497,6 +511,7 @@
 					/opt/homebrew/Cellar/glm/0.9.9.8/lib,
 					/opt/homebrew/Cellar/assimp/5.2.3/lib,
 					/opt/homebrew/Cellar/freetype/2.12.0/lib,
+					/opt/homebrew/Cellar/sfml/2.5.1_1/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
@@ -518,6 +533,7 @@
 					/opt/homebrew/Cellar/glm/0.9.9.8/lib,
 					/opt/homebrew/Cellar/assimp/5.2.3/lib,
 					/opt/homebrew/Cellar/freetype/2.12.0/lib,
+					/opt/homebrew/Cellar/sfml/2.5.1_1/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;

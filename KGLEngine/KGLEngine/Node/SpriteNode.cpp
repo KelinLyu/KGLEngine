@@ -28,7 +28,6 @@ Node* SpriteNode::copy() {
     node->renderingOrder = this->renderingOrder;
     node->name = this->name;
     node->isDisabled = this->isDisabled;
-    node->renderingBitMask = this->renderingBitMask;
     node->Node::position = this->Node::position;
     node->Node::eulerAngles = this->Node::eulerAngles;
     node->Node::scale = this->Node::scale;

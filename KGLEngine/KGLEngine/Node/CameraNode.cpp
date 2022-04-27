@@ -8,6 +8,7 @@ CameraNode::CameraNode(float field, float near, float far) {
     this->field = glm::radians(field);
     this->near = near;
     this->far = far;
+    this->renderingBitMask = -1;
 }
 CameraNode::CameraNode(float width, float height, float near, float far) {
     this->engineInitializeNode();
@@ -17,6 +18,7 @@ CameraNode::CameraNode(float width, float height, float near, float far) {
     this->field = 0.0f;
     this->near = near;
     this->far = far;
+    this->renderingBitMask = -1;
 }
 Node* CameraNode::copy() {
     CameraNode* node = new CameraNode(this->field, this->near, this->far);

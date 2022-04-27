@@ -3,7 +3,6 @@
 Engine* Engine::main;
 Engine::Engine(const char* windowTitle,
                float resolutionScaleFactor,
-               bool fullscreenMode,
                int samples,
                const char* iconFile) {
     this->FPS = 1.0f / 60.0f;
@@ -13,6 +12,7 @@ Engine::Engine(const char* windowTitle,
     this->deltaTime = 0.0f;
     this->cursorHidden = false;
     this->cursorLocked = false;
+    this->resolutionScaleFactor = glm::clamp(resolutionScaleFactor, 0.0f, 1.0f);
     Engine::main = this;
     char directory[1024];
     if(getcwd(directory, sizeof(directory)) == NULL) {
@@ -27,7 +27,7 @@ Engine::Engine(const char* windowTitle,
     }
     glfwWindowHint(GLFW_SAMPLES, samples);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    if(fullscreenMode) {
+    if(this->resolutionScaleFactor == 1.0f) {
         glfwWindowHint(GLFW_DECORATED, GL_FALSE);
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -43,10 +43,11 @@ Engine::Engine(const char* windowTitle,
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
     this->screenResolution = vec2(mode->width, mode->height);
-    this->windowResolution = this->screenResolution * resolutionScaleFactor;
-    if(fullscreenMode) {
+    if(this->resolutionScaleFactor == 1.0f) {
+        this->windowResolution = this->screenResolution;
         this->window = glfwCreateWindow(this->windowResolution.x, this->windowResolution.y, windowTitle, monitor, NULL);
     }else{
+        this->windowResolution = this->screenResolution * resolutionScaleFactor;
         this->window = glfwCreateWindow(this->windowResolution.x, this->windowResolution.y, windowTitle, NULL, NULL);
     }
     glViewport(0, 0, this->windowResolution.x, this->windowResolution.y);
@@ -76,11 +77,6 @@ Engine::Engine(const char* windowTitle,
     this->rootNode = new Node();
     this->mainCameraNode = NULL;
     this->skybox = NULL;
-}
-void Engine::changeResolution(float resolutionScaleFactor) {
-    this->windowResolution = this->screenResolution * resolutionScaleFactor;
-    glfwSetWindowSize(this->window, this->windowResolution.x, this->windowResolution.y);
-    glViewport(0, 0, this->windowResolution.x, this->windowResolution.y);
 }
 void Engine::hideCursor() {
     this->cursorHidden = true;
@@ -116,6 +112,7 @@ bool Engine::shouldUpdate() {
     this->deltaTime = this->currentTime - this->updateTime;
     this->currentFPS = 1.0f / deltaTime;
     if(this->deltaTime >= this->FPS) {
+        this->updateTime = this->currentTime;
         this->input->engineUpdateInput();
         this->rootNode->engineUpdateNodeAnimators(mat4(1.0f));
         map<string, Animation*>::iterator iterator;
@@ -126,7 +123,6 @@ bool Engine::shouldUpdate() {
                 ++iterator;
             }
         }
-        this->updateTime = this->currentTime;
         result = true;
     }
     return(result);
@@ -151,6 +147,12 @@ void Engine::render() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     if(this->mainCameraNode != NULL) {
+        vec3 cameraNodePosition = this->mainCameraNode->getWorldPosition();
+        vec3 cameraNodeFrontVector = this->mainCameraNode->getFrontVectorInWorld();
+        vec3 cameraNodeUpVector = this->mainCameraNode->getUpVectorInWorld();
+        Listener::setPosition(cameraNodePosition.x, cameraNodePosition.y, cameraNodePosition.z);
+        Listener::setDirection(cameraNodeFrontVector.x, cameraNodeFrontVector.y, cameraNodeFrontVector.z);
+        Listener::setUpVector(cameraNodeUpVector.x, cameraNodeUpVector.y, cameraNodeUpVector.z);
         this->preparedGeometries.clear();
         this->preparedLightNodes.clear();
         this->preparedLightNodeShadows.clear();
@@ -170,6 +172,7 @@ void Engine::render() {
 }
 void Engine::renderDirectionalLightShadowMap(LightNode* directionalLightNode) {
     CameraNode* currentCameraNode = this->mainCameraNode;
+    directionalLightNode->engineGetDirectionalLightCameraNode()->renderingBitMask = directionalLightNode->shadowBitMask;
     this->mainCameraNode = directionalLightNode->engineGetDirectionalLightCameraNode();
     glViewport(0, 0, directionalLightNode->engineLightNodeGetShadowMapSize(), directionalLightNode->engineLightNodeGetShadowMapSize());
     glBindFramebuffer(GL_FRAMEBUFFER, directionalLightNode->engineLightNodeGetShadowBuffer());

@@ -15,7 +15,6 @@ Node* UINode::copy() {
     node->renderingOrder = this->renderingOrder;
     node->name = this->name;
     node->isDisabled = this->isDisabled;
-    node->renderingBitMask = this->renderingBitMask;
     node->Node::position = this->Node::position;
     node->Node::eulerAngles = this->Node::eulerAngles;
     node->Node::scale = this->Node::scale;
@@ -66,7 +65,7 @@ void UINode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2 data,
         return;
     }
     this->engineCalculateNodeWorldTransform(parentWorldTransform);
-    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) > 0 && renderingMode == 0) {
+    if(renderingMode == 0) {
         for(unsigned int i = 0; i < this->geometries.size(); i += 1) {
             this->geometries[i]->renderingOrder = data.y + this->renderingOrder;
             this->geometries[i]->enginePrepareGeometryForRendering(this->renderingTransform);

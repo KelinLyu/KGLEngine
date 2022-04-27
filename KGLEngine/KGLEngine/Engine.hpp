@@ -6,6 +6,7 @@
 #include "System/FontLibrary.hpp"
 #include "System/Font.hpp"
 #include "System/Animation.hpp"
+#include "System/AudioBuffer.hpp"
 #include "Shading/Image.hpp"
 #include "Shading/Texture.hpp"
 #include "Shading/Shader.hpp"
@@ -24,6 +25,7 @@ class Engine final {
 private:
     vec2 screenResolution;
     vec2 windowResolution;
+    float resolutionScaleFactor;
     GLFWwindow* window;
     float FPS;
     float currentFPS;
@@ -45,10 +47,8 @@ public:
     vector<LightNode*> preparedLightNodeShadows;
     Engine(const char* windowTitle,
            float resolutionScaleFactor,
-           bool fullscreenMode,
            int samples,
            const char* iconFile);
-    void changeResolution(float resolutionScaleFactor);
     void hideCursor();
     void showCursor();
     void lockCursor();

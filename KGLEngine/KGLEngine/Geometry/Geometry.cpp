@@ -206,6 +206,7 @@ void Geometry::engineInitializeGeometry() {
     this->modelTransform = mat4(0.0f);
     this->isHidden = false;
     this->renderingOrder = 0.0f;
+    this->renderingBitMask = -1;
     this->lightingBitMask = -1;
     this->instanceCount = 0;
     this->requiresInstanceUpdate = false;
@@ -280,6 +281,9 @@ void Geometry::enginePrepareGeometryForRendering(mat4 worldTransform) {
         return;
     }
     if(this->isHidden) {
+        return;
+    }
+    if((this->renderingBitMask & Engine::main->mainCameraNode->renderingBitMask) == 0) {
         return;
     }
     this->prepared = true;
