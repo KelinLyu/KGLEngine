@@ -24,6 +24,7 @@ ParticleNode::ParticleNode(unsigned int birthrate, float duration, float duratio
     this->useLocalSpace = false;
     this->isAdditive = false;
     this->youngestFirst = true;
+    this->speedFactor = 1.0f;
     this->spreadingAngle = 0.0f;
     this->initialSpeed = 0.0f;
     this->initialSpeedVariation = 0.0f;
@@ -69,6 +70,7 @@ Node* ParticleNode::copy() {
     node->useLocalSpace = this->useLocalSpace;
     node->isAdditive = this->isAdditive;
     node->youngestFirst = this->youngestFirst;
+    node->speedFactor = this->speedFactor;
     node->spreadingAngle = this->spreadingAngle;
     node->initialSpeed = this->initialSpeed;
     node->initialSpeedVariation = this->initialSpeedVariation;
@@ -179,7 +181,8 @@ void ParticleNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2
     float currentTime = Engine::main->getTime();
     if(currentTime > this->productionTime) {
         this->productionTime = currentTime + this->productionTimeInterval;
-        for(unsigned int counter = 0; counter < this->productionAmount; counter += 1) {
+        unsigned int currentAmount = (unsigned int)((this->productionAmount) * this->speedFactor);
+        for(unsigned int counter = 0; counter < currentAmount; counter += 1) {
             if(!this->isPlaying) {
                 break;
             }
@@ -192,6 +195,7 @@ void ParticleNode::enginePrepareNodeForRendering(mat4 parentWorldTransform, vec2
                 break;
             }
             float duration = this->particleDuration + glm::linearRand(-this->particleDurationVariation, this->particleDurationVariation);
+            duration = duration / this->speedFactor;
             birthTimeAndDuration = vec2(currentTime, duration);
             data->birthTimeAndDuration = birthTimeAndDuration;
             vec3 initialPosition = vec3(0.0f);

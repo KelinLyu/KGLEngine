@@ -22,6 +22,7 @@ private:
     float fadeIn;
     float fadeOut;
     float currentBlendFactor;
+    float startTime;
     float stateChangeTime;
     float stateChangeBlendFactor;
     AnimationBoneNode* rootAnimationBoneNode;

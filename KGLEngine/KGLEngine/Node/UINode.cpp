@@ -8,6 +8,7 @@ Node* UINode::copy() {
     UINode* node = new UINode();
     node->screenPosition = this->screenPosition;
     node->position = this->position;
+    node->parentCoordinatePosition = this->parentCoordinatePosition;
     node->rotation = this->rotation;
     node->scale = this->scale;
     node->size = this->size;
@@ -53,6 +54,7 @@ void UINode::engineInitializeUINode() {
     this->engineInitializeNode();
     this->screenPosition = vec2(0.0f);
     this->position = vec2(0.0f);
+    this->parentCoordinatePosition = vec2(0.5f);
     this->rotation = 0.0f;
     this->scale = vec2(1.0f);
     this->size = vec2(0.0f);
@@ -81,6 +83,12 @@ void UINode::engineCalculateNodeWorldTransform(mat4 parentWorldTransform) {
     float minLength = glm::min(resolution.x, resolution.y);
     vec2 uiSize = this->size * this->scale * minLength;
     vec2 uiPosition = this->screenPosition * resolution + this->position * minLength;
+    if(this->parent != NULL) {
+        UINode* node = this->parent->convertToUINode();
+        if(node != NULL) {
+            uiPosition += (this->parentCoordinatePosition - vec2(0.5f)) * node->size * minLength;
+        }
+    }
     glm::mat4 pointTransform = glm::mat4(1.0f);
     pointTransform = glm::translate(pointTransform, vec3(uiPosition, 0.0f));
     pointTransform = glm::rotate(pointTransform, glm::radians(this->rotation), vec3(0.0f, 0.0f, 1.0f));

@@ -79,7 +79,6 @@ SpriteShader::~SpriteShader() {
     this->textureMap = NULL;
     this->multiplyTextureMap = NULL;
     this->emissionTextureMap = NULL;
-    delete(this);
 }
 void SpriteShader::engineRenderShader(Geometry *geometry, unsigned int renderingMode) {
     if(this->currentAlpha != this->alpha) {

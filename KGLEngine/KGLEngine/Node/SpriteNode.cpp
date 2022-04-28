@@ -2,6 +2,7 @@
 #include "Node.hpp"
 SpriteNode::SpriteNode(vec2 size) {
     this->engineInitializeUINode();
+    this->currentUINode = this;
     this->currentSpriteNode = this;
     this->color = vec4(1.0f);
     this->texture = NULL;

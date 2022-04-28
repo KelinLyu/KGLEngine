@@ -188,6 +188,7 @@ public:
     bool useLocalSpace;
     bool isAdditive;
     bool youngestFirst;
+    float speedFactor;
     float spreadingAngle;
     float initialSpeed;
     float initialSpeedVariation;
@@ -229,6 +230,7 @@ private:
 public:
     vec2 screenPosition;
     vec2 position;
+    vec2 parentCoordinatePosition;
     float rotation;
     vec2 scale;
     vec2 size;
