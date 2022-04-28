@@ -501,6 +501,7 @@
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
+				ENABLE_HARDENED_RUNTIME = NO;
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include/,
 					/opt/homebrew/Cellar/freetype/2.12.0/include/freetype2,
@@ -523,6 +524,7 @@
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
+				ENABLE_HARDENED_RUNTIME = NO;
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include/,
 					/opt/homebrew/Cellar/freetype/2.12.0/include/freetype2,
