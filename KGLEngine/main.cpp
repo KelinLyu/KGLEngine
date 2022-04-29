@@ -23,11 +23,6 @@ int main(int argc, char** argv) {
     
     
     
-    // Hide and lock the cursor to the center of the screen:
-    engine->lockCursor();
-    
-    
-    
     // The variable that controls the application:
     unsigned int applicationState = 1;
     // 0 = idle
@@ -972,6 +967,9 @@ int main(int argc, char** argv) {
                     curtainAnimation1->setFloatAnimation(&curtainNode->alpha, 1.0f);
                     curtainAnimation1->setEaseInTimingMode();
                     curtainAnimation1->setCompletionHandler([&] {
+                        
+                        // Hide and lock the cursor to the center of the screen:
+                        engine->lockCursor();
                         
                         // Hide the UI nodes:
                         logoUnitNode->isDisabled = true;
