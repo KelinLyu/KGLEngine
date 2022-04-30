@@ -12,4 +12,4 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - A guitar model from [Free3D.com](https://free3d.com/3d-model/acoustic-guitar-85235.html).
 - The skybox's cubemap from the [Unity Asset Store](https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014).
 - Trees, stones, and other models from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/environments/fantasy/ultimate-fantasy-creator-lite-45579).
-- Plants from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/vegetation/plants/yughues-free-bushes-13168).
+- Bushes from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/vegetation/plants/yughues-free-bushes-13168).
