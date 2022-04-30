@@ -6,12 +6,10 @@ This is a small but powerful OpenGL game engine I developed for my team for the 
 # About & License & Acknowledgements
 Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professor Geoffrey M. Voelker, TA Alexander Garza, my groupmates Felix Zhang, Jackie Li, Kelvin Yu, and especially Zifan Zhang for providing valuable feedback on this project. The free assets that the demo uses:
 - Cinzel from [Google fonts](https://fonts.google.com).
-- Textures from [Textures.com](https://www.textures.com/library).
+- The ground's textures from [Textures.com](https://www.textures.com/library).
 - A static cowboy model from [Creazilla.com](https://creazilla.com/nodes/1539732-cowboy-3d-model).
 - Other characters and all the animations from [Mixamo.com](https://www.mixamo.com/#/).
 - A guitar model from [Free3D.com](https://free3d.com/3d-model/acoustic-guitar-85235.html).
-- Skyboxes from the [Unity Asset Store](https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014).
-- Scene models from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/environments/fantasy/ultimate-fantasy-creator-lite-45579).
+- The skybox's cubemap from the [Unity Asset Store](https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014).
+- Trees, stones, and other models from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/environments/fantasy/ultimate-fantasy-creator-lite-45579).
 - Plants from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/vegetation/plants/yughues-free-bushes-13168).
-
-To be continued...
