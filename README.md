@@ -143,11 +143,12 @@ if(character.length() > 0) {
 You are probably asking, what about mouse events? Well, you can detect mouse clicks just like the keyboard events. You simply need to replace the key's name with MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT, or MOUSE_BUTTON_MIDDLE.
 To get the mouse's position and translation after the previous frame, use:
 ```
-vec2 position = engine->input->getMousePosition();
+vec2 position = engine->input->getMouseScreenPosition();
 vec2 translation = engine->input->getMouseTranslation();
 ```
-And you can also get the acceleration of the mouse's scroll wheel by using:
+The mouse's position is called the screen position and is connected to the UI system of the engine. It will be discussed in future chapters.
+And you can also get the acceleration of the mouse's scroll wheel as well, by calling:
 ```
-float acceleration = engine->input->getScrollWheelAcceleration();
+float acceleration = engine->input->engineSetScrollWheelEvent();
 ```
 These are all the interactions that have been implemented. **The interaction logic should only be implemented inside the if statement in the while loop.**
