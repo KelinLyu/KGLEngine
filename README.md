@@ -26,14 +26,14 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Read User Inputs](#read-user-inputs)
 - [More About the Engine Class](#more-about-the-engine-class)
 - [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
-- Change a Node’s Transform and Implement an Fps Camera System
+- Change a Node’s Transform and Implement an FPS Camera System
 - Load Textures and Models
 - Render Skyboxes
 - Use the Built-in Pbr Shader
 - Create Light Nodes
 - Render Shadows
 - Play and Control Skeletal Animations
-- Track Bones
+- Track Bone Nodes
 - Add Particle Systems
 - Add UI Nodes
 - Render Images
