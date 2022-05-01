@@ -69,3 +69,26 @@ For Windows developers, here are the steps to create a Visual Studio project. I 
 If building the project produces no errors, you are good to go.
 
 # Creating the Engine, a Window, and the Render Loop
+
+The first step you need to do is to create an instance of the engine inside the main function, which will subsequently create a window:
+```
+Engine* engine = new Engine("KGLEngine Demo", 0.8f, 0, "/Resources/Icon.png");
+```
+Parameters:
+- The title of the window.
+- The scale factor of the window. If the value is between 0 and 1, the window's size will be the scale factor multiplying the size of the monitor. If the value is 1, the window will appear in fullscreen mode.
+- The Multisampling factor.
+- The path to the icon image of the window, or NULL if you do not want one. Read the upcoming chapter about how to specify the paths to the resource files.
+
+Next, you need to create a render loop:
+```
+while(engine->isRunning()) {
+    if(engine->shouldUpdate()) {
+
+        // Implement the game's logic...
+
+        engine->render();
+    }
+}
+```
+And that's it. Build and run the project, and you will see an empty window.
