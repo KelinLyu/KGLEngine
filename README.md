@@ -158,4 +158,35 @@ These are all the interactions that have been implemented. **The interaction log
 
 ## More About the Engine
 
+Here are some helper methods of the Engine class that you might find helpful. First, here comes the cursor functions:
+```
+engine->hideCursor();
+engine->showCursor();
+engine->lockCursor();
+engine->unlockCursor();
+```
+The first two functions are straightforward and helpful if you want to implement a custom cursor appearance. The third function locks the cursor to the center of the screen and automatically hides it. This is necessary if you're developing an FPS or TPS game where the screen's boundaries should not limit the mouse's movement. Finally, the last function unlocks the cursor and shows it if you didn't hide the cursor.
+
+There are also some getters of the Engine class. For example, you will find the following methods in the engine's header file: 
+```
+vec2 getScreenResolution();
+vec2 getWindowResolution();
+float getTime();
+float getDeltaTime();
+float getCurrentFPS();
+```
+I think the names of these functions already explain their functionalities, so I won't waste any time discussing them. Note that the only way to close a window is by calling the terminate method:
+```
+engine->terminate();
+```
+As a busy UCSD student, I probably won't have time to explain every variable and function in this tutorial. I will only talk about the most important features of the engine. Therefore, you are encouraged to look at the hpp files yourself to learn more about a class. Although I didn't write any documentation, I always kept the names of variables, functions, and parameters as specific as possible. For example, the terrifyingly-long function below simply does what it says to do–rendering the shadow map of a directional light node:
+```
+void renderDirectionalLightShadowMap(LightNode* directionalLightNode);
+```
+Unless you want to understand the structure of the engine and how it works, you do not need to read the private members of a class and all the functions starting with the word "engine," for example, the following one:
+```
+void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
+``` 
+Calling these functions may result in undefined behavior.
+
 ## Set up a Camera and Render Some Stuff
