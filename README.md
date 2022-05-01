@@ -44,6 +44,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - More About the Shader Class
 - Create Smooth Animations
 - Play Static and Positional Audio Files
+- Advanced Tips
 
 ## Configurate the Development Environment
 
