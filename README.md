@@ -30,7 +30,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Load Textures and Models](#load-textures-and-models)
 - [More About the Geometry Class](#more-about-the-geometry-class)
 - [Render Skyboxes](#render-skyboxes)
-- Use the Built-in PBR Shader
+- [Use the Built-in PBR Shader](#use-the-built-in-pbr-shader)
 - Create Light Nodes
 - Render Shadows
 - Play and Control Skeletal Animations
@@ -427,5 +427,23 @@ node->geometries[3]->boundingSphereRadius *= 5.0f;
 You can print out the geometry's affectedLightCount to check the number of lights affecting the geometry.
 
 # Render Skyboxes
+
+[Tutorial Catalog](#tutorial-catalog)
+
+It is straightforward to create a skybox:
+```
+Skybox* skybox = new Skybox("/Resources/Front.png", 
+                            "/Resources/Back.png",
+                            "/Resources/Up.png",
+                            "/Resources/Down.png",
+                            "/Resources/Left.png",
+                            0.0f);
+engine->skybox = skybox;
+```
+The first six parameters are the image files of all the sides of the cube. The last parameter is the anisotropic filtering factor.
+
+Note that the order of the images might be different. For example, for some skyboxes, the left and right images are the front and back sides. If you see that the skybox looks incorrect, you should adjust the order. And similar to camera nodes, you can switch different skyboxes by setting the engine's skybox property.
+
+# Use the Built-in PBR Shader
 
 [Tutorial Catalog](#tutorial-catalog)
