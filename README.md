@@ -27,7 +27,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [More About the Engine](#more-about-the-engine)
 - [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
 
-# Configurate the Development Environment
+### Configurate the Development Environment
 
 The engine depends on the following libraries:
 - GLFW for creating a window and receiving user inputs.
@@ -72,7 +72,7 @@ For Windows developers, here are the steps to create a Visual Studio project. I 
 
 If building the project produces no errors, you are good to go.
 
-# Creating the Engine, a Window, and the Render Loop
+### Creating the Engine, a Window, and the Render Loop
 
 The first step you need to do is to create an instance of the engine inside the main function, which will subsequently create a window:
 ```
@@ -97,7 +97,7 @@ while(engine->isRunning()) {
 ```
 And that's it. Build and run the project, and you will see an empty window.
 
-# About the Game's Assets
+### About the Game's Assets
 
 Of course, your game needs to import assets like images, models, and audio files. Therefore, you need to tell the engine where it can find them. By default, the engine looks at the executable's directory for the files, which is the **current working directory**. You can also manually change the engine's working directory to somewhere else:
 ```
@@ -105,7 +105,7 @@ engine->workingDirectory = "/Desktop/Project"
 ```
 Note that the engine's workingDirectory variable should **not** contain a slash at the end. And when loading files, you should always include a slash at the beginning of the paths.
 
-# Read User Inputs
+### Read User Inputs
 
 It is very straightforward to handle user inputs. For detecting continuous keyboard inputs, write the following code inside the render loop:
 ```
@@ -156,6 +156,6 @@ float acceleration = engine->input->engineSetScrollWheelEvent();
 ```
 These are all the interactions that have been implemented. **The interaction logic should only be implemented inside the if statement in the while loop.**
 
-# More About the Engine
+### More About the Engine
 
-# Set up a Camera and Render Some Stuff
+### Set up a Camera and Render Some Stuff
