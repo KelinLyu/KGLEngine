@@ -29,7 +29,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Change a Node’s Transform and Hide a Node](#change-a-nodes-transform-and-hide-a-node)
 - [Load Textures and Models](#load-textures-and-models)
 - [More About the Geometry Class](#more-about-the-geometry-class)
-- Render Skyboxes
+- [Render Skyboxes](#render-skyboxes)
 - Use the Built-in PBR Shader
 - Create Light Nodes
 - Render Shadows
@@ -399,3 +399,33 @@ There is no need to delete the geometries of a node because deleting the node it
 
 [Tutorial Catalog](#tutorial-catalog)
 
+If you want to hide one geometry but still let the engine render other geometries of the node, you can set the geometry's isHidden variable:
+```
+node->geometries[2]->isHidden = true;
+```
+
+You can also specify a rendering order of a geometry. For opaque geometries, this is unnecessary. However, if the geometry has a semi-transparent shader, you must make the geometry's renderingOrder higher than all other geometries behind it. The engine cannot sort the geometries by their distance because the geometries might have overlapping components.
+```
+node->geometries[5]->renderingOrder = 20.0f;
+```
+
+The Geometry class also has two bit-mask variables. The first one is the renderingBitMask. Both the CameraNode class and the Geometry class have this property. When the engine renders a geometry, it performs an AND operation between the current camera's renderingBitMask and that of the geometries. If the result is zero, the engine will not render the geometry. 
+```
+node->geometries[4]->renderingBitMask = 2;
+cameraNode->renderingBitMask = 4;
+```
+The second is the lightingBitMask, which specifies whether a light node can affect a geometry. 
+
+The default value for the two bit-masks is -1, which sets all bits to 1. By default, the geometry is rendered by all the cameras and is affected by all the light nodes.
+
+Finally, you should know about the boundingSpherePosition and the boundingSphereRadius variables. When a node loads a model file, the engine tries to build a bounding sphere that covers the entire geometry. And when determining whether a point light affects the geometry, the engine compares the sum of the sphere's radius and the light's radius with the distance between the light and the node. If the distance is larger than the sum, the light will not affect the geometry, making your game more efficient.
+
+However, sometimes you need to manually edit the bounding sphere's position and radius. For example, if you play a skeletal animation that causes a character's head to grow ten times larger, the geometry will undoubtedly exceed the bounding sphere. In this case, you should increase the size of the bounding sphere:
+```
+node->geometries[3]->boundingSphereRadius *= 5.0f;
+```
+You can print out the geometry's affectedLightCount to check the number of lights affecting the geometry.
+
+# Render Skyboxes
+
+[Tutorial Catalog](#tutorial-catalog)
