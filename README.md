@@ -56,5 +56,5 @@ For Windows developers, here are the steps to create a Visual Studio project. I 
 7. Under **Configuration Properties** - **C/C++** - **General** - **Additional Include Directories**, add the paths to all the include folders of the libraries.
 8. Under **Configuration Properties** - **Linker** - **General** - **Additional Library Directories**, add the paths to all the libraries' folders that contain the lib files **except for the GLM library**. The names of the folders are different, for example, for the GLFW library, the folder is titled lib-vc2019.
 9. Under **Configuration Properties** - **Linker** - **Input** - **Additional Dependencies**, type the following lib files: glew32s.lib, glfw3.lib, OpenGL32.lib, assimp.lib, freetype.lib, sfml-audio.lib, and sfml-system.lib.
-10. Include the Engine.hpp in the cpp file containing the main function. You can type "../" to jump to the parent directory.
+10. Include the Engine.hpp in the cpp file containing the main function. Note that you can type "../" to jump to the parent directory.
 11. Build the project.
