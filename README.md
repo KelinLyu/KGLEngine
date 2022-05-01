@@ -147,7 +147,8 @@ vec2 position = engine->input->getMouseScreenPosition();
 vec2 translation = engine->input->getMouseTranslation();
 ```
 The mouse's position is called the screen position and is connected to the UI system of the engine. It will be discussed in future chapters.
-And you can also get the acceleration of the mouse's scroll wheel as well, by calling:
+
+You can also get the acceleration of the mouse's scroll wheel as well, by calling:
 ```
 float acceleration = engine->input->engineSetScrollWheelEvent();
 ```
