@@ -24,6 +24,8 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Creating the Engine, a Window, and the Render Loop](#creating-the-engine-a-window-and-the-render-loop)
 - [About the Game's Assets](#about-the-games-assets)
 - [Read User Inputs](#read-user-inputs)
+- [More About the Engine](#more-about-the-engine)
+- [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
 
 # Configurate the Development Environment
 
@@ -153,3 +155,7 @@ You can also get the acceleration of the mouse's scroll wheel as well, by callin
 float acceleration = engine->input->engineSetScrollWheelEvent();
 ```
 These are all the interactions that have been implemented. **The interaction logic should only be implemented inside the if statement in the while loop.**
+
+# More About the Engine
+
+# Set up a Camera and Render Some Stuff
