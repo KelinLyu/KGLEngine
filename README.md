@@ -44,5 +44,17 @@ There are already many tutorials about linking libraries so I will go over every
 14. Go to the project's Build Phases and look at the **Link Binary With Libraries** section.
 15. Click the + icon and add the OpenGL.framework.
 16. For each path you typed in the **Library Search Paths** in the project's Build Settings **except for the GLM library**, drag the dylib file under that path into the linked binaries list (or you can still click the + icon, click Add Other, and locate the dylib files). Most lib folders contain only one actual dylib file, while the others are shortcuts. However, for the SFML library, you will see many of them. Only the libsfml-audio and libsfml-system are needed.
+17. Include KGLEngine/Engine.hpp in main.cpp and build the project.
 
 For Windows developers, here are the steps to create a Visual Studio project. I admit that I had never used Visual Studio before, so my way of creating a new project might look inelegant.
+1. Download all the required libraries.
+2. Build the libraries if needed. If you are a lazy person like me, you can use Assimp's old binary, but some of the model formats are unsupported or buggy. You have to compile Freetype, but since an sln file is provided, you can simply open it with Visual Studio and build the project. Make sure to build in Release mode.
+3. Download the engine's source files.
+4. Download the stb_image.h from GitHub and copy it to the KGLEngine/Toolkit folder.
+5. Drag the KGLEngine folder (which directly contains the Engine.hpp file) to the project's Source Files folder so that Visual Studio will import all the files inside the KGLEngine folder.
+6. Open the project's Property Page by clicking **Project** - **Properties**.
+7. Under **Configuration Properties** - **C/C++** - **General** - **Additional Include Directories**, add the paths to all the include folders of the libraries.
+8. Under **Configuration Properties** - **Linker** - **General** - **Additional Library Directories**, add the paths to all the libraries' folders that contain the lib files **except for the GLM library**. The names of the folders are different, for example, for the GLFW library, the folder is titled lib-vc2019.
+9. Under **Configuration Properties** - **Linker** - **Input** - **Additional Dependencies**, type the following lib files: glew32s.lib, glfw3.lib, OpenGL32.lib, assimp.lib, freetype.lib, sfml-audio.lib, and sfml-system.lib.
+10. Include the Engine.hpp in the cpp file containing the main function. You can type "../" to jump to the parent directory.
+11. Build the project.
