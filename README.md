@@ -22,6 +22,8 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 
 - [Configurate the Development Environment](#configurate-the-development-environment)
 - [Creating the Engine, a Window, and the Render Loop](#creating-the-engine-a-window-and-the-render-loop)
+- [About the Game's Assets](#about-the-games-assets)
+- [Read User Inputs](#read-user-inputs)
 
 # Configurate the Development Environment
 
@@ -92,3 +94,14 @@ while(engine->isRunning()) {
 }
 ```
 And that's it. Build and run the project, and you will see an empty window.
+
+# About the Game's Assets
+
+Of course, your game needs to import assets like images, models, and audio files. Therefore, you need to tell the engine where it can find them. By default, the engine looks at the executable's directory for the files, which is the **current working directory**. You can also manually change the engine's working directory to somewhere else:
+```
+engine->workingDirectory = "/Desktop/Project"
+```
+Note that the engine's workingDirectory variable should not contain a slash at the end. And when loading files, you should include a slash at the beginning of the paths.
+
+# Read User Inputs
+
