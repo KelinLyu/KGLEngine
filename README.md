@@ -13,3 +13,18 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - The skybox's cubemap from the [Unity Asset Store](https://assetstore.unity.com/packages/2d/textures-materials/sky/allsky-free-10-sky-skybox-set-146014).
 - Trees, stones, and other models from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/environments/fantasy/ultimate-fantasy-creator-lite-45579).
 - Bushes from the [Unity Asset Store](https://assetstore.unity.com/packages/3d/vegetation/plants/yughues-free-bushes-13168).
+
+# Tutorial Catalog
+- [Configurate the Development Environment](#configurate-the-development-environment)
+
+# Configurate the Development Environment
+The engine depends on the following libraries:
+- GLFW for creating a window and receiving user inputs.
+- GLEW for running OpenGL.
+- GLM for doing linear algebra.
+- STB (stb_image.h) for loading images.
+- Assimp for importing models and animations.
+- Freetype for loading font files.
+- SFML for loading and playing audio files.
+
+There are already many tutorials about linking libraries so I will go over everything quickly. For developers using a Mac computer like me, do the following:
