@@ -14,6 +14,9 @@
 #include <unistd.h>
 #define strcpy_s strcpy
 #endif
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 #include <limits.h>
 #include <stdio.h>
 #include <ctype.h>

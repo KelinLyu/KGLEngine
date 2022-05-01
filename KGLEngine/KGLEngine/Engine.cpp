@@ -3,7 +3,7 @@
 Engine* Engine::main;
 Engine::Engine(const char* windowTitle,
                float resolutionScaleFactor,
-               int samples,
+               unsigned int samples,
                const char* iconFile) {
     this->FPS = 1.0f / 60.0f;
     this->currentFPS = 0.0f;
@@ -15,10 +15,25 @@ Engine::Engine(const char* windowTitle,
     this->resolutionScaleFactor = glm::clamp(resolutionScaleFactor, 0.0f, 1.0f);
     Engine::main = this;
     char directory[1024];
+#ifdef __APPLE__
+    uint32_t size = sizeof(directory);
+    if(_NSGetExecutablePath(directory, &size) != 0) {
+        cout << "\nFailed to find the executable's location!\n" << endl;
+        exit(1);
+    }
+    char* slash = directory;
+    for(char* i = directory; *i != '\0'; i += 1) {
+        if(*i == '/') {
+            slash = i + 1;
+        }
+    }
+    *slash = '\0';
+#elif
     if(getcwd(directory, sizeof(directory)) == NULL) {
         cout << "\nFailed to find the executable's location!\n" << endl;
         exit(1);
     }
+#endif
     this->workingDirectory = string(directory);
     glfwTerminate();
     if(!glfwInit()) {

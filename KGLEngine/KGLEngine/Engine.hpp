@@ -47,7 +47,7 @@ public:
     vector<LightNode*> preparedLightNodeShadows;
     Engine(const char* windowTitle,
            float resolutionScaleFactor,
-           int samples,
+           unsigned int samples,
            const char* iconFile);
     void hideCursor();
     void showCursor();

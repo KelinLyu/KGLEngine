@@ -96,11 +96,11 @@
 		C2AD2E8027FF0EE700A493D6 /* Geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
 		C2AD2E8127FF0EE700A493D6 /* Input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Input.hpp; sourceTree = "<group>"; };
 		C2AD2E8327FF0EE700A493D6 /* keys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = keys.h; sourceTree = "<group>"; };
-		C2AD2E8427FF0EE700A493D6 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		C2AD2E8527FF0EE700A493D6 /* libraries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libraries.h; sourceTree = "<group>"; };
 		C2AD2E8627FF0EE700A493D6 /* assimp_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = assimp_helper.h; sourceTree = "<group>"; };
 		C2AD2E8727FF0EE700A493D6 /* Image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Image.hpp; sourceTree = "<group>"; };
 		C2AD2E8827FF0EE700A493D6 /* Engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Engine.hpp; sourceTree = "<group>"; };
+		C2F15800281E1F05007758C8 /* stb_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		C2F7794D280666BE001A214D /* Skybox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Skybox.cpp; sourceTree = "<group>"; };
 		C2F7795728072F4E001A214D /* Sprite.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
 		C2F7795928072F5B001A214D /* UINode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UINode.cpp; sourceTree = "<group>"; };
@@ -251,7 +251,7 @@
 				C2AD2E8627FF0EE700A493D6 /* assimp_helper.h */,
 				C231B31B280351120030CD85 /* glm_helper.h */,
 				C2AD2E8327FF0EE700A493D6 /* keys.h */,
-				C2AD2E8427FF0EE700A493D6 /* stb_image.h */,
+				C2F15800281E1F05007758C8 /* stb_image.h */,
 			);
 			path = Toolkit;
 			sourceTree = "<group>";
