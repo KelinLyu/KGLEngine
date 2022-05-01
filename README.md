@@ -105,7 +105,7 @@ Note that the engine's workingDirectory variable should **not** contain a slash 
 
 # Read User Inputs
 
-It is very straightforward to handle user inputs. For detecting continuous keyboard inputs, use:
+It is very straightforward to handle user inputs. For detecting continuous keyboard inputs, write the following code inside the render loop:
 ```
 if(engine->input->isPressingKey(KEY_W)) {
     // Move forward!
