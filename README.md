@@ -21,7 +21,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 # Tutorial Catalog
 
 - [Configurate the Development Environment](#configurate-the-development-environment)
-- [Creating the Engine, a Window, and the Render Loop](#creating-the-engine,-a-window,-and-the-render-loop)
+- [Creating the Engine, a Window, and the Render Loop](#creating-the-engine-a-window-and-the-render-loop)
 
 # Configurate the Development Environment
 
