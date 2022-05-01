@@ -43,6 +43,6 @@ There are already many tutorials about linking libraries so I will go over every
 13. For the **Enabled Hardened Runtime**, change the value to No.
 14. Go to the project's Build Phases and look at the **Link Binary With Libraries** section.
 15. Click the + icon and add the OpenGL.framework.
-16. For each path you typed in the **Library Search Paths** in the project's Build Settings, drag the dylib file into the linked binaries list (or you can still click the + icon, click Add Other, and locate the dylib files). Most lib folders contain only one actual dylib file, while the others are shortcuts. However, for the SFML library, you will see many of them. Only the libsfml-audio and libsfml-system are needed.
+16. For each path you typed in the **Library Search Paths** in the project's Build Settings **except for the GLM library**, drag the dylib file into the linked binaries list (or you can still click the + icon, click Add Other, and locate the dylib files). Most lib folders contain only one actual dylib file, while the others are shortcuts. However, for the SFML library, you will see many of them. Only the libsfml-audio and libsfml-system are needed.
 
 For Windows developers, here are the steps to create a Visual Studio project. I admit that I had never used Visual Studio before, so my way of creating a new project might look inelegant.
