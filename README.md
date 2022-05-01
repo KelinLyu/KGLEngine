@@ -101,7 +101,53 @@ Of course, your game needs to import assets like images, models, and audio files
 ```
 engine->workingDirectory = "/Desktop/Project"
 ```
-Note that the engine's workingDirectory variable should not contain a slash at the end. And when loading files, you should include a slash at the beginning of the paths.
+Note that the engine's workingDirectory variable should **not** contain a slash at the end. And when loading files, you should always include a slash at the beginning of the paths.
 
 # Read User Inputs
 
+It is very straightforward to handle user inputs. For detecting continuous keyboard inputs, use:
+```
+if(engine->input->isPressingKey(KEY_W)) {
+    // Move forward!
+}
+```
+For detecting key press or release only **once**, use:
+```
+if(engine->input->wasKeyReleased(KEY_ESCAPE)) {
+    engine->terminate();
+}
+
+// Or try the following:
+// if(engine->input->wasKeyPressed(KEY_ESCAPE)) {...}
+```
+The above functions only trigger once after the player press or release a key. More specifically, after the player presses the key and you ask the engine whether the key was pressed, the engine returns true and clears the record of the key so that in the next frame, the engine will return false when you ask the same question. However, if you are uninterested in the state of that key, the record will remain untouched. Therefore, sometimes you must call the above functions to clear a key's record explicitly. For example, you want the player to press a key as soon as she enters a new scene to dodge a rocket, but if she has been holding that key all the time and you forgot to clear the key's record before the rocket launches, the player will automatically dodge that rocket.
+
+You can also get the duration since the time when the state of a key changed:
+```
+// First, you need to get the current time from the engine:
+double currentTime = engine->getTime();
+
+// Then, let's print out how long the user has been pressing the space bar:
+if(engine->input->isPressingKey(KEY_SPACE)) {
+    double duration = engine->input->getKeyDuration(KEY_SPACE, currentTime);
+    cout << "You have been holding space for " << duration << "s." << endl;
+}
+```
+If you want to implement a text box, using the methods above for text input might be complex. Therefore, you can use the following function that returns the recently pressed key's character. After getting the character, the engine reset it to the empty string. Note that this character will be capitalized if the user is holding shift.
+```
+string character = engine->input->getLastPressedCharacter();
+if(character.length() > 0) {
+    cout << "You typed [" << character << "]." << endl;
+}
+```
+You are probably asking, what about mouse events? Well, you can detect mouse clicks just like the keyboard events. You simply need to replace the key's name with MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT, or MOUSE_BUTTON_MIDDLE.
+To get the mouse's position and translation after the previous frame, use:
+```
+vec2 position = engine->input->getMousePosition();
+vec2 translation = engine->input->getMouseTranslation();
+```
+And you can also get the acceleration of the mouse's scroll wheel by using:
+```
+float acceleration = engine->input->getScrollWheelAcceleration();
+```
+These are all the interactions that have been implemented. **The interaction logic should only be implemented inside the if statement in the while loop.**
