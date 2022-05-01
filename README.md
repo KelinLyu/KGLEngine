@@ -30,18 +30,18 @@ The engine depends on the following libraries:
 There are already many tutorials about linking libraries so I will go over everything quickly. For developers using a Mac computer like me, do the following:
 1. Install Xcode.
 2. Install Homebrew.
-- With homebrew, install GLFW, GLEW, GLM, Assimp, Freetype, and SFML.
-- Open Xcode and create a macOS Command Line Tool project.
-- Download the engine's source files.
-- Drag the KGLEngine folder (which directly contains the Engine.hpp file) to the main.cpp's location in Xcode. Make sure that **Copy items if needed** is selected.
-- Download the stb_image.h from GitHub and copy it to the KGLEngine/Toolkit folder.
-- Go to the project's Build Settings.
-- For **Header Search Paths**, type the Homebrew's include folder. For me, this is /opt/homebrew/include/. Also, the Freetype library needs a separate one, which is /opt/homebrew/Cellar/freetype/2.12.0/include/freetype2/.
-- For the **Library Search Paths**, type the lib folders of the six libraries. For example, for the GLFW library, this is /opt/homebrew/Cellar/glfw/3.3.6/lib/. For other libraries, this is pretty much the same.
-- For the **Validate Workspace - Ignored Frameworks**, type OpenGL.
-- For the **Documentation Comments**, change the value to No.
-- For the **Enabled Hardened Runtime**, change the value to No.
-- Go to the project's Build Phases and look at the **Link Binary With Libraries** section.
-- Click the + icon and add the OpenGL.framework.
-- For each path you typed in the **Library Search Paths** in the project's Build Settings, drag the dylib file into the linked binaries list (or you can still click the + icon, click Add Other, and locate the dylib files). Most lib folders contain only one actual dylib file, while the others are shortcuts. However, for the SFML library, you will see many of them. Only the libsfml-audio and libsfml-system are needed.
+3. With homebrew, install GLFW, GLEW, GLM, Assimp, Freetype, and SFML.
+4. Open Xcode and create a macOS Command Line Tool project.
+5. Download the engine's source files.
+6. Drag the KGLEngine folder (which directly contains the Engine.hpp file) to the main.cpp's location in Xcode. Make sure that **Copy items if needed** is selected.
+7. Download the stb_image.h from GitHub and copy it to the KGLEngine/Toolkit folder.
+8. Go to the project's Build Settings.
+9. For **Header Search Paths**, type the Homebrew's include folder. For me, this is /opt/homebrew/include/. Also, the Freetype library needs a separate one, which is /opt/homebrew/Cellar/freetype/2.12.0/include/freetype2/.
+10. For the **Library Search Paths**, type the lib folders of the six libraries. For example, for the GLFW library, this is /opt/homebrew/Cellar/glfw/3.3.6/lib/. For other libraries, this is pretty much the same.
+11. For the **Validate Workspace - Ignored Frameworks**, type OpenGL.
+12. For the **Documentation Comments**, change the value to No.
+13. For the **Enabled Hardened Runtime**, change the value to No.
+14. Go to the project's Build Phases and look at the **Link Binary With Libraries** section.
+15. Click the + icon and add the OpenGL.framework.
+16. For each path you typed in the **Library Search Paths** in the project's Build Settings, drag the dylib file into the linked binaries list (or you can still click the + icon, click Add Other, and locate the dylib files). Most lib folders contain only one actual dylib file, while the others are shortcuts. However, for the SFML library, you will see many of them. Only the libsfml-audio and libsfml-system are needed.
 For Windows developers, here are the steps to create a Visual Studio project. I admit that I had never used Visual Studio before, so my way of creating a new project might look inelegant.
