@@ -28,6 +28,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
 - [Change a Node’s Transform and Hide a Node](#change-a-nodes-transform-and-hide-a-node)
 - [Load Textures and Models](#load-textures-and-models)
+- [More About the Geometry Class](#more-about-the-geometry-class)
 - Render Skyboxes
 - Use the Built-in PBR Shader
 - Create Light Nodes
@@ -40,11 +41,11 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - Load Font Files and Render Labels
 - Copy, Clone, and Freeze Nodes
 - More About the Node Class
-- More About the Geometry Class
 - More About the Shader Class
 - Create Smooth Animations
 - Play Static and Positional Audio Files
 - Advanced Tips
+- Release Your Game
 
 ## Configurate the Development Environment
 
@@ -353,6 +354,41 @@ nodeA->isDisabled = false;
 ```
 
 # Load Textures and Models
+
+[Tutorial Catalog](#tutorial-catalog)
+
+This chapter will continue to use the cube and the FPS camera system achieved in the previous chapters.
+
+First, you need to know how to load textures. The shaders require textures to achieve specific visual effects. You can load a texture in the following way:
+```
+Texture* texture = new Texture("/Resources/Image.png", 2.0f, true);
+```
+The parameters are:
+- The relative path of the target image file to load. Theoretically, all the image formats are supported, but I only tested and used the png format.
+- The anisotropic filtering factor. A value of 0.0f disables anisotropic filtering.
+- Whether to generate mipmaps for the texture.
+
+To test the texture loaded, for now, we attach the texture as the diffuse map of the shader object:
+```
+PBRShader* shader = new PBRShader(0.5f, 0.5f);
+shader->setDiffuseMap(texture);
+```
+Loading a large texture file takes time, so you should always prepare all the textures in the game's loading stage. In addition, you should try your best to reduce the number of textures by reusing the same texture file or merging them using image-editing and modeling software.
+
+Loading 3D model files are pretty much the same. First, remove the line that calls the loadUnitCube method. Then, load the model by calling the node's loadModelFile method, providing only the file's relative path. Finally, set the shader of every geometry of the node. You can check out the main.cpp of the demo program for how it is done:
+```
+sceneNode = new Node();
+sceneNode->loadModelFile("/Resources/Demo/Scene/Model.dae");
+sceneNode->geometries[0]->setShader(supportShader);
+sceneNode->geometries[1]->setShader(groundShader);
+sceneNode->geometries[2]->setShader(barkShader);
+sceneNode->geometries[3]->setShader(rockShader);
+sceneNode->geometries[4]->setShader(campShader);
+//...
+```
+You have to manually set the shaders for all the geometries, or the geometry will appear in purple. I recommend you test one geometry at a time to avoid setting the wrong shader to a geometry. You should also print out the size of the node's geometry vector ahead of time.
+
+# More About the Geometry Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
