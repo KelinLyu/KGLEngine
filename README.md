@@ -375,6 +375,11 @@ shader->setDiffuseMap(texture);
 ```
 Loading a large texture file takes time, so you should always prepare all the textures in the game's loading stage. In addition, you should try your best to reduce the number of textures by reusing the same texture file or merging them using image-editing and modeling software.
 
+And don't forget to delete the texture when you no longer need it:
+```
+delete(texture);
+```
+
 Loading 3D model files are pretty much the same. First, remove the line that calls the loadUnitCube method. Then, load the model by calling the node's loadModelFile method, providing only the file's relative path. Finally, set the shader of every geometry of the node. You can check out the main.cpp of the demo program for how it is done:
 ```
 sceneNode = new Node();
@@ -387,6 +392,8 @@ sceneNode->geometries[4]->setShader(campShader);
 //...
 ```
 You have to manually set the shaders for all the geometries, or the geometry will appear in purple. I recommend you test one geometry at a time to avoid setting the wrong shader to a geometry. You should also print out the size of the node's geometry vector ahead of time.
+
+There is no need to delete the geometries of a node because deleting the node itself automatically deletes all its geometries (unless the node is a clone of another node, which will be discussed in a future chapter).
 
 # More About the Geometry Class
 
