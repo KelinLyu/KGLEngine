@@ -26,8 +26,8 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Read Player Inputs](#read-player-inputs)
 - [More About the Engine Class](#more-about-the-engine-class)
 - [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
-- [Change a Node’s Transform](#change-a-nodes-transform)
-- Load Textures and Models
+- [Change a Node’s Transform and Hide a Node](#change-a-nodes-transform-and-hide-a-node)
+- [Load Textures and Models](#load-textures-and-models)
 - Render Skyboxes
 - Use the Built-in PBR Shader
 - Create Light Nodes
@@ -316,8 +316,42 @@ delete(cubeNode);
 ```
 Now, build and run the program.
 
-# Change a Node’s Transform
+# Change a Node’s Transform and Hide a Node
 
 [Tutorial Catalog](#tutorial-catalog)
 
+You can simply change a node's transform via modifying its position, eulerAngles, and scale properties. Note that all the angles you provide to the engine must use degrees instead of radians.
+
+When you move, rotate, or scale a node, all the child nodes of that node will follow its transformation. In other words, the child nodes will transform inside the parent's coordinate system.
+
+If you want a node always to face another node, such as a billboard effect, you can set the node's orientationTargetNode property. By default, the orientationTargetNode is set to NULL. After you set it to another node in the scene, the node will constantly overwrite its rotation so that its positive Z-axis points towards the target node. However, since the engine defines the positive X-axis as the front, which is a design mistake, you probably must introduce another node. For example, suppose you want a camera node to look at a cube node using the orientationTargetNode property. In that case, you need a control node and set the orientationTargetNode of the control node. Finally, attach the camera node to the control node and modify the camera node's rotation.
+
+As you already know, you have to attach a node to the engine or another node. Otherwise, the node and all its child nodes won't be rendered.
+```
+engine->addNode(nodeA);
+nodeA->addChildNode(nodeB);
+```
+To detach a node from the parent node, call the node's removeFromParentNode method:
+```
+nodeA->removeFromParentNode();
+nodeB->removeFromParentNode();
+```
+If you delete a node, it will automatically detach it. However, its child nodes will have dangling pointers pointing to the deleted node.
+
+You can access the parent node and child nodes of a node. They are declared in the following way in the Node's hpp file:
+```
+Node* parent;
+vector<Node*> childNodes;
+```
+These properties are read-only. If you wish to modify them, you must call the addNode, addChildNode, and removeFromParentNode methods.
+
+Finally, if you want to hide a node temporarily without playing with the node structures, you should use the isDisabled property:
+```
+nodeA->isDisabled = true;
+nodeA->isDisabled = false;
+```
+
+# Load Textures and Models
+
+[Tutorial Catalog](#tutorial-catalog)
 
