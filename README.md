@@ -183,7 +183,7 @@ As a busy UCSD student, I probably won't have time to explain every variable and
 ```
 void renderDirectionalLightShadowMap(LightNode* directionalLightNode);
 ```
-Unless you want to understand the structure of the engine and how it works, you do not need to read the private members of a class and all the functions starting with the word "engine," for example, the following one:
+Unless you want to understand the structure of the engine and how it works, you do not need to read the private members of a class and all the functions starting with the word "engine" like the one below. These functions usually appear at the end of a header file, and calling these functions may result in undefined behavior.
 ```
 void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
 ``` 
