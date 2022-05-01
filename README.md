@@ -23,13 +23,13 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Configurate the Development Environment](#configurate-the-development-environment)
 - [Create the Engine, a Window, and the Render Loop](#create-the-engine-a-window-and-the-render-loop)
 - [Load the Game's Assets](#load-the-games-assets)
-- [Read User Inputs](#read-user-inputs)
+- [Read Player Inputs](#read-player-inputs)
 - [More About the Engine Class](#more-about-the-engine-class)
 - [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
 - Change a Node’s Transform and Implement an FPS Camera System
 - Load Textures and Models
 - Render Skyboxes
-- Use the Built-in Pbr Shader
+- Use the Built-in PBR Shader
 - Create Light Nodes
 - Render Shadows
 - Play and Control Skeletal Animations
@@ -129,11 +129,11 @@ engine->workingDirectory = "/Desktop/Project"
 ```
 Note that the engine's workingDirectory variable should **not** contain a slash at the end. And when loading files, you should always include a slash at the beginning of the paths.
 
-## Read User Inputs
+## Read Player Inputs
 
 [Tutorial Catalog](#tutorial-catalog)
 
-It is very straightforward to handle user inputs. For detecting continuous keyboard inputs, write the following code inside the render loop:
+It is very straightforward to handle user interactions. For detecting continuous keyboard inputs, write the following code inside the render loop:
 ```
 if(engine->input->isPressingKey(KEY_W)) {
     // Move forward!
