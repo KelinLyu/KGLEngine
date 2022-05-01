@@ -238,7 +238,7 @@ After creating a camera node, you should attach it to the engine by calling the 
 
 **Note that my engine uses the positive X-axis as the front, unlike most engines and modeling software that uses the positive Z-axis. Therefore, the camera points towards the positive X-axis by default, and it is the same for the directional lights and particle systems. Therefore, you will have to rotate these nodes to change their default orientation.**
 
-Now, let's create an FPS camera system. We will first load a cube and let the player smoothly control the camera by pressing the W/S/A/D/Q/E keys (forward, backward, leftward, rightward, downward, and upward). You can find more details about the technologies used in this example in future chapters.
+Now, let's create an FPS camera system. We will load a cube and let the player smoothly control the camera by pressing the W/S/A/D/Q/E keys (forward, backward, leftward, rightward, downward, and upward). You can find more details about the technologies used in this example in future chapters.
 
 First, right after the line where you create the engine, you need to lock the cursor:
 ```
