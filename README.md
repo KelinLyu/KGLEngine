@@ -30,6 +30,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 ## Configurate the Development Environment
 
 [Tutorial Catalog](#tutorial-catalog)
+
 The engine depends on the following libraries:
 - GLFW for creating a window and receiving user inputs.
 - GLEW for running OpenGL.
@@ -76,6 +77,7 @@ If building the project produces no errors, you are good to go.
 ## Create the Engine, a Window, and the Render Loop
 
 [Tutorial Catalog](#tutorial-catalog)
+
 The first step you need to do is to create an instance of the engine inside the main function, which will subsequently create a window:
 ```
 Engine* engine = new Engine("KGLEngine Demo", 0.8f, 0, "/Resources/Icon.png");
@@ -102,6 +104,7 @@ And that's it. Build and run the project, and you will see an empty window.
 ## Load the Game's Assets
 
 [Tutorial Catalog](#tutorial-catalog)
+
 Of course, your game needs to import assets like images, models, and audio files. Therefore, you need to tell the engine where it can find them. By default, the engine looks at the executable's directory for the files, which is the **current working directory**. You can also manually change the engine's working directory to somewhere else:
 ```
 engine->workingDirectory = "/Desktop/Project"
@@ -111,6 +114,7 @@ Note that the engine's workingDirectory variable should **not** contain a slash 
 ## Read User Inputs
 
 [Tutorial Catalog](#tutorial-catalog)
+
 It is very straightforward to handle user inputs. For detecting continuous keyboard inputs, write the following code inside the render loop:
 ```
 if(engine->input->isPressingKey(KEY_W)) {
@@ -163,6 +167,7 @@ These are all the interactions that have been implemented. **The interaction log
 ## More About the Engine
 
 [Tutorial Catalog](#tutorial-catalog)
+
 Here are some helper methods of the Engine class that you might find helpful. First, here comes the cursor functions:
 ```
 engine->hideCursor();
@@ -196,3 +201,4 @@ void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
 ## Set up a Camera and Render Some Stuff
 
 [Tutorial Catalog](#tutorial-catalog)
+
