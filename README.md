@@ -230,9 +230,9 @@ engine->addNode(cameraNode);
 engine->mainCameraNode = cameraNode;
 ```
 The parameters for the constructor are:
--- An angle in degrees that indicates the camera's field of view. 
--- The distance of the near plane.
--- The distance of the far plane.
+- An angle in degrees that indicates the camera's field of view. 
+- The distance of the near plane.
+- The distance of the far plane.
 
 After creating a camera node, you should attach it to the engine by calling the engine's addNode method. Otherwise, other nodes attached to the camera will not be rendered. Of course, you can also attach the camera node under another node, which is pretty common if you want the camera to follow a character, for instance. Finally, you should set the engine's mainCameraNode so that the engine knows which camera it should use. You can create multiple camera nodes and switch the camera using this method.
 
