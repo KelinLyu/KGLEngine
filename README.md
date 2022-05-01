@@ -28,8 +28,8 @@ The engine depends on the following libraries:
 - SFML for loading and playing audio files.
 
 There are already many tutorials about linking libraries so I will go over everything quickly. For developers using a Mac computer like me, do the following:
-- Install Xcode.
-- Install Homebrew.
+1. Install Xcode.
+2. Install Homebrew.
 - With homebrew, install GLFW, GLEW, GLM, Assimp, Freetype, and SFML.
 - Open Xcode and create a macOS Command Line Tool project.
 - Download the engine's source files.
