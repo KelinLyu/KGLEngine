@@ -26,7 +26,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Read Player Inputs](#read-player-inputs)
 - [More About the Engine Class](#more-about-the-engine-class)
 - [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
-- Change a Node’s Transform and Implement an FPS Camera System
+- [Change a Node’s Transform](#change-a-nodes-transform)
 - Load Textures and Models
 - Render Skyboxes
 - Use the Built-in PBR Shader
@@ -116,6 +116,9 @@ while(engine->isRunning()) {
         engine->render();
     }
 }
+
+// Delete the engine after the game is terminated:
+delete(engine);
 ```
 And that's it. Build and run the project, and you will see an empty window.
 
@@ -219,4 +222,102 @@ void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
 ## Set up a Camera and Render Some Stuff
 
 [Tutorial Catalog](#tutorial-catalog)
+
+The engine won't render anything if you don't specify the main camera node. Therefore, you have to create one and set the engine's mainCameraNode variable:
+```
+CameraNode* cameraNode = new CameraNode(60.0f, 0.1f, 1000.0f);
+engine->addNode(cameraNode);
+engine->mainCameraNode = cameraNode;
+```
+The parameters for the constructor are:
+-- An angle in degrees that indicates the camera's field of view. 
+-- The distance of the near plane.
+-- The distance of the far plane.
+
+After creating a camera node, you should attach it to the engine by calling the engine's addNode method. Otherwise, other nodes attached to the camera will not be rendered. Of course, you can also attach the camera node under another node, which is pretty common if you want the camera to follow a character, for instance. Finally, you should set the engine's mainCameraNode so that the engine knows which camera it should use. You can create multiple camera nodes and switch the camera using this method.
+
+**Note that my engine uses the positive X-axis as the front, unlike most engines and modeling software that uses the Z-axis. Therefore, the camera invariably points towards the positive X-axis by default, the same for the directional lights and particle systems.**
+
+Now, let's create an FPS camera system. We will first load a cube and let the player smoothly control the camera by pressing the W/S/A/D/Q/E keys (forward, backward, leftward, rightward, downward, and upward). You can find more details about the technologies used in this example in future chapters.
+
+First, right after the line where you create the engine, you need to lock the cursor:
+```
+engine->lockCursor();
+```
+Then, create the camera node. Note that we need to adjust its position and also create two variables. We will transform the camera node to achieve the target position and Euler angles in every frame to get smooth movements and rotations:
+```
+CameraNode* cameraNode = new CameraNode(60.0f, 0.1f, 1000.0f);
+cameraNode->position = vec3(-3.0f, 0.0f, 0.0f);
+engine->addNode(cameraNode);
+engine->mainCameraNode = cameraNode;
+   
+vec3 cameraTargetPosition = cameraNode->position;
+vec3 cameraTargetEulerAngles = cameraNode->eulerAngles;
+```
+Finally, add a simple cube in front of the camera so that when you test the program, you will see that the camera is actually moving:
+```
+PBRShader* shader = new PBRShader(0.5f, 0.5f);
+   
+Node* cubeNode = new Node();
+cubeNode->loadUnitCube();
+cubeNode->geometries[0]->setShader(shader);
+engine->addNode(cubeNode);
+```
+Now, let's implement the logic inside the main loop. First, since we have locked the cursor, we need a keyboard shortcut for termination:
+```
+if(engine->input->wasKeyPressed(KEY_ESCAPE)) {
+    engine->terminate();
+}
+```
+Then, we update the target position and Euler angles according to player inputs:
+```
+// Update target position:
+if(engine->input->isPressingKey(KEY_W)) {
+    cameraTargetPosition += cameraNode->getFrontVectorInWorld() * 0.2f;
+}else if(engine->input->isPressingKey(KEY_S)) {
+    cameraTargetPosition += cameraNode->getBackVectorInWorld() * 0.2f;
+}
+if(engine->input->isPressingKey(KEY_A)) {
+    cameraTargetPosition += cameraNode->getLeftVectorInWorld() * 0.2f;
+}else if(engine->input->isPressingKey(KEY_D)) {
+    cameraTargetPosition += cameraNode->getRightVectorInWorld() * 0.2f;
+}
+if(engine->input->isPressingKey(KEY_E)) {
+    cameraTargetPosition += cameraNode->getUpVectorInWorld() * 0.2f;
+}else if(engine->input->isPressingKey(KEY_Q)) {
+    cameraTargetPosition += cameraNode->getDownVectorInWorld() * 0.2f;
+}
+       
+// Update target euler angles:
+vec2 mouseTranslation = engine->input->getMouseTranslation() * 0.1f;
+cameraTargetEulerAngles.y -= mouseTranslation.x;
+cameraTargetEulerAngles.z -= mouseTranslation.y;
+
+// Prevent overflow:
+cameraTargetEulerAngles.z = glm::max(-60.0f, glm::min(cameraTargetEulerAngles.z, 60.0f));
+```
+After that, we will create two animations to update the camera's position and Euler angles according to the target position and Euler angles. The Animation class will be explained in a future chapter.
+```
+// Smooth movement:
+Animation* moveAnimation = new Animation("moveCamera", 0.2f);
+moveAnimation->setVec3Animation(&cameraNode->position, cameraTargetPosition);
+engine->playAnimation(moveAnimation);
+       
+// Smooth rotation:
+Animation* rotateAnimation = new Animation("rotateCamera", 0.1f);
+rotateAnimation->setEulerAnglesAnimation(&cameraNode->eulerAngles, cameraTargetEulerAngles);
+engine->playAnimation(rotateAnimation);
+```
+Finally, outside the main loop, don't forget to delete all the allocated resources:
+```
+delete(cameraNode);
+delete(shader);
+delete(cubeNode);
+```
+Now, build and run the program.
+
+# Change a Node’s Transform
+
+[Tutorial Catalog](#tutorial-catalog)
+
 
