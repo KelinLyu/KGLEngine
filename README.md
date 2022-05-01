@@ -187,6 +187,5 @@ Unless you want to understand the structure of the engine and how it works, you 
 ```
 void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
 ``` 
-Calling these functions may result in undefined behavior.
 
 ## Set up a Camera and Render Some Stuff
