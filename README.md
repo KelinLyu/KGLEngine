@@ -236,7 +236,7 @@ The parameters for the constructor are:
 
 After creating a camera node, you should attach it to the engine by calling the engine's addNode method. Otherwise, other nodes attached to the camera will not be rendered. Of course, you can also attach the camera node under another node, which is pretty common if you want the camera to follow a character, for instance. Finally, you should set the engine's mainCameraNode so that the engine knows which camera it should use. You can create multiple camera nodes and switch the camera using this method.
 
-**Note that my engine uses the positive X-axis as the front, unlike most engines and modeling software that uses the Z-axis. Therefore, the camera invariably points towards the positive X-axis by default, the same for the directional lights and particle systems.**
+**Note that my engine uses the positive X-axis as the front, unlike most engines and modeling software that uses the positive Z-axis. Therefore, the camera points towards the positive X-axis by default, and it is the same for the directional lights and particle systems. Therefore, you will have to rotate these nodes to change their default orientation.**
 
 Now, let's create an FPS camera system. We will first load a cube and let the player smoothly control the camera by pressing the W/S/A/D/Q/E keys (forward, backward, leftward, rightward, downward, and upward). You can find more details about the technologies used in this example in future chapters.
 
