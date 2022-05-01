@@ -24,7 +24,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Create the Engine, a Window, and the Render Loop](#create-the-engine-a-window-and-the-render-loop)
 - [Load the Game's Assets](#load-the-games-assets)
 - [Read User Inputs](#read-user-inputs)
-- [More About the Engine](#more-about-the-engine)
+- [More About the Engine Class](#more-about-the-engine-class)
 - [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
 
 ## Configurate the Development Environment
@@ -164,7 +164,7 @@ float acceleration = engine->input->engineSetScrollWheelEvent();
 ```
 These are all the interactions that have been implemented. **The interaction logic should only be implemented inside the if statement in the while loop.**
 
-## More About the Engine
+## More About the Engine Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
