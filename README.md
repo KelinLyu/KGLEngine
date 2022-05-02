@@ -40,7 +40,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Render Images](#render-images)
 - [Load Font Files and Render Labels](#load-font-files-and-render-labels)
 - [Copy, Clone, and Freeze Nodes](#copy-clone-and-freeze-nodes)
-- More About the Node Class
+- [More About the Node Class](#more-about-the-node-class)
 - More About the Shader Class
 - Create Smooth Animations
 - Play Static and Positional Audio Files
@@ -929,11 +929,36 @@ Finally, you can move, rotate, scale, and disable it just like other UI nodes.
 
 [Tutorial Catalog](#tutorial-catalog)
 
+Loading 3D models takes time, so the engine allows you to copy a node to avoid loading it again from the disk:
+```
+Node* copiedNode = targetNode->copy();
+```
+Copying a node will deep-copy the node's transform, geometries, animators, and bone nodes. In other words, it is like doing everything you have done with the target node, but way faster. The method will also recursively copy all its child nodes. **However, the shaders on the geometries are not deep-copied at all. You need to copy the shaders and overwrite the geometries' shaders manually. Please read a future chapter about shaders.**
 
+For example, if you copy a rigged character node with animators, the copied character will animate independently. You can then add the new character to the scene and adjust its position.
 
+Copying nodes generates new geometries that can have different skeletal animations and shaders. If you wish the geometries to be identical, then you should simply use the clone method:
+```
+Node* clonedNode = targetNode->clone();
+```
+Cloning a node will create a mimic node with the same geometry. However, it does not have animators. Therefore, when you clone a character, all the clones will follow the animations of the original character. **Therefore, you are recommended to clone static objects only.** Cloning a node will clone all its child nodes recursively.
 
+The cloning technique is quite powerful because the GPU will only draw once for all the identical clones. However, since you are still allowed to modify their transforms, the CPU still has to do some calculations for every clone. Therefore, if the clones are static, such as rocks and trees in the scene, you should consider freezing them:
+```
+node->freeze();
+```
+For example, suppose you want to have a large scene with ten thousand rocks and a thousand trees, and they are all static objects. First, you should create an empty node for the entire scene. Next, you load the template models of the rocks and trees from the disk. Then, use the clone method to generate identical elements and adjust their position, Euler angles, and scale. Finally, freeze the scene node that contains all the nodes. In this way, it will only take the GPU a few draw calls to render the large scene, and the CPU skips all the unnecessary calculations.
+
+**Note that you must ensure that every clone and their original nodes are contained inside the node you are about to freeze.** If there is a clone somewhere else in the scene and it is not frozen under the node, it will result in undefined behavior.
+
+# More About the Node Class
 
 [Tutorial Catalog](#tutorial-catalog)
+
+
+
+
+
 
 [Tutorial Catalog](#tutorial-catalog)
 
