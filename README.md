@@ -37,7 +37,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Track Bone Nodes](#track-bone-nodes)
 - [Add Particle Systems](#add-particle-systems)
 - [Add UI Nodes](#add-ui-nodes)
-- Render Images
+- [Render Images](#render-images)
 - Load Font Files and Render Labels
 - Copy, Clone, and Freeze Nodes
 - More About the Node Class
@@ -778,6 +778,71 @@ void reset();
 # Add UI Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
+
+The engine combines the concept of 3D nodes and UI nodes, which could be a genius design or a disaster for some developers. This design makes the engine more efficient because the engine doesn't need to create a separate render pass for the UI elements and then blend the UI layer on top of the 3D layer. It also allows you to render 3D objects on top of the UI elements quickly. The disadvantage is that you might make mistakes, such as adding a UI node as a child node of an ordinary 3D node, which does not make sense for the engine.
+
+Therefore, to create a UI layer, you need to create a base node for all the UI elements:
+```
+UINode* baseNode = new UINode();
+baseNode->renderingOrder = 1000.0f;
+engine->addNode(baseNode);
+```
+You need to give it a rendering order larger than that of all the geometries in the 3D scene. And if you want a geometry to be on top of the UI layer, you need to make the rendering order of that geometry higher than that of all the UI elements and ask the geometry's shader to clear the depth buffer. **Note that the rendering order is cumulative.**
+
+After that, you can create other UI nodes and elements and add them to the base node. Many of the 3D node's features, such as the parent-children structure and the isDisabled variable, are still applicable for the UI nodes.
+
+The UI system uses three coordinate systems. The first is the screen position, which is also used by the getMouseScreenPosition method of the engine's input:
+```
+node->screenPosition = vec2(0.2f, 0.6f);
+```
+The actual position set is the point (screenPosition.x * screen's width, screenPosition.y * screen's height). This coordinate system is helpful when you want to locate the center, an edge, or a corner of the screen.
+
+The second coordinate system is the position. However, the unit used by this coordinate system is the minimal length of the screen, and in most cases, it is the screen's height.
+```
+node->position = vec2(0.1f, -0.2f);
+```
+The actual position set by the position variable is (position.x * screen's minimal length, position.y * screen's minimal length). This coordinate system is widely used, and it automatically adjusts the location and size of every UI element according to the screen's size.
+
+Finally, you can use the parentCoordinatePosition:
+``` 
+node->parentCoordinatePosition = vec2(0.4f, 0.6f);
+```
+The default value of the parentCoordinatePosition is vec2(0.5f, 0.5f), which is the center of the parent UI node. If the parent UI node has a size, then you can adjust this position to move the current UI node within the parent node.
+
+The engine adds the three positions from the three coordinate systems when computing the actual position.
+
+Usually, an empty UI node is a point without a size, but you can specify one so that you can use the parentCoordinatePosition:
+```
+node->size = vec2(0.5f, 0.1f);
+```
+
+You can also set the rotation and scale of a UI node, which is very straightforward.
+```
+node->rotation = 30.0f;
+node->scale = vec2(0.5f, 1.0f);
+```
+
+Next, you can set the alpha of the node to make it semitransparent:
+```
+node->alpha = 0.5f;
+```
+The alpha variable is cumulative, which means that if an ancestor's alpha is less than one, then the node is also semitransparent.
+
+Finally, here are two helper methods for position conversion and hit-testing:
+```
+vec2 convertScreenPositionToLocal(vec2 screenPosition);
+bool checkSizeIncludesScreenPosition(vec2 screenPosition);
+```
+The first one converts the screen position to the node's local coordinate. The second method uses the first one to check whether a screen position lies inside the node's size, which is helpful for implementing buttons.
+
+# Render Images
+
+[Tutorial Catalog](#tutorial-catalog)
+
+
+
+
+
 
 
 
