@@ -36,7 +36,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Play and Control Skeletal Animations](#play-and-control-skeletal-animations)
 - [Track Bone Nodes](#track-bone-nodes)
 - [Add Particle Systems](#add-particle-systems)
-- Add UI Nodes
+- [Add UI Nodes](#add-ui-nodes)
 - Render Images
 - Load Font Files and Render Labels
 - Copy, Clone, and Freeze Nodes
@@ -672,8 +672,117 @@ After generating the bone node, you can add other nodes to it. The bone node's p
 
 [Tutorial Catalog](#tutorial-catalog)
 
+The particle system is probably the most sophisticated part of the engine. It is potent and well optimized. To create a particle system, you first need to create a particle node:
+```
+ParticleNode* particleNode = new ParticleNode(60, 2.0f, 1.0f);
+```
+About the parameters:
+- The number of particles to produce within a second. It should be an integer greater than zero.
+- The lifetime duration of a single particle.
+- The variation of the lifetime duration.
+
+Most settings of the particle system have corresponding variations. For example, as you already see, the lifetime duration has one. Therefore, the actual lifetime of a particle is randomized within the range between (duration - variation) and (duration + variation).
+
+Next, you should specify a rendering order because the particles are always semitransparent or additive and do not write to the depth buffer.
+```
+particleNode->renderingOrder = 100.0f;
+```
+
+You can then switch the blend mode of the particle node between additive and semitransparent, the default value:
+```
+particleNode->isAdditive = true;
+```
+Note that if the particle node's isAdditive is set to false, you need to worry about sorting the particles. The engine does not sort them by distance because there are so many particles. Instead, the engine only sorts them according to their birth time. You can toggle the following variable to switch the order:
+```
+particleNode->youngestFirst = true;
+```
+
+Next, you need to specify the emission shape. By default, all the particles are generated at the node's location. If you want a spherical volume shape, use the setEmissionSphere method, providing the inner and outer radius:
+```
+particleNode->setEmissionSphere(0.4f, 0.8f);
+```
+If you want a box volume shape, use the setEmissionBox method, providing the size of the box as the only parameter:
+```
+particleNode->setEmissionBox(vec3(1.0f, 2.0f, 3.0f));
+```
+Next, use the following variables of the particle node to configure the particles' movement:
+```
+float spreadingAngle;
+float initialSpeed;
+float initialSpeedVariation;
+float speedAcceleration;
+float speedAccelerationVariation;
+vec3 acceleration;
+vec3 accelerationVariation;
+```
+The spreading angle is set initially to zero, indicating that the particles should only move towards the positive X-axis of the node's local coordinate system. Setting a value between 0 and 180 degrees randomizes the emission direction. The initial speed and its variation are very straightforward. They define the speed at which the particles move in the randomized direction. The speed acceleration then controls how the initial speed changes. Finally, the acceleration applies, with which you can simulate gravity or winds.
+
+By default, the particles live in world space. When the particle node moves, the generated particles stay where they are. You can also make them live in the particle node's local space so that when the particle node moves, the generated particles move with the node:
+```
+particleNode->useLocalSpace = true;
+```
+
+The next step is to set the rotation and scaling of the particles using the following variables:
+```
+float initialRotation;
+float initialRotationVariation;
+float rotatingSpeed;
+float rotatingSpeedVariation;
+bool randomizeRotatingDirection;
+
+float initialScale;
+float initialScaleVariation;
+float scalingSpeed;
+float scalingSpeedVariation;
+```
+These fields are very intuitive. Note that the randomizeRotatingDirection variable adds a plus or minus sign to the particle's rotating speed if it is set to true.
+
+Now, you probably want to apply colors and textures to the particles. You can simply set the default color:
+```
+particleNode->color = vec4(1.0f, 0.5f, 0.0f, 0.5f);
+```
+Or you can set a texture:
+```
+particleNode->texture = textureMap;
+```
+Moreover, you can create color animations using the setColorAnimation method, providing the color and progress as parameters:
+```
+particleNode->setColorAnimation(vec4(1.0f, 0.4f, 0.0f, 0.0f), 0.0f);
+particleNode->setColorAnimation(vec4(1.0f, 0.3f, 0.0f, 0.4f), 0.2f);
+particleNode->setColorAnimation(vec4(1.0f, 0.2f, 0.0f, 0.1f), 0.6f);
+particleNode->setColorAnimation(vec4(1.0f, 0.1f, 0.0f, 0.0f), 1.0f);
+```
+You can set ten keyframes for particle systems at most.
+
+Finally, the particles can even play sprite sheet animations using the following method:
+```
+void setSpriteSheetAnimation(unsigned int rows, unsigned int columns,
+                 unsigned int initialFrameRange,
+                 unsigned int FPS, unsigned int FPSVariation);
+```
+To call the setSpriteSheetAnimation function, first, you need to load a sprite sheet image as the particle node's texture. Then, provide the number of rows and columns, range of the initial frame, FPS, and FPS variation. Note that when a sprite sheet animation finishes on a particle, the particle automatically disappears.
+
+By default, the system continuously emits particles. However, if you are making an explosion effect, you probably want to limit the total amount of particles the system emits. Thus, you can make use of the following methods:
+```
+void setMaxAmount(unsigned int amount);
+void setUnlimitedAmount();
+```
+
+Finally, you can play, stop and reset the particle system. The reset method can be used to reactivate a particle system with a maximum amount.
+```
+void play();
+void stop();
+void reset();
+```
+
+# Add UI Nodes
+
+[Tutorial Catalog](#tutorial-catalog)
+
 
 
 [Tutorial Catalog](#tutorial-catalog)
+
 [Tutorial Catalog](#tutorial-catalog)
+
 [Tutorial Catalog](#tutorial-catalog)
