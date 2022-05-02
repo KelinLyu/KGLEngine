@@ -589,3 +589,69 @@ Note that the maximum number of shadow maps you can have is 6.
 # Play and Control Skeletal Animations
 
 [Tutorial Catalog](#tutorial-catalog)
+
+The engine makes it extremely easy to load, play, and control skeletal animations. However, it requires you to be familiar with modeling software like MAYA.
+
+First, you should prepare a rigid 3D model file. Although the Assimp library accepts almost every format, it fails to import some of the formats very often. After conducting many experiments, I realize that the DAE format is the most stable. Therefore, I strongly encourage you to compile and test Assimp by yourself.
+
+Second, you need to prepare a loopable base animation, for example, an idle animation for a character. The animation should have the exact bone structure as the model file. Having fewer or extra bones may result in undefined behavior. Also, all the bones require a least one keyframe. The most secure way of achieving this is to have the first and last frame added for every bone.
+
+Now, you can load the base animation by calling the loadAnimator method in the following way, providing a unique name for the animation and the relative path of the file:
+```
+Animator* animator = cowboyNode->loadAnimator("playing", "/Resources/Demo/Cowboy/Animation.dae");
+```
+The loadAnimator function returns an animator that controls the loaded animation. Then you can simply play and stop the animation, providing fade-in and fade-out durations:
+```
+animator->play(0.5f);
+animator->stop(1.0f);
+
+// Provide both the fade-in and fade-out durations for sudden animations:
+animator->play(0.5f, 0.5f);
+```
+You can now load other animations on top of the base animation. You do not need to set keyframes for every bone in other animations. For example, it is totally fine to have an animation that only animates a character's lower body. Just remember that the order you load the animations matters. The newly-loaded animations cover the old ones.
+
+There are two types of animations: loopable animations and sudden animations. The loopable animations (idle, moving, falling, etc.) will not stop once you play them, and you have to call the stop method manually. On the other hand, sudden animations (jumping, attacking, impacted, dying, etc.) will fade out and stop automatically when they are about to end. You can set the animator's repeats property to tell the engine whether the animation is loopable or sudden:
+```
+animator->repeats = true;
+```
+By default, an animator's repeats variable is set to false. After switching its value to true, you should provide both the fade-in and fade-out durations when calling the play method. You can still stop the animation early by calling the stop method.
+
+Some sudden animations, such as the dying animation, need to stop at the final frame. You can achieve this by setting the clamps variable:
+```
+animator->clamps = true;
+```
+
+You can also set and update the following fields:
+```
+float timeOffset;
+float speed;
+float blendFactor;
+```
+The timeOffset variable allows the animation to start early or late. For example, when a large crowd of characters is playing the same animation, it is better to randomize the timeOffset for every character so that the animation will look different. The speed variable is straightforward. The blendFactor controls the animation's intensity with a value between 0 and 1.
+
+There are also some helper methods. For example, you can check whether the animation is playing or not, get its time progress, reads its total duration, and get its current blend factor. 
+```
+bool isPlaying();
+float getTime();
+float getDuration();
+float getCurrentBlendFactor();
+```
+Here is an example of the use of the last function. If you want the character to move forward while playing the running animation, it is better to multiply its moving speed with the running animation's current blend factor. In this way, the speed also increases or decreases when the animation fades in or fades out.
+
+You don't have to keep all the animator pointers because you can ask the node for it:
+```
+Animator* animator = node->getAnimator("idle");
+```
+The getAnimator is an O(n) algorithm that simply iterates through all the animators of the node and returns the one with the name that matches the parameter. Therefore, if you want to control a large group of animators, you should avoid using the above method. Instead, you should do the following:
+```
+animator1->animatorBitMask = 2;
+animator2->animatorBitMask = 4;
+//...
+
+node->playAnimators(6, 0.5f);
+node->stopAnimators(6, 0.5f);
+
+// Provide the optional fade-out duration: 
+node->playAnimators(6, 0.5f, 1.0f);
+```
+In short, you can set the animator's animatorBitMask, and ask the node to play and stop the animators for you by providing a bit-mask as the first argument. The node then performs an AND operation using the provided bit-mask and all the animator's animatorBitMasks. If the result is not zero, the node plays or stops the animation.
