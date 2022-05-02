@@ -815,6 +815,7 @@ Usually, an empty UI node is a point without a size, but you can specify one so 
 ```
 node->size = vec2(0.5f, 0.1f);
 ```
+Note that the size also uses the minimal length of the screen for calculation.
 
 You can also set the rotation and scale of a UI node, which is very straightforward.
 ```
