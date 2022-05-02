@@ -39,7 +39,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Add UI Nodes](#add-ui-nodes)
 - [Render Images](#render-images)
 - [Load Font Files and Render Labels](#load-font-files-and-render-labels)
-- Copy, Clone, and Freeze Nodes
+- [Copy, Clone, and Freeze Nodes](#copy-clone-and-freeze-nodes)
 - More About the Node Class
 - More About the Shader Class
 - Create Smooth Animations
@@ -883,6 +883,53 @@ A future chapter will discuss how to make custom shaders.
 # Load Font Files and Render Labels
 
 [Tutorial Catalog](#tutorial-catalog)
+
+Currently, the engine can only render basic ASCII characters.
+
+To show some texts, first, you need to load font files:
+```
+FontLibrary* fontLibrary = new FontLibrary();
+
+Font* font1 = fontLibrary->loadFontFile("/Resources/Font1.ttf", 50);
+Font* font2 = fontLibrary->loadFontFile("/Resources/Font2.ttf", 50);
+//...
+
+delete(fontLibrary);
+```
+You should create a FontLibrary object and use it to load the font files, then delete the library. When loading the fonts, the first parameter is the relative path to the font file, and the second is the resolution factor in pixels. You should preload all the font files when you are loading the game, not during the game.
+
+Next, construct a text node, providing the font, height of a line, the maximum length of a line, and the distance between lines:
+```
+TextNode* labelNode = new TextNode(font, 0.06f, 1.0f, 0.05f);
+```
+Note that the height, length, and distance parameters all use the minimal length of the screen as the unit.
+
+Then, you can simply set the text and its color:
+```
+labelNode->text = "Hello world!"
+labelNode->color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+```
+The text will be automatically wrapped when a line exceeds its maximum length.
+
+You can also call the following methods to change the text's alignment modes:
+```
+void setLeftHorizontalAlignment();
+void setCenterHorizontalAlignment();
+void setRightHorizontalAlignment();
+
+void setTopVerticalAlignment();
+void setCenterVerticalAlignment();
+void setBottomVerticalAlignment();
+```
+The horizontal alignment modes are straightforward. Note that the vertical alighment refers to the text's base lines. Therefore, some characters may go below the bottom line.
+
+Finally, you can move, rotate, scale, and disable it just like other UI nodes.
+
+# Copy, Clone, and Freeze Nodes
+
+[Tutorial Catalog](#tutorial-catalog)
+
+
 
 
 
