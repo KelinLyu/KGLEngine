@@ -541,6 +541,8 @@ The ambient light lights up all the pixels evenly. The directional light shoots 
 float progress = (range - currentDistance) / range;
 float lightIntensity = progress^attenuationExponent;
 ```
+As I mentioned before, the directional lights and spotlights point towards the positive X-axis by default.
+
 If you wish to increase, reduce, or remove the highlight caused by a light node, you can modify its highlight's intensity:
 ```
 lightNode->highlightIntensity = 0.5f;
