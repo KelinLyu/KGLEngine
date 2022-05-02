@@ -660,7 +660,7 @@ In short, you can set the animator's animatorBitMask, and ask the node to play a
 
 [Tutorial Catalog](#tutorial-catalog)
 
-When you want to attach a weapon to a character's hand or achieve something similar, you need to implement bone tracking. By default, the engine does not calculate the transform of a bone node unless you explicitly request it in the following way:
+Whenever you want to attach a weapon to a character's hand or achieve something similar, you need to implement bone tracking. By default, the engine does not calculate the transform of a bone node unless you explicitly request it in the following way:
 ```
 Node* boneNode = characterNode->generateBoneNode("RightHand");
 ```
@@ -669,6 +669,10 @@ The parameter of the generateBoneNode method must match the actual name of the b
 After generating the bone node, you can add other nodes to it. The bone node's position, rotation, and scale are fixed because the engine will overwrite them when it updates the node's animators.
 
 # Add Particle Systems
+
+[Tutorial Catalog](#tutorial-catalog)
+
+
 
 [Tutorial Catalog](#tutorial-catalog)
 [Tutorial Catalog](#tutorial-catalog)
