@@ -1098,3 +1098,38 @@ The above implementation is problematic because, after half a second, the node p
 ## 24. Play Static and Positional Audio Files
 
 [Tutorial Catalog](#tutorial-catalog)
+
+Thanks to the SFML library, playing audio files becomes very simple. Anyway, first, you should prepare the audio files. I recommend you use the WAV format. The mono audio files will be used for positional audios, while the stereo ones are for static audios. Then, you need to load all the audio files into the audio buffer objects in the game's loading process:
+```
+AudioBuffer* buffer1 = new AudioBuffer("/Resources/Audio1.wav");
+AudioBuffer* buffer2 = new AudioBuffer("/Resources/Audio2.wav");
+AudioBuffer* buffer3 = new AudioBuffer("/Resources/Audio3.wav");
+```
+Note that if you have multiple audio files for the same audio effect, you can load them into the same buffer object using this constructor:
+```
+AudioBuffer* buffer = new AudioBuffer("/Resources/Audio", "wav", 1, 3);
+```
+The above line of code automatically loads Audio1.wav, Audio2.wav, and Audio3.wav. When the engine plays the buffer, it will randomly choose one of the audio sources different from the previous one it plays.
+
+Next, load the audio buffers with a node. Again, similar to the design of the Animator class, you need to assign a unique name to the buffer:
+```
+node->loadAudioBuffer("sound1", buffer1);
+node->loadAudioBuffer("sound2", buffer2, 4.0f, 2.0f);
+```
+About the parameters:
+- The unique name of the sound.
+- A pointer to the buffer object.
+- The minimal distance greater than one in which the sound will be heard at full loudness (optional, for positional audios only).
+- The attenuation factor (optional, for positional audios only).
+
+Note that the buffer object can be reused multiple times by the same node and other nodes. And if you wish to play a sound without the positional effect, you can ask the camera node to load the buffer.
+
+Finally, you can use the following methods to control a sound, get the progress of a sound in seconds, and change its volume:
+```
+void playAudio(string name);
+void pauseAudio(string name);
+void stopAudio(string name);
+float getAudioTime(string name);
+void changeAudioVolume(string name, float volume, float duration);
+```
+Note that for the changeAudioVolume function, you can specify a duration greater than zero to animate the process.
