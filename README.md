@@ -32,7 +32,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Render Skyboxes](#render-skyboxes)
 - [Use the Built-in PBR Shader and Helpful Shader Methods](#use-the-built-in-pbr-shader-and-helpful-shader-methods)
 - [Create Light Nodes](#create-light-nodes)
-- Render Shadows
+- [Render Shadows](#render-shadows)
 - Play and Control Skeletal Animations
 - Track Bone Nodes
 - Add Particle Systems
@@ -521,5 +521,38 @@ shader->clearDepthBuffer = true;
 ```
 
 # Create Light Nodes
+
+[Tutorial Catalog](#tutorial-catalog)
+
+Creating lights is similar to creating cameras. First, you create an instance of a light node, providing only the color factor as the parameter. The color factor indicates how intense each RGB channel is, and the value does not have an upper bound. Then, you attach the light node to the engine or another node in the scene.
+```
+LightNode* lightNode = new LightNode(vec3(5.0f, 5.0f, 10.0f));
+engine->addNode(lightNode);
+```
+Now, you need to specify the light's behavior. Here are the methods:
+```
+void setAmbientLight();
+void setDirectionalLight();
+void setPointLight(float attenuationExponent, float range);
+void setSpotLight(float attenuationExponent, float range, float innerAngle, float outerAngle); 
+```
+The ambient light lights up all the pixels evenly. The directional light shoots parallel light rays and can cause shadows. The point light emits light rays in every direction within a given range, and the spotlight shoots light rays inside a cone within a range. Note that the attenuation exponent controls how the light fades as the object moves away. The formula used here is simply the following:
+```
+float progress = (range - currentDistance) / range;
+float lightIntensity = progress^attenuationExponent;
+```
+If you wish to increase, reduce, or remove the highlight caused by a light node, you can modify its highlight's intensity:
+```
+lightNode->highlightIntensity = 0.5f;
+```
+The penetration range allows the pixels inside to shine, ignoring the normal vector it is pointing to. 
+```
+lightNode->penetrationRange = 1.0f;
+```
+The penetration range only works with point lights and spotlights. By default, this variable is set to zero. Also, the same attenuation exponent applies to the penetration range as well.
+
+Finally, the lightingBitMask has already been introduced in a previous chapter. And the shadowBitMask will be introduced in the next chapter.
+
+# Render Shadows
 
 [Tutorial Catalog](#tutorial-catalog)
