@@ -31,7 +31,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [More About the Geometry Class](#more-about-the-geometry-class)
 - [Render Skyboxes](#render-skyboxes)
 - [Use the Built-in PBR Shader and Helpful Shader Methods](#use-the-built-in-pbr-shader-and-helpful-shader-methods)
-- Create Light Nodes
+- [Create Light Nodes](#create-light-nodes)
 - Render Shadows
 - Play and Control Skeletal Animations
 - Track Bone Nodes
@@ -504,3 +504,22 @@ float emissionIntensity;
 void setEmissionMap(Texture* texture);
 ```
 Note that the setReflectionMap method only accepts a spherical map.
+
+The Shader class itself also has some useful methods. For example, the following functions modify the blend mode:
+```
+void setOpaque();
+void setAdditive();
+void setSemitransparent();
+```
+By default, the engine renders the shader in opaque mode. If you set the shader as additive or semitransparent, you need to set the geometry's rendering order. Sometimes you also need to change the following variable to false if your geometries have many components overlapping with each other.
+```
+shader->writeToDepthBuffer = false;
+```
+If you are making an FPS game where the character's hand and weapon should always be on top of everything else, you should clear the depth buffer before rendering the shader. This is also helpful if you want to have 3D models on top of UI images.
+```
+shader->clearDepthBuffer = true;
+```
+
+# Create Light Nodes
+
+[Tutorial Catalog](#tutorial-catalog)
