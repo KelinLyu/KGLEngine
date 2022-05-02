@@ -1046,7 +1046,7 @@ At this point, you already know how to achieve smooth movements by updating a no
 ```
 Animation* animation = new Animation("test", 2.0f);
 ```
-Note that when multiple animations share the same name, the latest one will overwrite the previous ones. For example, if you still remember, the FPS camera system discussed in an earlier chapter uses two animations to move and rotate the camera. In every frame, those animations overwrite their old versions to create smooth movements and rotations. However, if you plan to use the same animation for different characters, you should modify their names.
+Note that when multiple animations share the same name, the latest one will overwrite the previous ones. For example, if you still remember, the FPS camera system discussed in an earlier chapter uses two animations to move and rotate the camera. In every frame, those animations overwrite their old versions to create smooth movements and rotations. However, if you plan to use the similar animations for different characters, you should make their names different from each other.
 
 Then, you can set one of the following animation types:
 ```
