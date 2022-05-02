@@ -34,7 +34,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Create Light Nodes](#create-light-nodes)
 - [Render Shadows](#render-shadows)
 - [Play and Control Skeletal Animations](#play-and-control-skeletal-animations)
-- Track Bone Nodes
+- [Track Bone Nodes](#track-bone-nodes)
 - Add Particle Systems
 - Add UI Nodes
 - Render Images
@@ -592,7 +592,7 @@ Note that the maximum number of shadow maps you can have is 6.
 
 The engine makes it extremely easy to load, play, and control skeletal animations. However, it requires you to be familiar with modeling software like MAYA.
 
-First, you should prepare a rigid 3D model file. Although the Assimp library accepts almost every format, it fails to import some of the formats very often. After conducting many experiments, I realize that the DAE format is the most stable. Therefore, I strongly encourage you to compile and test Assimp by yourself.
+First, you should prepare a rigid 3D model file. Although the Assimp library accepts almost every format, it fails to import some of the formats very often. After conducting many experiments, I realize that the DAE format is the most stable, but I am not sure whether it's the same for you. Therefore, I strongly encourage you to compile and test Assimp by yourself.
 
 Second, you need to prepare a loopable base animation, for example, an idle animation for a character. The animation should have the exact bone structure as the model file. Having fewer or extra bones may result in undefined behavior. Also, all the bones require a least one keyframe. The most secure way of achieving this is to have the first and last frame added for every bone.
 
@@ -655,3 +655,7 @@ node->stopAnimators(6, 0.5f);
 node->playAnimators(6, 0.5f, 1.0f);
 ```
 In short, you can set the animator's animatorBitMask, and ask the node to play and stop the animators for you by providing a bit-mask as the first argument. The node then performs an AND operation using the provided bit-mask and all the animator's animatorBitMasks. If the result is not zero, the node plays or stops the animation.
+
+# Track Bone Nodes
+
+[Tutorial Catalog](#tutorial-catalog)
