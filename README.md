@@ -949,7 +949,9 @@ node->freeze();
 ```
 For example, suppose you want to have a large scene with ten thousand rocks and a thousand trees, and they are all static objects. First, you should create an empty node for the entire scene. Next, you load the template models of the rocks and trees from the disk. Then, use the clone method to generate identical elements and adjust their position, Euler angles, and scale. Finally, freeze the scene node that contains all the nodes. In this way, it will only take the GPU a few draw calls to render the large scene, and the CPU skips all the unnecessary calculations.
 
-**Note that you must ensure that every clone and their original nodes are contained inside the node you are about to freeze.** If there is a clone somewhere else in the scene and it is not frozen under the node, it will result in undefined behavior.
+**Note that you must ensure that every clone and their original nodes are contained inside the node you are about to freeze.** If there is a clone somewhere else in the scene and it is not frozen under the node, it will result in undefined behaviors.
+
+**Cloning cameras, lights, particle systems, and UI elements will copy them. Freezing these nodes will result in undefined behaviors.**
 
 # More About the Node Class
 
