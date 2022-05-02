@@ -322,11 +322,11 @@ Now, build and run the program.
 
 [Tutorial Catalog](#tutorial-catalog)
 
-You can simply change a node's transform via modifying its position, eulerAngles, and scale properties. Note that all the angles you provide to the engine must use degrees instead of radians.
+You can simply change a node's transform via modifying its position, eulerAngles, and scale variables. Note that all the angles you provide to the engine must use degrees instead of radians.
 
 When you move, rotate, or scale a node, all the child nodes of that node will follow its transformation. In other words, the child nodes will transform inside the parent's coordinate system.
 
-If you want a node always to face another node, such as a billboard effect, you can set the node's orientationTargetNode property. By default, the orientationTargetNode is set to NULL. After you set it to another node in the scene, the node will constantly overwrite its rotation so that its positive Z-axis points towards the target node. However, since the engine defines the positive X-axis as the front (which is a design mistake), you must introduce another node. For example, suppose you want a camera node to look at a cube node using the orientationTargetNode property. In that case, you need a control node and set the orientationTargetNode of the control node. Finally, attach the camera node to the control node and modify the camera node's rotation.
+If you want a node always to face another node, such as a billboard effect, you can set the node's orientationTargetNode. By default, the orientationTargetNode is set to NULL. After you set it to another node in the scene, the node will constantly overwrite its rotation so that its positive Z-axis points towards the target node. However, since the engine defines the positive X-axis as the front (which is a design mistake), you must introduce another node. For example, suppose you want a camera node to look at a cube node using the orientationTargetNode. In that case, you need a control node and set the orientationTargetNode of the control node. Finally, attach the camera node to the control node and modify the camera node's rotation.
 
 As you already know, you have to attach a node to the engine or another node. Otherwise, the node and all its child nodes won't be rendered.
 ```
@@ -345,9 +345,9 @@ You can access the parent node and child nodes of a node. They are declared in t
 Node* parent;
 vector<Node*> childNodes;
 ```
-These properties are read-only. If you wish to modify them, you must call the addNode, addChildNode, and removeFromParentNode methods.
+These fields are read-only. If you wish to modify them, you must call the addNode, addChildNode, and removeFromParentNode methods.
 
-Finally, if you want to hide a node temporarily without playing with the node structures, you should use the isDisabled property:
+Finally, if you want to hide a node temporarily without playing with the node structures, you should use the isDisabled variable:
 ```
 nodeA->isDisabled = true;
 nodeA->isDisabled = false;
@@ -409,7 +409,7 @@ You can also specify a rendering order of a geometry. For opaque geometries, thi
 node->geometries[5]->renderingOrder = 20.0f;
 ```
 
-The Geometry class also has two bit-mask variables. The first one is the renderingBitMask. Both the CameraNode class and the Geometry class have this property. When the engine renders a geometry, it performs an AND operation between the current camera's renderingBitMask and that of the geometries. If the result is zero, the engine will not render the geometry. 
+The Geometry class also has two bit-mask variables. The first one is the renderingBitMask. Both the CameraNode class and the Geometry class have this field. When the engine renders a geometry, it performs an AND operation between the current camera's renderingBitMask and that of the geometries. If the result is zero, the engine will not render the geometry. 
 ```
 node->geometries[4]->renderingBitMask = 2;
 cameraNode->renderingBitMask = 4;
@@ -442,7 +442,7 @@ engine->skybox = skybox;
 ```
 The first six parameters are the image files of all the sides of the cube. The last parameter is the anisotropic filtering factor.
 
-Note that the order of the images might be different. For example, for some skyboxes, the left and right images are the front and back sides. If you see that the skybox looks incorrect, you should adjust the order. And similar to camera nodes, you can switch different skyboxes by setting the engine's skybox property.
+Note that the order of the images might be different. For example, for some skyboxes, the left and right images are the front and back sides. If you see that the skybox looks incorrect, you should adjust the order. And similar to camera nodes, you can switch different skyboxes by setting the engine's skybox.
 
 # Use the Built-in PBR Shader and Helpful Shader Methods
 
@@ -458,7 +458,7 @@ vec4 diffuseColor;
 float diffuseIntensity;
 void setDiffuseMap(Texture* texture);
 ```
-Things are very straightforward. Note that the shader will ignore the diffuse color property after setting the diffuse map.
+Things are very straightforward. Note that the shader will ignore the diffuse color after setting the diffuse map.
 
 The following variable and function set the normal map:
 ```
@@ -487,7 +487,7 @@ void setRoughnessMap(Texture* texture);
 ```
 Note that the invert variables askes the shader to calculate one minus the actual value for the final result.
 
-Finally, here are the remaining properties:
+Finally, here are the remaining fields:
 ```
 float reflectionIntensity;
 void setReflectionMap(Texture* texture);
