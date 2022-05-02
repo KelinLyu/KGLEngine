@@ -41,10 +41,9 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Load Font Files and Render Labels](#load-font-files-and-render-labels)
 - [Copy, Clone, and Freeze Nodes](#copy-clone-and-freeze-nodes)
 - [More About the Node Class](#more-about-the-node-class)
-- More About the Shader Class
+- [More About the Shader Class](#more-about-the-shader-class)
 - Create Smooth Animations
 - Play Static and Positional Audio Files
-- Advanced Tips
 - Release Your Game
 
 ## Configurate the Development Environment
@@ -957,8 +956,61 @@ For example, suppose you want to have a large scene with ten thousand rocks and 
 
 [Tutorial Catalog](#tutorial-catalog)
 
+Here are some crucial variables and methods you should know. First, you can set a name for a node:
+```
+node->name = "weapon";
+```
+Then, you can recursively search and get a node's child node by name:
+```
+Node* weaponNode = parentNode->getChildNode("weapon");
+```
+Next, you should know the following getters that convert a node's transform to the world's coordinate system:
+```
+mat4 getWorldTransform();
+vec3 getWorldPosition();
+vec3 getWorldEulerAngles();
+vec3 getWorldScale();
+```
+Next, the updateTransform function:
+```
+node->updateTransform();
+```
+Usually, in every cycle of the main loop, the transformations of nodes are calculated twice. The first calculation is done after updating the animations and before entering your logic in the main loop. Therefore, when you request a node's world transform, the value returned is correctly reflected by the animations. The second calculation is done when you call the engine's render method so that any changes you made to a node's transform are correctly rendered. Calling the updateTransform method updates a node and all its child nodes' transforms recursively. For example, if you want to request a node's world position after moving its parent to another location, you have to call the updateTransform method explicitly. Otherwise, the position you get will be incorrect.
 
+Next, you can convert a local position or vector to the world space using the following two methods:
+```
+vec3 convertLocalPositionToWorld(vec3 localPosition);
+vec3 convertLocalVectorToWorld(vec3 localVector);
+```
+And six derived functions that use the convertLocalVectorToWorld method:
+```
+vec3 getFrontVectorInWorld();
+vec3 getBackVectorInWorld();
+vec3 getLeftVectorInWorld();
+vec3 getRightVectorInWorld();
+vec3 getUpVectorInWorld();
+vec3 getDownVectorInWorld();
+```
+If you want to convert a 3D node's position to the screen position, you can make use of the following method:
+```
+vec3 getPositionOnScreen();
+```
+The x and y value returned are the coordinates on the screen. The z value is the linear distance between the node and the current camera node. The z value is negative if the node is behind the object.
 
+Finally, since typecasting is not as convenient as Swift, Java, or Python, you can use the following methods to convert the type of a node to one of the inherited node classes:
+```
+CameraNode* convertToCameraNode();
+LightNode* convertToLightNode();
+ParticleNode* convertToParticleNode();
+UINode* convertToUINode();
+SpriteNode* convertToSpriteNode();
+TextNode* convertToTextNode();
+```
+The above function returns NULL if the node does not have that type.
+
+# More About the Shader Class
+
+[Tutorial Catalog](#tutorial-catalog)
 
 
 
