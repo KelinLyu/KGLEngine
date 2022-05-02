@@ -30,7 +30,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Load Textures and Models](#load-textures-and-models)
 - [More About the Geometry Class](#more-about-the-geometry-class)
 - [Render Skyboxes](#render-skyboxes)
-- [Use the Built-in PBR Shader](#use-the-built-in-pbr-shader)
+- [Use the Built-in PBR Shader and Helpful Shader Methods](#use-the-built-in-pbr-shader-and-helpful-shader-methods)
 - Create Light Nodes
 - Render Shadows
 - Play and Control Skeletal Animations
@@ -444,6 +444,63 @@ The first six parameters are the image files of all the sides of the cube. The l
 
 Note that the order of the images might be different. For example, for some skyboxes, the left and right images are the front and back sides. If you see that the skybox looks incorrect, you should adjust the order. And similar to camera nodes, you can switch different skyboxes by setting the engine's skybox property.
 
-# Use the Built-in PBR Shader
+# Use the Built-in PBR Shader and Helpful Shader Methods
 
 [Tutorial Catalog](#tutorial-catalog)
+
+The built-in PBR shader can help you develop the game very quickly. However, you are strongly recommended to write your own shader files so that your game can be better optimized. Please read the shader chapter about that.
+
+When constructing the built-in PBR shader, you need to provide two parameters: the metallic factor and the roughness factor, both between 0.0f and 1.0f.
+
+Then, you can set the shader's diffuse behavior using the following variables and functions in the Shader class's hpp:
+```
+vec4 diffuseColor;
+float diffuseIntensity;
+void setDiffuseMap(Texture* texture);
+```
+Things are very straightforward. Note that the shader will ignore the diffuse color property after setting the diffuse map.
+
+The following variable and function set the normal map:
+```
+float normalIntensity;
+void setNormalMap(Texture* texture);
+```
+And for the heightmap:
+```
+float heightIntensity;
+vec2 heightLayerRange;
+void setHeightMap(Texture* texture);
+```
+Note that the height layer range specifies the range of steps to iterate when calculating the height of a fragment. The less, the more efficient. The higher, the more accurate.
+
+Next, you can also provide a metallic map and a roughness map:
+```
+float metallic;
+float metallicIntensity;
+bool invertMetallic;
+void setMetallicMap(Texture* texture);
+
+float roughness;
+float roughnessIntensity;
+bool invertRoughness; 
+void setRoughnessMap(Texture* texture);
+```
+Note that the invert variables askes the shader to calculate one minus the actual value for the final result.
+
+Finally, here are the remaining properties:
+```
+float reflectionIntensity;
+void setReflectionMap(Texture* texture);
+
+float ambientOcclusionIntensity;
+void setAmbientOcclusionMap(Texture* texture);
+
+vec3 multiplyColor;
+float multiplyIntensity;
+void setMultiplyMap(Texture* texture);
+
+vec3 emissionColor;
+float emissionIntensity;
+void setEmissionMap(Texture* texture);
+```
+Note that the reflection map requires a spherical map.
