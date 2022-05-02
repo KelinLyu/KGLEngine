@@ -216,7 +216,7 @@ As a busy UCSD student, I probably won't have time to explain every variable and
 ```
 void renderDirectionalLightShadowMap(LightNode* directionalLightNode);
 ```
-Unless you want to understand the structure of the engine and how it works, you do not need to read the private members of a class and all the functions starting with the word "engine" like the one below. These functions usually appear at the end of a header file, and calling these functions may result in undefined behavior.
+Unless you want to understand the structure of the engine and how it works, you do not need to read the private members of a class and all the functions starting with the word "engine" like the one below. These functions usually appear at the end of a header file, and calling these functions may result in undefined behaviors.
 ```
 void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
 ``` 
@@ -594,7 +594,7 @@ The engine makes it extremely easy to load, play, and control skeletal animation
 
 First, you should prepare a rigid 3D model file. Although the Assimp library accepts almost every format, it fails to import some of the formats very often. After conducting many experiments, I realize that the DAE format is the most stable, but I am not sure whether it's the same for you. Therefore, I strongly encourage you to compile and test Assimp by yourself.
 
-Second, you need to prepare a loopable base animation, for example, an idle animation for a character. The animation should have the exact bone structure as the model file. Having fewer or extra bones may result in undefined behavior. Also, all the bones require a least one keyframe. The most secure way of achieving this is to have the first and last frame added for every bone.
+Second, you need to prepare a loopable base animation, for example, an idle animation for a character. The animation should have the exact bone structure as the model file. Having fewer or extra bones may result in undefined behaviors. Also, all the bones require a least one keyframe. The most secure way of achieving this is to have the first and last frame added for every bone.
 
 Now, you can load the base animation by calling the loadAnimator method in the following way, providing a unique name for the animation and the relative path of the file:
 ```
