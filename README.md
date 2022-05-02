@@ -8,7 +8,7 @@ This is a small but powerful OpenGL game engine I developed for my team for the 
 
 # About & License & Acknowledgements
 
-Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professor Geoffrey M. Voelker, TA Alexander Garza, my groupmates Felix Zhang, Jackie Li, Kelvin Yu, and especially Zifan Zhang for providing valuable feedback on this project. The free assets that the demo uses:
+Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professor Geoffrey M. Voelker, TA Alexander Garza, my groupmates Felix Zhang, Jackie Li, Kelvin Yu, and especially Zifan Zhang for providing valuable feedback on this project. Here is a list of all the free assets that the demo uses:
 - Cinzel from [Google fonts](https://fonts.google.com).
 - The ground's textures from [Textures.com](https://www.textures.com/library).
 - A static cowboy model from [Creazilla.com](https://creazilla.com/nodes/1539732-cowboy-3d-model).
@@ -42,7 +42,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Copy, Clone, and Freeze Nodes](#copy-clone-and-freeze-nodes)
 - [More About the Node Class](#more-about-the-node-class)
 - [More About the Shader Class](#more-about-the-shader-class)
-- Create Smooth Animations
+- [Create Smooth Animations](#create-smooth-animations)
 - Play Static and Positional Audio Files
 - Release Your Game
 
@@ -1011,6 +1011,38 @@ The above functions return NULL if the node cannot be converted.
 # More About the Shader Class
 
 [Tutorial Catalog](#tutorial-catalog)
+
+To create custom shaders, you should first look at the sample shaders provided inside the Sample Shaders folder. Your custom shader should keep the essential data such as frame_data, node_data, light_data, shadow_data, and boneTransforms. You are strongly recommended to create a custom PBR shader first to understand how things work:
+1. Copy the two PBR Shader files under the Sample Shaders folder and rename them.
+2. Make some minor changes. For example, you can play with the color output at the end of the fragment shader file. Or you can apply some movement to the vertices in the vertex shader like what I did in the engine's demo for the leaves and bushes.
+3. Construct a custom PBR shader by inserting the relative path of the shader files (without the file extensions) before the metallic and roughness parameters:
+```
+PBRShader* customShader = new PBRShader("/Resources/Shader", 0.2f, 0.6f);
+```
+
+By doing so, you get a PBR shader that runs your custom shader code. Now, you can conduct some experiments like modifying and deleting the shader code, adding more uniform variables, and setting the new uniforms using the following methods for the Shader class:
+```
+void setBool(string name, bool value);
+void setInt(string name, int value);
+void setFloat(string name, float value);
+void setVec2(string name, vec2 value);
+void setVec3(string name, vec3 value);
+void setVec4(string name, vec4 value);
+void setMat2(string name, mat2 mat);
+void setMat3(string name, mat3 mat);
+void setMat4(string name, mat4 mat);
+void setTexture(string name, Texture* texture);
+```
+Hopefully, this will help you understand how to dock a shader with the engine. And when you are ready, you can start implementing a complete custom shader from scratch and load the shader in the following way:
+```
+Shader* shader = new Shader("/Resources/Shader");
+```
+Finally, although you are allowed to copy a shader by calling its copy method, the uniforms set in the past will not be copied because the engine does not keep track of them. The built-in PBR shader can be copied directly with the same uniforms.
+
+# Create Smooth Animations
+
+[Tutorial Catalog](#tutorial-catalog)
+
 
 
 
