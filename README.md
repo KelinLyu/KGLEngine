@@ -316,7 +316,7 @@ delete(cubeNode);
 ```
 Now, build and run the program.
 
-# Change a Node’s Transform and Hide a Node
+## Change a Node’s Transform and Hide a Node
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -351,7 +351,7 @@ nodeA->isDisabled = true;
 nodeA->isDisabled = false;
 ```
 
-# Load Textures and Models
+## Load Textures and Models
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -393,7 +393,7 @@ You have to manually set the shaders for all the geometries, or the geometry wil
 
 There is no need to delete the geometries of a node because deleting the node itself automatically deletes all its geometries (unless the node is a clone of another node, which will be discussed in a future chapter).
 
-# More About the Geometry Class
+## More About the Geometry Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -424,7 +424,7 @@ node->geometries[3]->boundingSphereRadius *= 5.0f;
 ```
 You can print out the geometry's affectedLightCount to check the number of lights affecting the geometry.
 
-# Render Skyboxes
+## Render Skyboxes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -442,7 +442,7 @@ The first six parameters are the image files of all the sides of the cube. The l
 
 Note that the order of the images might be different. For example, for some skyboxes, the left and right images are the front and back sides. If you see that the skybox looks incorrect, you should adjust the order. And similar to camera nodes, you can switch different skyboxes by setting the engine's skybox.
 
-# Use the Built-in PBR Shader and Helpful Shader Methods
+## Use the Built-in PBR Shader and Helpful Shader Methods
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -518,7 +518,7 @@ If you are making an FPS game where the character's hand and weapon should alway
 shader->clearDepthBuffer = true;
 ```
 
-# Create Light Nodes
+## Create Light Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -555,7 +555,7 @@ Finally, the lightingBitMask has already been introduced in a previous chapter. 
 
 Note that the maximum number of lights you can have affecting a single geometry is 30.
 
-# Render Shadows
+## Render Shadows
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -584,7 +584,7 @@ The only argument is a pointer to the directional light node.
 
 Note that the maximum number of shadow maps you can have is 6.
 
-# Play and Control Skeletal Animations
+## Play and Control Skeletal Animations
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -654,7 +654,7 @@ node->playAnimators(6, 0.5f, 1.0f);
 ```
 In short, you can set the animator's animatorBitMask, and ask the node to play and stop the animators for you by providing a bit-mask as the first argument. The node then performs an AND operation using the provided bit-mask and all the animator's animatorBitMasks. If the result is not zero, the node plays or stops the animation.
 
-# Track Bone Nodes
+## Track Bone Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -666,7 +666,7 @@ The parameter of the generateBoneNode method must match the actual name of the b
 
 After generating the bone node, you can add other nodes to it. The bone node's position, rotation, and scale are fixed because the engine will overwrite them when it updates the node's animators.
 
-# Add Particle Systems
+## Add Particle Systems
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -773,7 +773,7 @@ void stop();
 void reset();
 ```
 
-# Add UI Nodes
+## Add UI Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -834,7 +834,7 @@ bool checkSizeIncludesScreenPosition(vec2 screenPosition);
 ```
 The first one converts the screen position to the node's local coordinate. The second method uses the first one to check whether a screen position lies inside the node's size, which is helpful for implementing buttons.
 
-# Render Images
+## Render Images
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -878,7 +878,7 @@ node->size = vec2(0.2f, 0.3f);
 ```
 A future chapter will discuss how to make custom shaders.
 
-# Load Font Files and Render Labels
+## Load Font Files and Render Labels
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -923,7 +923,7 @@ The horizontal alignment modes are straightforward. Note that the vertical aligh
 
 Finally, you can move, rotate, scale, and disable it just like other UI nodes.
 
-# Copy, Clone, and Freeze Nodes
+## Copy, Clone, and Freeze Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -951,7 +951,7 @@ For example, suppose you want to have a large scene with ten thousand rocks and 
 
 **Cloning cameras, lights, particle systems, and UI elements will copy them. Freezing these nodes will result in undefined behaviors.**
 
-# More About the Node Class
+## More About the Node Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -1007,7 +1007,7 @@ TextNode* convertToTextNode();
 ```
 The above functions return NULL if the node cannot be converted.
 
-# More About the Shader Class
+## More About the Shader Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -1038,7 +1038,7 @@ Shader* shader = new Shader("/Resources/Shader");
 ```
 Finally, although you are allowed to copy a shader by calling its copy method, the uniforms set in the past will not be copied because the engine does not keep track of them. The built-in PBR shader can be copied directly with the same uniforms.
 
-# Create Smooth Animations
+## Create Smooth Animations
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -1095,6 +1095,6 @@ for(unsigned int i = 0; i < 10; i += 1) {
 ```
 The above implementation is problematic because, after half a second, the node pointer is no longer valid when the animations want to remove the nodes. The easiest way to resolve this problem is to give the nodes different names and look for the nodes in the completion handler. You can also store the nodes in a vector and iterate through the vector to remove them.
 
-# Play Static and Positional Audio Files
+## Play Static and Positional Audio Files
 
 [Tutorial Catalog](#tutorial-catalog)
