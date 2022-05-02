@@ -471,7 +471,7 @@ float heightIntensity;
 vec2 heightLayerRange;
 void setHeightMap(Texture* texture);
 ```
-Note that the height layer range specifies the range of steps to iterate when calculating the height of a fragment. The less, the more efficient. The higher, the more accurate.
+The heightLayerRange specifies the range of steps to iterate when calculating the height of a fragment. The less, the more efficient. The higher, the more accurate.
 
 Next, you can also provide a metallic map and a roughness map:
 ```
@@ -503,4 +503,4 @@ vec3 emissionColor;
 float emissionIntensity;
 void setEmissionMap(Texture* texture);
 ```
-Note that the reflection map requires a spherical map.
+Note that the setReflectionMap method only accepts a spherical map.
