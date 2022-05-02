@@ -38,7 +38,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Add Particle Systems](#add-particle-systems)
 - [Add UI Nodes](#add-ui-nodes)
 - [Render Images](#render-images)
-- Load Font Files and Render Labels
+- [Load Font Files and Render Labels](#load-font-files-and-render-labels)
 - Copy, Clone, and Freeze Nodes
 - More About the Node Class
 - More About the Shader Class
@@ -840,10 +840,49 @@ The first one converts the screen position to the node's local coordinate. The s
 
 [Tutorial Catalog](#tutorial-catalog)
 
+The easiest way to render an image is to use the sprite node, specifying the image's size, which is the same as the node's size:
+```
+SpriteNode* spriteNode = SpriteNode(vec2 size);
+```
+After that, you can start configuring the node's properties:
+```
+vec4 color;
+Texture* texture;
 
+vec3 multiplyColor;
+Texture* multiplyTexture;
+float multiplyIntensity;
 
+vec3 emissionColor;
+Texture* emissionTexture;
+float emissionIntensity;
 
+void setSemitransparent();
+void setAdditive();
+```
+You can set the color variable to create a color block or set the texture to display an image.
 
+Then you can darken or lighten the image using the multiply or emission properties. You can also set the color block or the texture to be semitransparent or additive. 
+
+You probably have recognized many properties because they look similar to the built-in PBR shader. I directly embedded these properties into the node itself so that the developer does not need to create a shader object and a geometry object to show a simple image. But if you prefer, you can still do it in the old way. For example, if you want to add special effects to the image, then you need to prepare a custom UI shader:
+```
+Shader* shader = new Shader("/Resources/Shader");
+shader->setTexture("textureMap", textureMap);
+//...
+
+Sprite* sprite = new Sprite();
+sprite->setShader(shader);
+
+UINode* node = new UINode();
+node->loadSprite(sprite);
+node->size = vec2(0.2f, 0.3f);
+//...
+```
+A future chapter will discuss how to make custom shaders.
+
+# Load Font Files and Render Labels
+
+[Tutorial Catalog](#tutorial-catalog)
 
 
 
