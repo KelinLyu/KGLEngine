@@ -995,9 +995,9 @@ If you want to convert a 3D node's position to the screen position, you can make
 ```
 vec3 getPositionOnScreen();
 ```
-The x and y value returned are the coordinates on the screen. The z value is the linear distance between the node and the current camera node. The z value is negative if the node is behind the object.
+The x and y value returned are the coordinates on the screen. The z value is the linear distance between the node and the current camera node. The z value is negative if the node is behind the camera.
 
-Finally, since typecasting is not as convenient as Swift, Java, or Python, you can use the following methods to convert the type of a node to one of the inherited node classes:
+Finally, since typecasting is not as convenient as Swift, Java, or Python, you can use the following methods to convert a node explicitly:
 ```
 CameraNode* convertToCameraNode();
 LightNode* convertToLightNode();
@@ -1006,7 +1006,7 @@ UINode* convertToUINode();
 SpriteNode* convertToSpriteNode();
 TextNode* convertToTextNode();
 ```
-The above function returns NULL if the node does not have that type.
+The above functions return NULL if the node cannot be converted.
 
 # More About the Shader Class
 
