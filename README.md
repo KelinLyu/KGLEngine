@@ -43,8 +43,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [More About the Node Class](#more-about-the-node-class)
 - [More About the Shader Class](#more-about-the-shader-class)
 - [Create Smooth Animations](#create-smooth-animations)
-- Play Static and Positional Audio Files
-- Release Your Game
+- [Play Static and Positional Audio Files](#play-static-and-positional-audio-files)
 
 ## Configurate the Development Environment
 
@@ -1043,9 +1042,59 @@ Finally, although you are allowed to copy a shader by calling its copy method, t
 
 [Tutorial Catalog](#tutorial-catalog)
 
+At this point, you already know how to achieve smooth movements by updating a node's position frame by frame. You can also adjust a node's rotation and scale, a light's color factor, or a shader's properties in similar ways. However, there is a much easier way to do so–by using the engine's pointer-based animations. First, declare an animation object with a unique name and the duration in seconds:
+```
+Animation* animation = new Animation("test", 2.0f);
+```
+Note that when multiple animations share the same name, the latest one will overwrite the previous ones. For example, if you still remember, the FPS camera system discussed in an earlier chapter uses two animations to move and rotate the camera. In every frame, those animations overwrite their old versions to create smooth movements and rotations. However, if you plan to use the same animation for different characters, you should modify their names.
 
+Then, you can set one of the following animation types:
+```
+void setFloatAnimation(float* variable, float value);
+void setAngleAnimation(float* variable, float value);
+void setVec2Animation(vec2* variable, vec2 value);
+void setVec3Animation(vec3* variable, vec3 value);
+void setVec4Animation(vec4* variable, vec4 value);
+void setEulerAnglesAnimation(vec3* variable, vec3 value);
+```
+Basically, you pass a pointer to the variable you want to animate and the target value as the parameters. Then, the engine will adjust the variable frame by frame to reach the given value after the duration you specified in the animation's constructor. Note that the angle animation is just a float animation, but the rotation will go by the shortest arc, and it is the same for the Euler angles animation. By default, the animation is linear, but you can change its timing mode using the following methods:
+```
+void setLinearTimingMode();
+void setEaseInTimingMode();
+void setEaseOutTimingMode();
+void setEaseInEaseOutTimingMode();
+```
 
+Finally, you need to play or stop an animation:
+```
+engine->playAnimation(animation);
+engine->stopAnimation("test");
+```
+You need to pass in a pointer to an animation to play that animation. But to stop one, you need to provide its name because the original pointer might be lost already.
 
-[Tutorial Catalog](#tutorial-catalog)
+The most powerful feature is that you can set a completion handler. Before you ask the engine to play an animation, write:
+```
+animation->setCompletionHandler([&] {
+    cout << "Done!" << endl;
+});
+```
+The completion handler will be executed when the animation finishes. Implementing the completion handler does not require the animation to animate a variable. In other words, you can just create an animation, set the completion handler, and play the animation. Inside the completion handler, you can implement other animations or modify variables and objects. **However, please remember, first, you cannot play an animation with the same name as the finished one inside the completion handler. Second, if the object you are accessing is invalid, it will result in undefined behaviors.** For example, take a look at the following code:
+```
+for(unsigned int i = 0; i < 10; i += 1) {
+
+    Node* node = explosionNode->copy();
+    //...
+    engine->addNode(node);
+
+    Animation* remove = new Animation("remove" + to_string(i), 0.5f);
+    remove->setCompletionHandler([&] {
+        node->removeFromParentNode();
+    });
+    engine->playAnimation(remove);
+}
+```
+The above implementation is problematic because, after half a second, the node pointer is no longer valid when the animations want to remove the nodes. The easiest way to resolve this problem is to give the nodes different names and look for the nodes in the completion handler. You can also store the nodes in a vector and iterate through the vector to remove them.
+
+# Play Static and Positional Audio Files
 
 [Tutorial Catalog](#tutorial-catalog)
