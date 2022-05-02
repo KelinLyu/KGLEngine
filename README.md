@@ -20,32 +20,32 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 
 # Tutorial Catalog
 
-- [Configurate the Development Environment](#configurate-the-development-environment)
-- [Create the Engine, a Window, and the Render Loop](#create-the-engine-a-window-and-the-render-loop)
-- [Load the Game's Assets](#load-the-games-assets)
-- [Read Player Inputs](#read-player-inputs)
-- [More About the Engine Class](#more-about-the-engine-class)
-- [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
-- [Change a Node’s Transform and Hide a Node](#change-a-nodes-transform-and-hide-a-node)
-- [Load Textures and Models](#load-textures-and-models)
-- [More About the Geometry Class](#more-about-the-geometry-class)
-- [Render Skyboxes](#render-skyboxes)
-- [Use the Built-in PBR Shader and Helpful Shader Methods](#use-the-built-in-pbr-shader-and-helpful-shader-methods)
-- [Create Light Nodes](#create-light-nodes)
-- [Render Shadows](#render-shadows)
-- [Play and Control Skeletal Animations](#play-and-control-skeletal-animations)
-- [Track Bone Nodes](#track-bone-nodes)
-- [Add Particle Systems](#add-particle-systems)
-- [Add UI Nodes](#add-ui-nodes)
-- [Render Images](#render-images)
-- [Load Font Files and Render Labels](#load-font-files-and-render-labels)
-- [Copy, Clone, and Freeze Nodes](#copy-clone-and-freeze-nodes)
-- [More About the Node Class](#more-about-the-node-class)
-- [More About the Shader Class](#more-about-the-shader-class)
-- [Create Smooth Animations](#create-smooth-animations)
-- [Play Static and Positional Audio Files](#play-static-and-positional-audio-files)
+1. [Configurate the Development Environment](#configurate-the-development-environment)
+2. [Create the Engine, a Window, and the Render Loop](#create-the-engine-a-window-and-the-render-loop)
+3. [Load the Game's Assets](#load-the-games-assets)
+4. [Read Player Inputs](#read-player-inputs)
+5. [More About the Engine Class](#more-about-the-engine-class)
+6. [Set up a Camera and Render Some Stuff](#set-up-a-camera-and-render-some-stuff)
+7. [Change a Node’s Transform and Hide a Node](#change-a-nodes-transform-and-hide-a-node)
+8. [Load Textures and Models](#load-textures-and-models)
+9. [More About the Geometry Class](#more-about-the-geometry-class)
+10. [Render Skyboxes](#render-skyboxes)
+11. [Use the Built-in PBR Shader and Helpful Shader Methods](#use-the-built-in-pbr-shader-and-helpful-shader-methods)
+12. [Create Light Nodes](#create-light-nodes)
+13. [Render Shadows](#render-shadows)
+14. [Play and Control Skeletal Animations](#play-and-control-skeletal-animations)
+15. [Track Bone Nodes](#track-bone-nodes)
+16. [Add Particle Systems](#add-particle-systems)
+17. [Add UI Nodes](#add-ui-nodes)
+18. [Render Images](#render-images)
+19. [Load Font Files and Render Labels](#load-font-files-and-render-labels)
+20. [Copy, Clone, and Freeze Nodes](#copy-clone-and-freeze-nodes)
+21. [More About the Node Class](#more-about-the-node-class)
+22. [More About the Shader Class](#more-about-the-shader-class)
+23. [Create Smooth Animations](#create-smooth-animations)
+24. [Play Static and Positional Audio Files](#play-static-and-positional-audio-files)
 
-## Configurate the Development Environment
+## 1. Configurate the Development Environment
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -92,7 +92,7 @@ For Windows developers, here are the steps to create a Visual Studio project. I 
 
 If building the project produces no errors, you are good to go.
 
-## Create the Engine, a Window, and the Render Loop
+## 2. Create the Engine, a Window, and the Render Loop
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -122,7 +122,7 @@ delete(engine);
 ```
 And that's it. Build and run the project, and you will see an empty window.
 
-## Load the Game's Assets
+## 3. Load the Game's Assets
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -132,7 +132,7 @@ engine->workingDirectory = "/Desktop/Project"
 ```
 Note that the engine's workingDirectory variable should **not** contain a slash at the end. And when loading files, you should always include a slash at the beginning of the paths.
 
-## Read Player Inputs
+## 4. Read Player Inputs
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -185,7 +185,7 @@ float acceleration = engine->input->engineSetScrollWheelEvent();
 ```
 These are all the interactions that have been implemented. **The interaction logic should only be implemented inside the if statement in the while loop.**
 
-## More About the Engine Class
+## 5. More About the Engine Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -219,7 +219,7 @@ Unless you want to understand the structure of the engine and how it works, you 
 void engineUpdateGeometrySkeletalAnimations(vector<mat4> boneTransforms);
 ``` 
 
-## Set up a Camera and Render Some Stuff
+## 6. Set up a Camera and Render Some Stuff
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -316,7 +316,7 @@ delete(cubeNode);
 ```
 Now, build and run the program.
 
-## Change a Node’s Transform and Hide a Node
+## 7. Change a Node’s Transform and Hide a Node
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -351,7 +351,7 @@ nodeA->isDisabled = true;
 nodeA->isDisabled = false;
 ```
 
-## Load Textures and Models
+## 8. Load Textures and Models
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -393,7 +393,7 @@ You have to manually set the shaders for all the geometries, or the geometry wil
 
 There is no need to delete the geometries of a node because deleting the node itself automatically deletes all its geometries (unless the node is a clone of another node, which will be discussed in a future chapter).
 
-## More About the Geometry Class
+## 9. More About the Geometry Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -424,7 +424,7 @@ node->geometries[3]->boundingSphereRadius *= 5.0f;
 ```
 You can print out the geometry's affectedLightCount to check the number of lights affecting the geometry.
 
-## Render Skyboxes
+## 10. Render Skyboxes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -442,7 +442,7 @@ The first six parameters are the image files of all the sides of the cube. The l
 
 Note that the order of the images might be different. For example, for some skyboxes, the left and right images are the front and back sides. If you see that the skybox looks incorrect, you should adjust the order. And similar to camera nodes, you can switch different skyboxes by setting the engine's skybox.
 
-## Use the Built-in PBR Shader and Helpful Shader Methods
+## 11. Use the Built-in PBR Shader and Helpful Shader Methods
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -518,7 +518,7 @@ If you are making an FPS game where the character's hand and weapon should alway
 shader->clearDepthBuffer = true;
 ```
 
-## Create Light Nodes
+## 12. Create Light Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -555,7 +555,7 @@ Finally, the lightingBitMask has already been introduced in a previous chapter. 
 
 Note that the maximum number of lights you can have affecting a single geometry is 30.
 
-## Render Shadows
+## 13. Render Shadows
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -584,7 +584,7 @@ The only argument is a pointer to the directional light node.
 
 Note that the maximum number of shadow maps you can have is 6.
 
-## Play and Control Skeletal Animations
+## 14. Play and Control Skeletal Animations
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -654,7 +654,7 @@ node->playAnimators(6, 0.5f, 1.0f);
 ```
 In short, you can set the animator's animatorBitMask, and ask the node to play and stop the animators for you by providing a bit-mask as the first argument. The node then performs an AND operation using the provided bit-mask and all the animator's animatorBitMasks. If the result is not zero, the node plays or stops the animation.
 
-## Track Bone Nodes
+## 15. Track Bone Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -666,7 +666,7 @@ The parameter of the generateBoneNode method must match the actual name of the b
 
 After generating the bone node, you can add other nodes to it. The bone node's position, rotation, and scale are fixed because the engine will overwrite them when it updates the node's animators.
 
-## Add Particle Systems
+## 16. Add Particle Systems
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -773,7 +773,7 @@ void stop();
 void reset();
 ```
 
-## Add UI Nodes
+## 17. Add UI Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -834,7 +834,7 @@ bool checkSizeIncludesScreenPosition(vec2 screenPosition);
 ```
 The first one converts the screen position to the node's local coordinate. The second method uses the first one to check whether a screen position lies inside the node's size, which is helpful for implementing buttons.
 
-## Render Images
+## 18. Render Images
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -878,7 +878,7 @@ node->size = vec2(0.2f, 0.3f);
 ```
 A future chapter will discuss how to make custom shaders.
 
-## Load Font Files and Render Labels
+## 19. Load Font Files and Render Labels
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -923,7 +923,7 @@ The horizontal alignment modes are straightforward. Note that the vertical aligh
 
 Finally, you can move, rotate, scale, and disable it just like other UI nodes.
 
-## Copy, Clone, and Freeze Nodes
+## 20. Copy, Clone, and Freeze Nodes
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -951,7 +951,7 @@ For example, suppose you want to have a large scene with ten thousand rocks and 
 
 **Cloning cameras, lights, particle systems, and UI elements will copy them. Freezing these nodes will result in undefined behaviors.**
 
-## More About the Node Class
+## 21. More About the Node Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -1007,7 +1007,7 @@ TextNode* convertToTextNode();
 ```
 The above functions return NULL if the node cannot be converted.
 
-## More About the Shader Class
+## 22. More About the Shader Class
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -1038,7 +1038,7 @@ Shader* shader = new Shader("/Resources/Shader");
 ```
 Finally, although you are allowed to copy a shader by calling its copy method, the uniforms set in the past will not be copied because the engine does not keep track of them. The built-in PBR shader can be copied directly with the same uniforms.
 
-## Create Smooth Animations
+## 23. Create Smooth Animations
 
 [Tutorial Catalog](#tutorial-catalog)
 
@@ -1095,6 +1095,6 @@ for(unsigned int i = 0; i < 10; i += 1) {
 ```
 The above implementation is problematic because, after half a second, the node pointer is no longer valid when the animations want to remove the nodes. The easiest way to resolve this problem is to give the nodes different names and look for the nodes in the completion handler. You can also store the nodes in a vector and iterate through the vector to remove them.
 
-## Play Static and Positional Audio Files
+## 24. Play Static and Positional Audio Files
 
 [Tutorial Catalog](#tutorial-catalog)
