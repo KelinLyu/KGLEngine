@@ -33,7 +33,7 @@ Developed by Kelin.Lyu. Licensed under the MIT license. I want to thank professo
 - [Use the Built-in PBR Shader and Helpful Shader Methods](#use-the-built-in-pbr-shader-and-helpful-shader-methods)
 - [Create Light Nodes](#create-light-nodes)
 - [Render Shadows](#render-shadows)
-- Play and Control Skeletal Animations
+- [Play and Control Skeletal Animations](#play-and-control-skeletal-animations)
 - Track Bone Nodes
 - Add Particle Systems
 - Add UI Nodes
@@ -547,7 +547,7 @@ If you wish to increase, reduce, or remove the highlight caused by a light node,
 ```
 lightNode->highlightIntensity = 0.5f;
 ```
-The penetration range allows the pixels inside to shine, ignoring the normal vector it is pointing to. 
+The penetration range allows the pixels inside to shine, ignoring the normal vector's direction. 
 ```
 lightNode->penetrationRange = 1.0f;
 ```
@@ -555,6 +555,37 @@ The penetration range only works with point lights and spotlights. By default, t
 
 Finally, the lightingBitMask has already been introduced in a previous chapter. And the shadowBitMask will be introduced in the next chapter.
 
+Note that the maximum number of lights you can have affecting a single geometry is 30.
+
 # Render Shadows
+
+[Tutorial Catalog](#tutorial-catalog)
+
+In the current version, only directional light nodes can render shadows. To do so, first, call the activateDirectionalLightShadow method of the light node after setting it as directional light:
+```
+void activateDirectionalLightShadow(unsigned int mapSize, 
+                                    float projectionSize, 
+                                    float near, 
+                                    float far, 
+                                    float xOffset, 
+                                    float bias, 
+                                    int samples);
+```
+About the parameters:
+- The mapSize is the size of the shadow map in pixels. The larger, the more accurate, but it will take longer to render.
+- The projectionSize is a distance in meters. It limits the boundaries of the shadow area.
+- For the near, far, and xOffset parameters, since rendering shadows is simply done by rendering the scene's depth through an orthogonal camera within the directional light node, the engine has to generate a camera node as well. The near and far variables control the distance of the camera's near and far planes. The xOffset parameter moves the camera along the X-axis. Usually, you should set the xOffset with a negative value.
+- The bias is simply the shadow bias, a common technique for rendering shadows.
+- The samples variable controls how blurry the shadows are.
+
+After calling the above function, you should also render the shadows manually before you call the engine's render function in the main loop:
+```
+engine->renderDirectionalLightShadowMap(lightNode);
+```
+The only argument is a pointer to the directional light node.
+
+Note that the maximum number of shadow maps you can have is 6.
+
+# Play and Control Skeletal Animations
 
 [Tutorial Catalog](#tutorial-catalog)
