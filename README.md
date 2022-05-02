@@ -864,7 +864,7 @@ You can set the color variable to create a color block or set the texture to dis
 
 Then you can darken or lighten the image using the multiply or emission properties. You can also set the color block or the texture to be semitransparent or additive. 
 
-You probably have recognized many properties because they look similar to the built-in PBR shader. I directly embedded these properties into the node itself so that the developer does not need to create a shader object and a geometry object to show a simple image. But if you prefer, you can still do it in the old way. For example, if you want to add special effects to the image, then you need to prepare a custom UI shader:
+You probably have recognized many of the mentioned properties because they look similar to the ones in the built-in PBR shader. I directly embedded these properties into the node itself so that the developer does not need to create a shader object and a geometry object to show just a simple image. But if you prefer, you can still do it in the old way. For example, if you want to add special effects to the image, then you need to prepare a custom UI shader:
 ```
 Shader* shader = new Shader("/Resources/Shader");
 shader->setTexture("textureMap", textureMap);
