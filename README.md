@@ -551,7 +551,8 @@ lightNode->penetrationRange = 1.0f;
 ```
 The penetration range only works with point lights and spotlights. By default, this variable is set to zero. Also, the same attenuation exponent applies to the penetration range as well.
 
-Finally, the lightingBitMask has already been introduced in a previous chapter. And the shadowBitMask will be introduced in the next chapter.
+Finally, the lightingBitMask has already been introduced in a previous chapter. And the 
+will be introduced in the next chapter.
 
 Note that the maximum number of lights you can have affecting a single geometry is 30.
 
@@ -583,6 +584,8 @@ engine->renderDirectionalLightShadowMap(lightNode);
 The only argument is a pointer to the directional light node.
 
 Note that the maximum number of shadow maps you can have is 6.
+
+You can set the light node's shadowBitMask to tell the engine not to render shadows for a specific group of geometries. The shadowBitMask is comapred to the geometry's renderingBitMask.
 
 ## 14. Play and Control Skeletal Animations
 
